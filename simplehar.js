@@ -21,6 +21,36 @@ jQuery.create = function(e) {return $(document.createElement(e));};
 	$container.append($table.parent());
 	
 	
+	$container.find('.inside').removeClass('hidden').find('dt').each(function() {
+		var $this = $(this);
+		if($this.css('width', 'auto').width() > 160)
+			$this.attr('title', $this.text());
+		$this.css('width', '');
+	}).end().each(function() {
+		//TODO: Jogar isso pro CSS
+		var $this = $(this),
+			widthDefault = $this.find('div').eq(0).width() + 20;
+		
+		$this.find('div').css('width', widthDefault);
+		
+	}).addClass('hidden');
+	
+	
+	$container.find('.nav').find('a').click(function() {
+		
+		var $this = $(this);
+		
+		$this.parent().parent().find('.active').removeClass('active');
+		$this.parent().addClass('active');
+		
+		
+		$this.parents('.inside').find('div').addClass('hidden');
+		$this.parents('.inside').find('div.' + $this.attr('href').substr(1)).removeClass('hidden');
+		
+		
+		return false;
+	});
+	
 })(har.log, window, document, jQuery);
 
 
@@ -33,18 +63,22 @@ function entrieToHtml(entrie) {
 		formatedSize = Math.round(parseInt(size,10) / 1024),
 		plusSign = 'glyphicon-arrow-right',
 		minusSign = 'glyphicon-arrow-down',
-		params, toggle, headers;
+		params, toggle, objParser;
 	
 	filename = filename.split('#')[0].split('?')[0];
 	params = url[url.length - 1].substr(filename.length);
 	
-	headers = function(arr) {
-		var dl = '<dl class="dl-horizontal">';
-		for(var i=0,ilen=arr.length;i<ilen;i++) {
-			dl += '<dt>' + arr[i].name + '</dt><dd>' + arr[i].value + '</dd>';
+	objParser = function(arr, filter) {
+		if(arr.length) {
+			var dl = '<dl class="dl-horizontal">';
+			for(var i=0,ilen=arr.length;i<ilen;i++) {
+				if(!filter || !filter.length || filter.indexOf(arr[i].name) == -1)
+					dl += '<dt>' + arr[i].name + '</dt><dd>' + arr[i].value.split(';').join(';<br>') + '</dd>';
+			}
+			dl += '</dl>';
+			return dl;
 		}
-		dl += '</dl>';
-		return dl;
+		return '';
 	};
 	
 	toggle = function(evt) {
@@ -65,16 +99,20 @@ function entrieToHtml(entrie) {
 	var obj = {
 		plusSign:plusSign,
 		fullUrl:url.join("/"),
-		filename:filename,
+		filename:filename || '/',
 		params:params,
 		responseStatus:entrie.response.status,
 		responseTextStatus:entrie.response.statusText,
 		mimeType:entrie.response.content.mimeType.split(";")[0],
 		size:size,
 		formatedSize:formatedSize,
-		responseHeaders:headers(entrie.response.headers),
-		requestHeaders:headers(entrie.request.headers)
+		responseHeaders:objParser(entrie.response.headers, ['cookie']),
+		requestHeaders:objParser(entrie.request.headers, ['cookie']),
+		responseCookies:objParser(entrie.response.cookies),
+		requestCookies:objParser(entrie.request.cookies)
 	};
+	
+	
 	
 	var template = 
 	'<tr class="top">' + 
@@ -91,16 +129,40 @@ function entrieToHtml(entrie) {
 		'<td colspan="5">' + 
 			'<ul class="nav nav-tabs">' + 
 				'<li class="active">' + 
-					'<a href="#">Headers</a>' + 
+					'<a href="#headers">Headers</a>' + 
+				'</li>' + 
+				'<li>' + 
+					'<a href="#cookies">Cookies</a>' + 
+				'</li>' + 
+				'<li>' + 
+					'<a href="#content">Content</a>' + 
 				'</li>' + 
 			'</ul>' + 
-			'<h3><small>Response Headers</small></h3>%responseHeaders%' + 
-			'<h3><small>Request Headers</small></h3>%requestHeaders%' + 
+			'<div class="headers">' + 
+				'<h3><small>Response Headers</small></h3>%responseHeaders%' + 
+				'<h3><small>Request Headers</small></h3>%requestHeaders%' + 
+			'</div>' + 
+			'<div class="cookies hidden">' + 
+				'<h3><small>Response Cookies</small></h3>%responseCookies%' + 
+				'<h3><small>Request Cookies</small></h3>%requestCookies%' + 
+			'</div>' + 
+			'<div class="content hidden"><pre></pre></div>' + 
 		'</td>' + 
 	'</tr>';
 	
 	
-	return $(templateParser(template, obj)).filter('.top').click(toggle).end();
+	var result = $(templateParser(template, obj)).filter('.top').click(toggle).end();
+	
+	
+	if(obj.mimeType.split('/')[0] == 'image')
+		result.find('.content pre').replaceWith($.create('img').attr('src', 'data:' + obj.mimeType + ';base64,' + entrie.response.content.text));
+	else
+		result.find('.content pre').text(entrie.response.content.text);
+	
+	
+	
+	
+	return result;
 }
 
 function templateParser(html, obj) {

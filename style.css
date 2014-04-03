@@ -41,8 +41,15 @@
 }
 
 
-.inside:hover td {
-	background-color:#fff !important;
+.inside div {
+	background-color:#fff;
+	padding:20px 10px 5px;
+}
+.inside div h3 {
+	text-indent:15px;
+}
+.inside div h3:first-child {
+	margin-top:0;
 }
 
 .inside dd {
@@ -50,6 +57,14 @@
 	word-break:break-all;
 }
 
+.inside .content pre,
+.inside .content {
+	width:100%;
+	overflow:hidden;
+	display:block;
+	word-wrap: break-word;
+	word-break:break-all;
+}
 
 
 
