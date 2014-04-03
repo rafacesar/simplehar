@@ -8,13 +8,17 @@ jQuery.create = function(e) {return $(document.createElement(e));};
 		url, filename, params;
 	
 	
+	var $table = $.create('table').addClass('table table-condensed table-hover');
 	
+	$table.html('<thead><tr><th>Url</th><th>Status</th><th>Mime Type</th><th>Size</th><th>Tempo</th></thead><tbody></tbody>');
+	$table = $table.find('tbody');
 	
 	for(var i=0;i<har.entries.length;i++) {
 		
-		$container.append(entrieToHtml(har.entries[i]));
+		$table.append(entrieToHtml(har.entries[i]));
 	}
 	
+	$container.append($table.parent());
 	
 	
 })(har.log, window, document, jQuery);
@@ -48,36 +52,62 @@ function entrieToHtml(entrie) {
 		if($this.hasClass('opened')) {
 			$this.removeClass('opened');
 			$this.find('i').removeClass(minusSign).addClass(plusSign);
+			$this.next().addClass('hidden');
 		}
 		else {
 			$this.addClass('opened');
 			$this.find('i').removeClass(plusSign).addClass(minusSign);
+			$this.next().removeClass('hidden');
 		}
 		return false;
 	};
 	
-	return $.create('div')
-				.addClass('row')
-				.click(toggle)
-				.html('\
-				<div class="col-md-4 url">\
-					<i class="glyphicon ' + plusSign + '"></i>\
-					<a>' + url.join("/") + '</a>\
-					<strong>' + filename + '<em>' + params + '</em></strong>\
-				</div>\
-				<div class="col-md-1 status">' + entrie.response.status + ' ' + entrie.response.statusText + '</div>\
-				<div class="col-md-2 type">' + entrie.response.content.mimeType.split(";")[0] + '</div>\
-				<div class="col-md-1 size" title="' + size + ' Bytes">' + formatedSize + ' KB</div>\
-				<div class="col-md-12 inside"><div class="row">\
-					<ul class="nav nav-tabs">\
-						<li class="active">\
-							<a href="#">Headers</a>\
-						</li>\
-					</ul>\
-					<h4><small>Response Headers</small></h4>\
-					' + headers(entrie.response.headers) + '\
-					<h4><small>Request Headers</small></h4>\
-					' + headers(entrie.request.headers) + '\
-				</div></div>\
-				');
+	var obj = {
+		plusSign:plusSign,
+		fullUrl:url.join("/"),
+		filename:filename,
+		params:params,
+		responseStatus:entrie.response.status,
+		responseTextStatus:entrie.response.statusText,
+		mimeType:entrie.response.content.mimeType.split(";")[0],
+		size:size,
+		formatedSize:formatedSize,
+		responseHeaders:headers(entrie.response.headers),
+		requestHeaders:headers(entrie.request.headers)
+	};
+	
+	var template = 
+	'<tr class="top">' + 
+		'<td class="url">' + 
+			'<i class="glyphicon %plusSign%"></i>' + 
+			'<a>%fullUrl%</a>' + 
+			'<strong>%filename%<em>%params%</em></strong>' + 
+		'</td>' + 
+		'<td class="status">%responseStatus% %responseTextStatus%</td>' + 
+		'<td class="type">%mimeType%</td>' + 
+		'<td class="size" title="%size% Bytes">%formatedSize% KB</td>' + 
+	'</tr>' + 
+	'<tr class="inside hidden">' + 
+		'<td colspan="5">' + 
+			'<ul class="nav nav-tabs">' + 
+				'<li class="active">' + 
+					'<a href="#">Headers</a>' + 
+				'</li>' + 
+			'</ul>' + 
+			'<h3><small>Response Headers</small></h3>%responseHeaders%' + 
+			'<h3><small>Request Headers</small></h3>%requestHeaders%' + 
+		'</td>' + 
+	'</tr>';
+	
+	
+	return $(templateParser(template, obj)).filter('.top').click(toggle).end();
+}
+
+function templateParser(html, obj) {
+	var prop, re;
+	for(prop in obj) {
+		re = new RegExp("%" + prop + "%", 'g');
+		html = html.replace(re,obj[prop]);
+	}
+	return html;
 }
