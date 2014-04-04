@@ -2,7 +2,8 @@
 	"folders":
 	[
 		{
-			"path": "/C/Users/cad_candrade/Dev/simplehar"
+			"path": "/C/Users/cad_candrade/Dev/simplehar",
+			"file_exclude_patterns": ["*.har", "*.sublime-workspace"]
 		}
 	]
 }

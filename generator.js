@@ -1,15 +1,27 @@
 $(function($) {
-	$('.container').load('template.html table');
+	$('.container').load('tableTemplate.html table');
 	
 	window.module = {};
 	
-	$(document.createElement('script')).attr('src','harToHtml.js').appendTo($('body'));
+	$(document.createElement('script')).attr('src','harToHtml.js?a').appendTo($('body'));
 	
-	$.get('teste.har', function(har) {
+	var harFile = location.href.split('?');
+	if(harFile.length <= 1)
+		return;
+	
+	harFile = harFile[1].match(/(?:^|&)har=([^&]+)/);
+	if(!harFile || harFile.length != 2)
+		return;
+	
+	$.get(harFile[1], function(har) {
 		window.har = JSON.parse(har);
-		window.newHar = module.exports(window.har);
+		window.newHar = module.exports(window.har, function(content) {
+			var elm = document.createElement('span');
+			elm.appendChild(document.createTextNode(content));
+			return elm.innerHTML;
+		});
 		
-		$.get('requestTemplate.html?b', function(template) {
+		$.get('requestTemplate.html', function(template) {
 			var html =  '',
 				i = 0,
 				ilen = newHar.entries.length,

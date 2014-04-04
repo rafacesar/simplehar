@@ -1,12 +1,13 @@
 <tr class="top">
 	<td class="url">
-		<i class="glyphicon {sign}"></i>
+		<i class="glyphicon {sign}" data-toggle-sign="glyphicon {toggleSign}"></i>
 		<a>{fullUrl}</a>
-		<strong>{fileName}<em>{params}</em></strong>
+		<strong>{method} {fileName}<em>{params}</em></strong>
 	</td>
-	<td class="status">{responseStatus} {responseTextStatus}</td>
-	<td class="type">{mimeType}</td>
-	<td class="size" title="{fullSize}">{formatedSize}</td>
+	<td class="status">{statusToShow}</td>
+	<td class="type" data-toggle="tooltip" title="{charset}">{mimeType}</td>
+	<td class="size" data-toggle="tooltip" title="{size} (compressed)<br>{fullSize} (normal)">{sizeToShow}</td>
+	<td class="tempo" data-toggle="popover" data-content="{progressContent}">{progress}</td>
 </tr>
 <tr class="inside">
 	<td colspan="5">
