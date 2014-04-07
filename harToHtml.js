@@ -17,7 +17,7 @@ module.exports = function(har, htmler) {
 		blockedWidth, dnsWidth, connectWidth, sendWidth, waitWidth, receiveWidth;
 
 
-
+		newHar.domLoadedPosition = (har.log.pages[0].pageTimings.onContentLoad / onLoad) * 100;
 
 
 

@@ -1,3 +1,6 @@
+.top {
+	font-size:12px;
+}
 .url {
 	width:350px;
 	white-space:nowrap;
@@ -18,6 +21,9 @@
 .url strong strong {
 	font-weight:bold;
 	display:inline;
+}
+.container {
+	position:relative;
 }
 
 .container i {
@@ -45,6 +51,18 @@
 	font-weight:normal;
 }
 
+.container .status {
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	width:100px;
+}
+.container .type {
+	white-space:nowrap;
+	text-overflow:ellipsis;
+	width:150px;
+}
+
+
 .container .status strong {
 	color:#d9534f;
 }
@@ -56,7 +74,7 @@
 	color:#999;
 }
 .container .tempo {
-	width:300px;
+	width:500px;
 }
 
 .inside div {
@@ -125,3 +143,15 @@
 	text-decoration:underline;
 }
 
+tfoot td {
+	position:relative;
+}
+
+.domloaded {
+	display:block;
+	border-left:1px solid #5cb85c;
+	height:31px;
+	width:1px;
+	position:absolute;
+	bottom:100%;
+}

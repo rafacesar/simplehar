@@ -4,7 +4,9 @@
 	var fs = require('fs'),
 		hth = require('./harToHtml.js');
 	
-	fs.readFile('teste.har',function(err, har) {
+	
+	
+	fs.readFile(process.argv[2],function(err, har) {
 		if(err) throw err;
 		
 		har = JSON.parse(har);

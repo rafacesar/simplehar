@@ -21,6 +21,7 @@ $(function($) {
 			return elm.innerHTML;
 		});
 		
+		
 		$.get('requestTemplate.html', function(template) {
 			var html =  '',
 				i = 0,
@@ -35,6 +36,7 @@ $(function($) {
 				html += _html;
 			}
 			$('tbody').html(html);
+			$('tfoot').find('td').last().html('<span class="domloaded" style="left:' + newHar.domLoadedPosition + '%;height:' + (31*ilen) + 'px"></span>');
 		});
 		
 	});
