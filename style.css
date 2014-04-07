@@ -66,6 +66,9 @@
 .container .status strong {
 	color:#d9534f;
 }
+.container .status em {
+	color:#f0ad4e;
+}
 .container .size {
 	text-align:right;
 	width:90px;
@@ -73,8 +76,15 @@
 .container .size em {
 	color:#999;
 }
+.container .size strong {
+	text-decoration:underline;
+	font-weight:normal;
+}
 .container .tempo {
 	width:500px;
+	position:relative;
+	padding-left:0;
+	padding-right:0;
 }
 
 .inside div {
@@ -93,6 +103,7 @@
 .inside dd {
 	word-wrap: break-word;
 	word-break:break-all;
+	min-height:20px;
 }
 
 .inside .content pre,
@@ -130,12 +141,16 @@
 	padding:5px;
 	white-space:nowrap;
 	width:270px;
+	margin:0;
 }
 .popover p strong {
 	float:left;
 }
 .popover p em {
 	float:right;
+}
+.popover .bg-info {
+	background-color:#5bc0de;
 }
 
 .popover .start-time strong,
@@ -153,5 +168,15 @@ tfoot td {
 	height:31px;
 	width:1px;
 	position:absolute;
-	bottom:100%;
+	bottom:0;
+	background-color:#000;
+}
+.windowloaded {
+	display:block;
+	border-left:1px solid #d9534f;
+	height:31px;
+	width:1px;
+	position:absolute;
+	bottom:0;
+	background-color:#000;
 }

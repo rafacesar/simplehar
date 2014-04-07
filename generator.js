@@ -3,18 +3,13 @@ $(function($) {
 	
 	window.module = {};
 	
-	$(document.createElement('script')).attr('src','harToHtml.js?a').appendTo($('body'));
+	$(document.createElement('script')).attr('src','harToHtml.js').appendTo($('body'));
 	
-	var harFile = location.href.split('?');
-	if(harFile.length <= 1)
-		return;
 	
-	harFile = harFile[1].match(/(?:^|&)har=([^&]+)/);
-	if(!harFile || harFile.length != 2)
-		return;
 	
-	$.get(harFile[1], function(har) {
-		window.har = JSON.parse(har);
+	
+	var runHar = function(har) {
+		window.har = har;
 		window.newHar = module.exports(window.har, function(content) {
 			var elm = document.createElement('span');
 			elm.appendChild(document.createTextNode(content));
@@ -36,15 +31,40 @@ $(function($) {
 				html += _html;
 			}
 			$('tbody').html(html);
-			$('tfoot').find('td').last().html('<span class="domloaded" style="left:' + newHar.domLoadedPosition + '%;height:' + (31*ilen) + 'px"></span>');
+			$('tfoot tr').html(newHar.info);
 		});
 		
+	};
+	
+	$('body').on('dragover', function(evt) {
+		return false;
+	}).on('dragend', function(evt) {
+		return false;
 	});
 	
-	
-	
-	
-	
+	$('body').one('drop', function(evt) {
+		evt.stopPropagation();
+		evt.preventDefault();
+		
+		var file = evt.originalEvent.dataTransfer.files[0],
+			reader = new FileReader();
+		reader.onload = function (evt) {
+			var har;
+			try {
+				har = JSON.parse(evt.target.result);
+			}
+			catch(e) {
+				alert('Arquivo fora do formato JSON');
+				return;
+			}
+			
+			runHar(har);
+		};
+		reader.readAsText(file);
+		
+		
+		return false;
+	});
 	
 	
 });

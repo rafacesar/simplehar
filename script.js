@@ -56,17 +56,21 @@ $(function($) {
 			return false;
 		});
 		
-		$('.top td').tooltip({
+		$('.top td[class!="tempo"], .tempo span').tooltip({
 			placement:'right',
 			trigger: 'hover',
 			html:true,
 			container:$('table').parent()
 		});
 		
+		var $tempo = $('.top .tempo');
+		
+		for(var i=0, ilen=$tempo.length, half=ilen/2;i<ilen;i++)
+			$tempo.eq(i).data('placement', i<half?'bottom':'top');
+		
 		$('.top .tempo').popover({
 			html:true,
 			trigger:'hover',
-			placement:'bottom', //TODO: adjust position for the lasts lines
 			container:$('table').parent()
 		});
 		

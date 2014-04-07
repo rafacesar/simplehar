@@ -1,4 +1,4 @@
-module.exports = function(har, htmler) {
+module.exports = function(har, htmlEncode) {
 	'use strict';
 	var prepareHar = function(har) {
 		var newHar = {
@@ -10,18 +10,21 @@ module.exports = function(har, htmler) {
 		toggleSign = 'glyphicon-arrow-down',
 		//TODO: check this later to get from the page ID
 		onLoad = har.log.pages[0].pageTimings.onLoad,
-		fullSize, sizeToShow, entrie, url, filename, size, responseHeaders,
-		responseCookies, requestCookies, progressContent, startedTime,
-		requestHeaders, charset, tabs, content, responseContent, mimeType, 
+		fullSize, sizeToShow, entrie, url, filename, size, responseHeaders, progressStart,
+		responseCookies, requestCookies, progressContent, startedTime, domloaded,
+		requestHeaders, charset, tabs, content, responseContent, mimeType, windowloaded,
 		_responseContent, progress, startTimeBefore, startTime, startPosition,
-		blockedWidth, dnsWidth, connectWidth, sendWidth, waitWidth, receiveWidth;
+		blockedWidth, dnsWidth, connectWidth, sendWidth, waitWidth, receiveWidth,
+		requests = ilen, totalSize = 0, totalTime = onLoad, totalSizeCache = 0;
 
+		
+		// newHar.info = {requests:ilen, totalSize:0, totalTime:onLoad, totalSizeCache:0};
+		
+		domloaded = (har.log.pages[0].pageTimings.onContentLoad / onLoad) * 100;
+		domloaded = '<span class="domloaded" data-toggle="tooltip" title="DOMContentLoaded (' + formatSize(har.log.pages[0].pageTimings.onContentLoad, 2) + ' ms)" style="left:' + domloaded + '%"></span>';
+		windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="Page Loaded (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>';
 
-		newHar.domLoadedPosition = (har.log.pages[0].pageTimings.onContentLoad / onLoad) * 100;
-
-
-
-
+// debugger;
 
 		for(;i<ilen;i++) {
 			entrie = entries[i];
@@ -35,6 +38,11 @@ module.exports = function(har, htmler) {
 			requestCookies = objListToHtml(entrie.request.cookies);
 			responseContent = entrie.response.content.text;
 			
+			
+			totalSize += entrie.response.content.size;
+			totalSizeCache += entrie.response.bodySize;
+			
+			
 			fullSize = entrie.response.content.size;
 			size = entrie.response.bodySize;
 			if(size < 0)
@@ -46,6 +54,8 @@ module.exports = function(har, htmler) {
 			
 			if(entrie.response.status == 304)
 				sizeToShow = '<em>' + formatSize(parseInt(sizeToShow,10) / 1024) + ' KB</em>';
+			else if(entrie.response.status == 200 && size === 0)
+				sizeToShow = '<strong>' + formatSize(parseInt(sizeToShow,10) / 1024) + ' KB</strong>';
 			else
 				sizeToShow = formatSize(parseInt(sizeToShow,10) / 1024) + ' KB';
 			
@@ -70,7 +80,7 @@ module.exports = function(har, htmler) {
 					content += '<img src="data:' + mimeType + ';base64,' + responseContent + '" />';
 				}
 				else {
-					content += '<pre class="pre-scrollable">' + htmler(responseContent) + '</pre>';
+					content += '<pre class="pre-scrollable">' + htmlEncode(responseContent) + '</pre>';
 				}
 				content += '</div>';
 			}
@@ -102,20 +112,21 @@ module.exports = function(har, htmler) {
 						'<div class="progress-bar progress-bar-danger" style="width: ' + waitWidth + '%"></div>' + 
 						'<div class="progress-bar progress-bar-success" style="width: ' + receiveWidth + '%"></div></div>';
 			
-			progressContent = '<p class=\'clearfix start-time\'><strong>Start Time:</strong> <em>' + startedTime + ' ms</em></p>';
+			progressStart = '<p class=\'clearfix start-time\'><strong>Start Time:</strong> <em>' + startedTime + ' ms</em></p>';
 			
+			progressContent = '';
 			if(entrie.timings.blocked >= 0)
-				progressContent += '<p class=\'clearfix bg-warning\'><strong>Blocking: </strong> <em> ' + formatSize(entrie.timings.blocked,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-warning\'><strong>Blocking: </strong> <em> ~' + formatSize(entrie.timings.blocked,5) + ' ms</em></p>';
 			if(entrie.timings.dns >= 0)
-				progressContent += '<p class=\'clearfix bg-last\'><strong>DNS: </strong> <em> ' + formatSize(entrie.timings.dns,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-last\'><strong>DNS: </strong> <em> ~' + formatSize(entrie.timings.dns,5) + ' ms</em></p>';
 			if(entrie.timings.connect >= 0)
-				progressContent += '<p class=\'clearfix bg-info\'><strong>Connect: </strong> <em> ' + formatSize(entrie.timings.connect,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-info\'><strong>Connect: </strong> <em> ~' + formatSize(entrie.timings.connect,5) + ' ms</em></p>';
 			if(entrie.timings.send >= 0)
-				progressContent += '<p class=\'clearfix bg-primary\'><strong>Send: </strong> <em> ' + formatSize(entrie.timings.send,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-primary\'><strong>Send: </strong> <em> ~' + formatSize(entrie.timings.send,5) + ' ms</em></p>';
 			if(entrie.timings.wait >= 0)
-				progressContent += '<p class=\'clearfix bg-danger\'><strong>Wait: </strong> <em> ' + formatSize(entrie.timings.wait,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-danger\'><strong>Wait: </strong> <em> ~' + formatSize(entrie.timings.wait,5) + ' ms</em></p>';
 			if(entrie.timings.receive >= 0)
-				progressContent += '<p class=\'clearfix bg-success\'><strong>Receive: </strong> <em> ' + formatSize(entrie.timings.receive,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-success\'><strong>Receive: </strong> <em> ~' + formatSize(entrie.timings.receive,5) + ' ms</em></p>';
 			
 			newHar.entries.push({
 				sign:sign,
@@ -125,21 +136,30 @@ module.exports = function(har, htmler) {
 				//TODO: check when the domain is different
 				fileName: filename || '/',
 				params:url[url.length - 1].substr(filename.length),
-				statusToShow:(entrie.response.status>=500)?('<strong>' + entrie.response.status + ' ' + entrie.response.statusText + '</strong>'):(entrie.response.status + ' ' + entrie.response.statusText),
+				statusToShow:(entrie.response.status>=500)?('<strong>' + entrie.response.status + ' ' + entrie.response.statusText + '</strong>'):((entrie.response.status>=400)?('<em>' + entrie.response.status + ' ' + entrie.response.statusText + '</em>'):(entrie.response.status + ' ' + entrie.response.statusText)),
 				responseStatus:entrie.response.status,
 				responseTextStatus:entrie.response.statusText,
 				mimeType:mimeType,
 				charset:(mimeType && entrie.response.content.mimeType.split(";")[1]) || '',
-				size:formatSize(size,0) + ' Bytes',
-				fullSize:formatSize(fullSize,0) + ' Bytes',
+				size:formatSize(size,'0') + ' Bytes',
+				fullSize:formatSize(fullSize,'0') + ' Bytes',
 				sizeToShow:sizeToShow,
 				formatedFullSize:formatSize(parseInt(fullSize,10) / 1024) + ' KB',
 				tabs:tabs,
 				tabContainers:content,
 				progress:progress,
-				progressContent:progressContent
+				progressStart:progressStart,
+				progressContent:progressContent,
+				domloaded:domloaded,
+				windowloaded:windowloaded
 			});
 		}
+		
+		
+		newHar.info = '<th>' + requests + ' requests</th>' + 
+						'<th colspan="3" class="text-right">~' + formatSize(totalSize / 1024, 2) + ' KB ' + 
+						'(~' + formatSize(totalSizeCache / 1024, 2) + ' KB compressed)</th>' + 
+						'<th class="text-center">' + formatSize(totalTime / 1000, 2) + 's</th>';
 		
 		return newHar;
 		
@@ -156,11 +176,20 @@ module.exports = function(har, htmler) {
 		}
 		return '';
 	},
-	formatSize = function(n, c, d, t){
-		c = isNaN(c = Math.abs(c)) ? 2 : c; d = d === undefined ? "," : d; t = t === undefined ? "." : t;var s = n < 0 ? "-" : "",
-		i = parseInt(n = Math.abs(+n || 0).toFixed(c), 10) + "", j = (j = i.length) > 3 ? j % 3 : 0;
-		return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) +
-		(c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+	formatSize = function(number, precision) {
+		var matcher, fPoint;
+		precision = precision || 2;
+		number = number.toFixed(precision);
+		if(precision === '0')
+			return number;
+		fPoint = number.split('.')[1];
+		matcher = fPoint.match(/0+/);
+		if(matcher && matcher[0].length == fPoint.length) {
+			return number.split('.')[0];
+		}
+		else {
+			return number.replace('.', ',');
+		}
 	};
 	
 	return prepareHar(har);
