@@ -1,9 +1,9 @@
 $(function($) {
-	$('.container').load('tableTemplate.html table');
+	$('.container').load('template.html table');
 	
 	window.module = {};
 	
-	$(document.createElement('script')).attr('src','harToHtml.js').appendTo($('body'));
+	$(document.createElement('script')).attr('src','harParser.js').appendTo($('body'));
 	
 	
 	

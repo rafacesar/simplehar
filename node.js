@@ -2,7 +2,7 @@
 	'use strict';
 
 	var fs = require('fs'),
-		hth = require('./harToHtml.js');
+		hth = require('./harParser.js');
 	
 	
 	
@@ -20,7 +20,7 @@
 		var newHar = hth(har, encode);
 		
 		
-		fs.readFile('requestTemplate.html', function(err,template) {
+		fs.readFile('template.html', function(err,template) {
 			if(err) throw err;
 			
 			var html =  '',
@@ -50,7 +50,7 @@
 					html = tpl
 						.toString()
 						.replace('{content}', html)
-						.replace('<script src="generator.js"></script>', '');
+						.replace('<script src="html.js"></script>', '');
 				}
 				else {	
 					css = fs.readFileSync('style.css');
