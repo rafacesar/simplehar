@@ -3,7 +3,7 @@ $(function($) {
 	
 	window.module = {};
 	
-	$(document.createElement('script')).attr('src','harParser.js').appendTo($('body'));
+	$(document.createElement('script')).attr({src:'harParser.js', id:'harParser'}).appendTo($('body'));
 	
 	
 	
