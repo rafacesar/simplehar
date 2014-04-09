@@ -37,8 +37,8 @@ module.exports = function(har, htmlEncode) {
 			url = entrie.request.url.split('/');
 			filename = url[url.length - 1].split('#')[0].split('?')[0];
 			
-			responseHeaders = objListToHtml(entrie.response.headers, ['cookie']);
-			requestHeaders = objListToHtml(entrie.request.headers, ['cookie']);
+			responseHeaders = objListToHtml(entrie.response.headers, ['cookie', 'Cookie', 'cookies', 'Cookies']);
+			requestHeaders = objListToHtml(entrie.request.headers, ['cookie', 'Cookie', 'cookies', 'Cookies']);
 			responseCookies = objListToHtml(entrie.response.cookies);
 			requestCookies = objListToHtml(entrie.request.cookies);
 			responseContent = entrie.response.content.text;
