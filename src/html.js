@@ -5,6 +5,20 @@ window.module = {};
 	d.body.appendChild(s);
 })(document);
 $(function($) {
+	var stop;
+	if(~navigator.userAgent.indexOf('Chrome') && location.href.indexOf('file:') === 0) {
+		$(document.createElement('p')).css({
+			width:'100%',
+			height:'100%',
+			position:'absolute',
+			left:0,
+			top:0,
+			textAlign:'center',
+			verticalAlign:'middle',
+			display:'table-cell',
+			backgroundColor:'rgba(0,255,255,0.5)'
+		}).text('Chrome + Ajax + Local = :(').appendTo(document.body);
+	}
 	$('.container').load('template.html table');
 	
 	
