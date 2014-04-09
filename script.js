@@ -9,7 +9,7 @@
 			$inside = $table.find('.inside'),
 			$nav = $inside.find('.nav'),
 			$top = $table.find('.top'),
-			$tempo = $top.find('.tempo'),
+			$timeline = $top.find('.timeline'),
 			$div = $inside.find('div'),
 			tableWidth;
 		
@@ -36,10 +36,11 @@
 		$nav.find('a').click(function() {
 			
 			var $this = $(this),
-				$parent = $this.parent();
+				$inside = $this.parents('.inside'),
+				$div = $inside.find('div');
 			
-			$parent.parent().find('.active').removeClass('active');
-			$parent.addClass('active');
+			$inside.find('.active').removeClass('active');
+			$this.parent().addClass('active');
 			
 			
 			$div.addClass('hidden');
@@ -73,7 +74,7 @@
 			return false;
 		});
 		
-		$top.find('td[class!="tempo"], .tempo span').tooltip({
+		$top.find('td[class!="timeline"], .timeline span').tooltip({
 			placement:'right',
 			trigger: 'hover',
 			html:true,
@@ -81,10 +82,10 @@
 		});
 		
 		
-		for(var i=0, ilen=$tempo.length, half=ilen/2;i<ilen;i++)
-			$tempo.eq(i).data('placement', i<half?'bottom':'top');
+		for(var i=0, ilen=$timeline.length, half=ilen/2;i<ilen;i++)
+			$timeline.eq(i).data('placement', i<half?'bottom':'top');
 		
-		$tempo.popover({
+		$timeline.popover({
 			html:true,
 			trigger:'hover',
 			container:$table.parent()
