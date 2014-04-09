@@ -2,25 +2,41 @@
 	'use strict';
 
 	var fs = require('fs'),
-		hth = require('./harParser.js');
+		hth = require('./harParser.js'),
+		args = (function(args) {
+
+			var result = {},
+				tmp;
+			
+			for(var i=2,ilen=args.length;i<ilen;i++) {
+				if(~args[i].indexOf('=')) {
+					tmp = args[i].split('=');
+					result[tmp[0]] = tmp[1];
+				}
+				else {
+					result[args[i]] = true;
+				}
+			}
+			
+			return result;
+		})(process.argv);
 	
 	
-	
-	fs.readFile(process.argv[2],function(err, har) {
+	fs.readFile(args.har,function(err, har) {
 		if(err) throw err;
 		
 		har = JSON.parse(har);
 		
-		var encode = function(html) {
+		var encode = (function() {
 			var Ent = require('html-entities').XmlEntities,ent;
 			ent = new Ent();
-			return ent.encode(html);
-		};
+			return ent.encode;
+		})();
 		
 		var newHar = hth(har, encode);
 		
 		
-		fs.readFile('template.html', function(err,template) {
+		fs.readFile('requestTemplate.html', function(err,template) {
 			if(err) throw err;
 			
 			var html =  '',
@@ -36,17 +52,20 @@
 				html += _html;
 			}
 			
-			fs.readFile('tableTemplate.html', function(err,tableTemplate) {
+			fs.readFile('template.html', function(err,tableTemplate) {
 				if(err) throw err;
 				
-				html = tableTemplate.toString().replace('{har}', html);
+				html = tableTemplate
+						.toString()
+						.replace('{har}', html)
+						.replace('{info}', newHar.info);
 				
 				var tpl, css, js;
 				
 				
-				if(process.argv.indexOf('fullHtml') != -1) {
+				if(!args.frame) {
 					html = html.replace('{style}', '').replace('{script}', '');
-					tpl = fs.readFileSync('singleViewer.html');
+					tpl = fs.readFileSync('index.html');
 					html = tpl
 						.toString()
 						.replace('{content}', html)
@@ -61,7 +80,7 @@
 				}
 				
 				
-				fs.writeFile('testando.html', html, function(err) {
+				fs.writeFile(args.html, html, function(err) {
 					if(err) throw err;
 				});
 				
