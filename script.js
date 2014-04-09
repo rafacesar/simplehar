@@ -7,11 +7,16 @@
 		var $ = jQuery,
 			$table = $('.har-table'),
 			$inside = $table.find('.inside'),
-			$nav = $table.find('.nav'),
+			$nav = $inside.find('.nav'),
 			$top = $table.find('.top'),
 			$tempo = $top.find('.tempo'),
-			tableWidth = $table.width();
-			
+			$div = $inside.find('div'),
+			tableWidth;
+		
+		$div.hide();
+		tableWidth = $table.width();
+		$div.show();
+		
 		$inside.find('dt').css('width', 'auto').each(function() {
 			var $this = $(this);
 			if($this.width() > 160)
@@ -20,7 +25,7 @@
 		
 		
 		
-		$inside.find('div').css('width', width - 10).end().each(function() {
+		$div.css('width', tableWidth - 10).end().each(function() {
 			var $div = $(this).find('div');
 			for(var i=1,ilen=$div.length;i<ilen;i++) {
 				$div.eq(i).addClass('hidden');
@@ -37,8 +42,8 @@
 			$parent.addClass('active');
 			
 			
-			$inside.find('div').addClass('hidden');
-			$inside.find('div.' + $this.attr('href').substr(1)).removeClass('hidden');
+			$div.addClass('hidden');
+			$div.filter('.' + $this.attr('href').substr(1)).removeClass('hidden');
 			
 			
 			return false;
@@ -46,7 +51,7 @@
 		
 		
 		
-		$nav('li:first-child').addClass('active');
+		$nav.find('li:first-child').addClass('active');
 		
 		$top.click(function() {
 			var $this = $(this),
