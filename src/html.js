@@ -1,12 +1,12 @@
 window.module = {};
 (function(d,s) {
-	(s = d.createElement('script')).src = 'harParser.js';
+	(s = d.createElement('script')).src = 'src/harParser.js';
 	s.id = 'harParser';
 	d.body.appendChild(s);
 })(document);
 $(function($) {
 	var stop;
-	if(~navigator.userAgent.indexOf('Chrome') && location.href.indexOf('file:') === 0) {
+	if(~navigator.userAgent.indexOf('Chrome') && location.href.indexOf('file:') === 0 && !$('.top').length) {
 		$(document.createElement('p')).css({
 			width:'100%',
 			height:'100%',
@@ -15,11 +15,22 @@ $(function($) {
 			top:0,
 			textAlign:'center',
 			verticalAlign:'middle',
-			display:'table-cell',
+			display:'table',
 			backgroundColor:'rgba(0,255,255,0.5)'
-		}).text('Chrome + Ajax + Local = :(').appendTo(document.body);
+		})
+		.append(
+			$(document.createElement('span'))
+			.text('Chrome + Ajax + Local = :(')
+			.css({
+				display:'table-cell',
+				verticalAlign:'middle',
+				color:'rgb(0,200,200)',
+				fontWeight:'bold'
+			})
+		).appendTo(document.body);
+		return;
 	}
-	$('.container').load('template.html table');
+	$('.container').load('src/template.html table');
 	
 	
 	var runHar = function(har) {
@@ -31,7 +42,7 @@ $(function($) {
 		});
 		
 		
-		$.get('requestTemplate.html', function(template) {
+		$.get('src/requestTemplate.html', function(template) {
 			var html =  '',
 				i = 0,
 				ilen = newHar.entries.length,

@@ -2,7 +2,7 @@
 	'use strict';
 
 	var fs = require('fs'),
-		hth = require('./harParser.js'),
+		hth = require('./src/harParser.js'),
 		args = (function(args) {
 
 			var result = {},
@@ -36,7 +36,7 @@
 		var newHar = hth(har, encode);
 		
 		
-		fs.readFile('requestTemplate.html', function(err,template) {
+		fs.readFile('src/requestTemplate.html', function(err,template) {
 			if(err) throw err;
 			
 			var html =  '',
@@ -52,7 +52,7 @@
 				html += _html;
 			}
 			
-			fs.readFile('template.html', function(err,tableTemplate) {
+			fs.readFile('src/template.html', function(err,tableTemplate) {
 				if(err) throw err;
 				
 				html = tableTemplate
@@ -69,13 +69,13 @@
 					html = tpl
 						.toString()
 						.replace('{content}', html)
-						.replace('<script src="html.js"></script>', '');
+						.replace('<script src="src/html.js"></script>', '');
 				}
 				else {	
-					css = fs.readFileSync('style.css');
+					css = fs.readFileSync('src/style.css');
 					html = html.replace('{style}', '<style>' + css + '</style>');
 					
-					js = fs.readFileSync('script.js');
+					js = fs.readFileSync('src/script.js');
 					html = html.replace('{script}', '<script>' + js + '</script>');
 				}
 				
