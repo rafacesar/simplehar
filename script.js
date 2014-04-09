@@ -99,7 +99,7 @@
 		
 		jQuery(addInteraction);
 	};
-	if(document.getElementById('harParser')) {
+	if(!document.getElementById('harParser')) {
 		waiting();
 	}
 	window.addInteraction = addInteraction;

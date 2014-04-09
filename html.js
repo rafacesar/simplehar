@@ -1,11 +1,11 @@
+window.module = {};
+(function(d,s) {
+	(s = d.createElement('script')).src = 'harParser.js';
+	s.id = 'harParser';
+	d.body.appendChild(s);
+})(document);
 $(function($) {
 	$('.container').load('template.html table');
-	
-	window.module = {};
-	
-	$(document.createElement('script')).attr({src:'harParser.js', id:'harParser'}).appendTo($('body'));
-	
-	
 	
 	
 	var runHar = function(har) {
@@ -32,6 +32,9 @@ $(function($) {
 			}
 			$('tbody').html(html);
 			$('tfoot tr').html(newHar.info);
+			
+			
+			addInteraction($);
 		});
 		
 	};
@@ -42,7 +45,7 @@ $(function($) {
 		return false;
 	});
 	
-	$('body').one('drop', function(evt) {
+	$('body').on('drop', function(evt) {
 		evt.stopPropagation();
 		evt.preventDefault();
 		
