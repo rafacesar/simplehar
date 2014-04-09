@@ -10,6 +10,7 @@ module.exports = function(har, htmlEncode) {
 		toggleSign = 'glyphicon-arrow-down',
 		//TODO: check this later to get from the page ID
 		onLoad = har.log.pages[0].pageTimings.onLoad,
+		domTime = har.log.pages[0].pageTimings.onContentLoad,
 		fullSize, sizeToShow, entrie, url, filename, size, responseHeaders, progressStart,
 		responseCookies, requestCookies, progressContent, startedTime, domloaded,
 		requestHeaders, charset, tabs, content, responseContent, mimeType, windowloaded,
@@ -20,8 +21,12 @@ module.exports = function(har, htmlEncode) {
 		
 		// newHar.info = {requests:ilen, totalSize:0, totalTime:onLoad, totalSizeCache:0};
 		
-		domloaded = (har.log.pages[0].pageTimings.onContentLoad / onLoad) * 100;
-		domloaded = '<span class="domloaded" data-toggle="tooltip" title="DOMContentLoaded (' + formatSize(har.log.pages[0].pageTimings.onContentLoad, 2) + ' ms)" style="left:' + domloaded + '%"></span>';
+		if(typeof domTime !== 'undefined') {
+			domloaded = (domTime / onLoad) * 100;
+			domloaded = '<span class="domloaded" data-toggle="tooltip" title="DOMContentLoaded (' + formatSize(domTime, 2) + ' ms)" style="left:' + domloaded + '%"></span>';
+		}
+		else
+			domloaded = '';
 		windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="Page Loaded (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>';
 
 // debugger;
@@ -159,7 +164,7 @@ module.exports = function(har, htmlEncode) {
 		newHar.info = '<th>' + requests + ' requests</th>' + 
 						'<th colspan="3" class="text-right">~' + formatSize(totalSize / 1024, 2) + ' KB ' + 
 						'(~' + formatSize(totalSizeCache / 1024, 2) + ' KB compressed)</th>' + 
-						'<th class="text-center">' + formatSize(totalTime / 1000, 2) + 's</th>';
+						'<th class="text-center">' + (domTime?'(' + formatSize(domTime / 1000, 2) + 's) ':'') + formatSize(totalTime / 1000, 2) + 's</th>';
 		
 		return newHar;
 		
