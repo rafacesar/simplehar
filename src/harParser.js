@@ -57,9 +57,11 @@ module.exports = function(har, htmlEncode) {
 			else
 				sizeToShow = size;
 			
-			if(entrie.response.status == 304)
+			status = entrie.response.status;
+			
+			if(status == 304)
 				sizeToShow = '<em>' + formatSize(parseInt(sizeToShow,10) / 1024) + ' KB</em>';
-			else if(entrie.response.status == 200 && size === 0)
+			else if(status == 200 && size === 0)
 				sizeToShow = '<strong>' + formatSize(parseInt(sizeToShow,10) / 1024) + ' KB</strong>';
 			else
 				sizeToShow = formatSize(parseInt(sizeToShow,10) / 1024) + ' KB';
@@ -133,6 +135,19 @@ module.exports = function(har, htmlEncode) {
 			if(entrie.timings.receive >= 0)
 				progressContent += '<p class=\'clearfix bg-success\'><strong>Receive: </strong> <em> ~' + formatSize(entrie.timings.receive,5) + ' ms</em></p>';
 			
+			
+			
+			if(status >= 500)
+				status = '<strong>' + status + ' ' + entrie.response.statusText + '</strong>';
+			else if(status >= 400)
+				status = '<em>' + status + ' ' + entrie.response.statusText + '</em>';
+			else if(status < 100)
+				status = '<b><i>' + status + ' ' + (entrie.response.statusText || '') + '</i></b>';
+			else
+				status = status + ' ' + entrie.response.statusText;
+			
+			
+			
 			newHar.entries.push({
 				sign:sign,
 				toggleSign:toggleSign,
@@ -141,7 +156,7 @@ module.exports = function(har, htmlEncode) {
 				//TODO: check when the domain is different
 				fileName: filename || '/',
 				params:url[url.length - 1].substr(filename.length),
-				statusToShow:(entrie.response.status>=500)?('<strong>' + entrie.response.status + ' ' + entrie.response.statusText + '</strong>'):((entrie.response.status>=400)?('<em>' + entrie.response.status + ' ' + entrie.response.statusText + '</em>'):(entrie.response.status + ' ' + entrie.response.statusText)),
+				statusToShow:status,
 				responseStatus:entrie.response.status,
 				responseTextStatus:entrie.response.statusText,
 				mimeType:mimeType,
