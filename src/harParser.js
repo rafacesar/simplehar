@@ -12,14 +12,12 @@ module.exports = function(har, htmlEncode) {
 		onLoad = har.log.pages[0].pageTimings.onLoad,
 		domTime = har.log.pages[0].pageTimings.onContentLoad,
 		fullSize, sizeToShow, entrie, url, filename, size, responseHeaders, progressStart,
-		responseCookies, requestCookies, progressContent, startedTime, domloaded,
+		responseCookies, requestCookies, progressContent, startedTime, domloaded, domain,
 		requestHeaders, charset, tabs, content, responseContent, mimeType, windowloaded,
-		_responseContent, progress, startTimeBefore, startTime, startPosition,
-		blockedWidth, dnsWidth, connectWidth, sendWidth, waitWidth, receiveWidth,
+		_responseContent, progress, startTimeBefore, startTime, startPosition, status,
+		blockedWidth, dnsWidth, connectWidth, sendWidth, waitWidth, receiveWidth, params,
 		requests = ilen, totalSize = 0, totalTime = onLoad, totalSizeCache = 0;
 
-		
-		// newHar.info = {requests:ilen, totalSize:0, totalTime:onLoad, totalSizeCache:0};
 		
 		if(typeof domTime !== 'undefined') {
 			domloaded = (domTime / onLoad) * 100;
@@ -34,8 +32,35 @@ module.exports = function(har, htmlEncode) {
 		for(;i<ilen;i++) {
 			entrie = entries[i];
 			
-			url = entrie.request.url.split('/');
-			filename = url[url.length - 1].split('#')[0].split('?')[0];
+			url = entrie.request.url;
+			
+			filename = url.split('?')[0].split('#')[0].split('/');
+			filename = filename[filename.length - 1];
+			
+			if(filename === '')
+				domain = url.split('?')[0].split('#')[0];
+			else {
+				domain = url.split('?')[0].split('#')[0].split('/');
+				domain.pop();
+				domain = domain.join('/');
+			}
+			
+			if(url.split('?').length > 1) {
+				params = url.split('?');
+				params.shift();
+				params = '?' + params.join('?');
+			}
+			else if(url.split('#').length > 1) {
+				params = url.split('#');
+				params.shift();
+				params = '#' + params.join('#');
+			}
+			else {
+				params = '';
+			}
+				
+			
+			// filename = url[url.length - 1].split('#')[0].split('?')[0];
 			
 			responseHeaders = objListToHtml(entrie.response.headers, ['cookie', 'Cookie', 'cookies', 'Cookies']);
 			requestHeaders = objListToHtml(entrie.request.headers, ['cookie', 'Cookie', 'cookies', 'Cookies']);
@@ -152,10 +177,10 @@ module.exports = function(har, htmlEncode) {
 				sign:sign,
 				toggleSign:toggleSign,
 				method: (entrie.request.method=='GET')?(entrie.request.method):('<strong>' + entrie.request.method + '</strong>'),
-				fullUrl: url.join('/'),
+				fullUrl: url,
 				//TODO: check when the domain is different
-				fileName: filename || '/',
-				params:url[url.length - 1].substr(filename.length),
+				fileName: filename || (i>1?domain:'/'),
+				params:params,
 				statusToShow:status,
 				responseStatus:entrie.response.status,
 				responseTextStatus:entrie.response.statusText,
