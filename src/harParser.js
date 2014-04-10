@@ -1,5 +1,193 @@
 module.exports = function(har, htmlEncode) {
 	'use strict';
+	
+	// har = har.log;
+	// var page = har.pages[0],
+	// 	harEntries = har.entries,
+	// 	entries = [],
+	// 	id = page.id,
+	// 	sign = 'glyphicon-arrow-right',
+	// 	toggleSign = 'glyphicon-arrow-down',
+	// 	onContentLoad = page.pageTimings.onContentLoad || false,
+	// 	onLoad = page.pageTimings.onLoad,
+	// 	i, ilen, onContentLoadText, onLoadText;
+	
+	
+	// if(onContentLoad) {
+	// 	onContentLoadText = (onContentLoad / onLoad) * 100;
+	// 	onContentLoadText = '<span class="domloaded" data-toggle="tooltip" title="DOMContentLoaded (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
+	// }
+	// else
+	// 	onContentLoadText = '';
+	// onLoadText = '<span class="windowloaded" data-toggle="tooltip" title="Page Loaded (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>';
+	
+	
+	
+	
+	// if(id && id !== '') {
+	// 	for(i=0, ilen=harEntries.length;i<ilen;i++) {
+	// 		if(harEntries[i].pageref && harEntries[i].pageref == page.id)
+	// 			entries.push(harEntries[i]);
+	// 	}
+	// }
+	
+	// var strong = function(str,cname) {
+	// 	if(cname)
+	// 		cname = ' class="' + cname + '"';
+	// 	return '<strong' + cname + '>' + str + '</strong>';
+	// };
+	
+	// var em = function(str, cname) {
+	// 	if(cname)
+	// 		cname = ' class="' + cname + '"';
+	// 	return '<em' + cname + '>' + str + '</em>';
+	// };
+	
+	
+	// var convertHar = function(entrie, i) {
+		
+		
+	// 	var method = entrie.request.method,
+		
+	// 		url = entrie.request.url.match(/([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i),
+			
+	// 		status = entrie.response.status,
+	// 		statusText = entrie.response.statusText || '',
+			
+	// 		mimeType = entrie.response.content.mimeType && entrie.response.content.mimeType.split(';'),
+			
+	// 		completeSize = entrie.response.content.size,
+	// 		compressedSize = entrie.response.bodySize,
+	// 		sizeToShow = compressedSize,
+		
+	// 		_tabs = ['headers', 'cookies'], tabs = '', content = '',
+	// 		_request = {}, _response = {}, contentText = entrie.response.content.text,
+			
+	// 		progress = {
+	// 			startedDateTime:entrie.startedDateTime,
+	// 			time: entrie.time,
+	// 			blocked: entrie.timings.blocked,
+	// 			dns: entrie.timings.dns,
+	// 			connect: entrie.timings.connect,
+	// 			send: entrie.timings.send,
+	// 			wait: entrie.timings.wait,
+	// 			receive: entrie.timings.receive,
+	// 			ssl: entrie.timings.ssl
+	// 		};
+		
+		
+		
+		
+	// 	// METHOD
+	// 	if(method != 'GET')
+	// 		method = strong(method);
+		
+		
+	// 	// URL
+	// 	if(url[4] === '') {
+	// 		if(i > 1)
+	// 			url[4] = url.splice(1,3).join('');
+	// 		else
+	// 			url[4] = url[3];
+	// 	}
+		
+		
+	// 	// STATUS
+	// 	if(status >= 500)
+	// 		statusText = strong(status + ' ' + statusText, 'text-error');
+	// 	else if(status >= 400)
+	// 		statusText = strong(status + ' ' + statusText, 'text-warning');
+	// 	else if(status < 100)
+	// 		statusText = em(status + ' ' + statusText, 'text-muted');
+	// 	else
+	// 		statusText = status + ' ' + statusText;
+		
+		
+		
+		
+	// 	// SIZE
+	// 	if(compressedSize < 0)
+	// 		sizeToShow = 0;
+	// 	else if(compressedSize === 0)
+	// 		sizeToShow = completeSize;
+			
+
+	// 	if(status == 304)
+	// 		sizeToShow = em(formatSize(sizeToShow / 1024) + ' KB');
+	// 	else if(status == 200 && size === 0)
+	// 		sizeToShow = strong(formatSize(sizeToShow / 1024) + ' KB');
+	// 	else
+	// 		sizeToShow = formatSize(sizeToShow / 1024) + ' KB';
+		
+		
+		
+		
+		
+		
+		
+	// 	// TABS INFO
+	// 	for(var j=0, jlen=_tabs.length, _tab, _tabCapital;j<jlen;j++) {
+			
+	// 		_tab = _tabs[j];
+	// 		_request[_tab] = objListToHtml(entrie.request[_tab], _tab=='headers'?['ookie']:undefined);
+	// 		_response[_tab] = objListToHtml(entrie.response[_tab], _tab=='headers'?['ookie']:undefined);
+			
+	// 		if(_request[_tab] || _response[_tab]) {
+	// 			_tabCapital = _tab.charAt(0).toUpperCase() + _tab.substr(1);
+	// 			tabs += '<li><a href="#' + _tab + '">' + _tabCapital + '</a></li>';
+	// 			content += '<div class="' + _tab + '">';
+				
+	// 			if(_request[_tab])
+	// 				content += '<h3><small>Request ' + _tabCapital + '</small></h3>' + _request[_tab];
+				
+	// 			if(_response[_tab])
+	// 				content += '<h3><small>Response ' + _tabCapital + '</small></h3>' + _response[_tab];
+				
+	// 			content += '</div>';	
+	// 		}
+	// 	}
+		
+	// 	// CONTENT
+	// 	if(contentText) {
+	// 		tabs += '<li><a href="#content">Content</a></li>';
+	// 		content += '<div class="content">';
+	// 		if(mimeType && mimeType[0].split('/')[0] == 'image') {
+	// 			content += '<img src="data:' + mimeType[0] + ';base64,' + contentText + '" />';
+	// 		}
+	// 		else {
+	// 			content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
+	// 		}
+	// 		content += '</div>';
+	// 	}
+		
+		
+	// 	// TODO: PROGRESS
+	// 	return {
+	// 		sign: sign,
+	// 		toggleSign: toggleSign,
+	// 		method: method,
+	// 		fullUrl: url[0],
+	// 		fileName: url[4],
+	// 		params: url[5],
+	// 		statusToShow: statusText,
+	// 		mimeType: mimeType[0],
+	// 		charset: mimeType[1] || '',
+	// 		size: formatSize(compressedSize,'0') + ' Bytes',
+	// 		fullSize: formatSize(completeSize,'0') + ' Bytes',
+	// 		sizeToShow: sizeToShow,
+	// 		formatedFullSize: formatSize(completeSize / 1024) + ' KB',
+	// 		tabs: tabs,
+	// 		tabContainers: content,
+	// 		progress:progress,
+	// 		progressTitle:'',
+	// 		progressDetails:'',
+	// 		domloaded:onContentLoadText,
+	// 		windowloaded:onLoadText
+	// 	};
+	// };
+	
+	
+	
 	var prepareHar = function(har) {
 		var newHar = {
 			entries:[]
