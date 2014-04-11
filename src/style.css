@@ -71,12 +71,6 @@
 }
 
 
-.container .status strong {
-	color:#d9534f;
-}
-.container .status em {
-	color:#f0ad4e;
-}
 .container .size {
 	text-align:right;
 	width:90px;
@@ -164,6 +158,15 @@
 .popover .start-time strong,
 .popover .start-time em {
 	text-decoration:underline;
+}
+.popover-title {
+	height:35px;
+}
+.popover-title strong {
+	float:left;
+}
+.popover-title em {
+	float:right;
 }
 
 tfoot td {

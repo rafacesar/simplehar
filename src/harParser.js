@@ -71,7 +71,7 @@ module.exports = function(har, htmlEncode) {
 		
 		// STATUS
 		if(status >= 500)
-			statusText = strong(status + ' ' + statusText, 'text-error');
+			statusText = strong(status + ' ' + statusText, 'text-danger');
 		else if(status >= 400)
 			statusText = strong(status + ' ' + statusText, 'text-warning');
 		else if(status < 100)
@@ -91,7 +91,7 @@ module.exports = function(har, htmlEncode) {
 
 		if(status == 304)
 			sizeToShow = em(formatSize(sizeToShow / 1024) + ' KB');
-		else if(status == 200 && compressedSize === 0)
+		else if(status == 200 && (compressedSize === 0 || compressedSize < 0))
 			sizeToShow = strong(formatSize(sizeToShow / 1024) + ' KB');
 		else
 			sizeToShow = formatSize(sizeToShow / 1024) + ' KB';
