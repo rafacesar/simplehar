@@ -7,7 +7,9 @@ window.module = {};
 $(function($) {
 	
 	$.get('src/template.html', function() {
-		$('.container').load('src/template.html table');
+		$('.container').load('src/template.html table', function() {
+			$('caption').html('');
+		});
 		
 		
 		$('body').on('dragover', function(evt) {
@@ -57,8 +59,14 @@ $(function($) {
 		}).on('drop', function(evt) {
 			evt.stopPropagation();
 			evt.preventDefault();
-			// debugger;
+
 			$('#drop').css('display', 'none');
+
+			
+			if($('.loader').length)
+				$('.loader').show();
+			else
+				$(document.createElement('div')).addClass('loader').appendTo(document.body);
 			
 			var file = evt.originalEvent.dataTransfer.files[0],
 				reader = new FileReader();
@@ -70,16 +78,23 @@ $(function($) {
 				}
 				catch(e) {
 					alert('Arquivo fora do formato JSON');
+					$('.loader').hide();
 					return;
 				}
+				$('tbody, tfoot tr, caption').html('');
+				$('.tooltip, .popover').remove();
+				
 				
 				runHar(har);
+				
 			};
 			reader.readAsText(file);
 			
 			
 			return false;
 		});
+		
+		
 		
 		
 	}).fail(function() {
@@ -120,9 +135,7 @@ $(function($) {
 			return elm.innerHTML;
 		});
 		
-		$('tbody').html('');
-		$('tfoot tr').html('');
-		$('.tooltip, .popover').remove();
+		
 		
 		
 		$.get('src/requestTemplate.html', function(template) {
@@ -140,7 +153,10 @@ $(function($) {
 			}
 			$('tbody').html(html);
 			$('tfoot tr').html(newHar.info);
+			$('caption').html(newHar.title);
+			// $('.har-table').html(newHar.title);
 			
+			$('.loader').hide();
 			
 			addInteraction($);
 		});

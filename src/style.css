@@ -1,3 +1,13 @@
+.container caption:empty {
+	display:none;
+}
+.container caption {
+	font-size:20px;
+	font-family:"Trebuchet MS", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	text-align:center;
+	color:#999;
+	background-color:#EEE;
+}
 .top {
 	font-size:12px;
 }
@@ -190,4 +200,59 @@ tfoot td {
 	position:absolute;
 	bottom:0;
 	background-color:#000;
+}
+
+
+
+.loader {
+	position: absolute;
+	left: 50%;
+	top: 20%;
+	margin: -25px 0 0 -25px;
+	background: rgb(91, 192, 222);
+	width: 60px;
+	height: 60px;
+	border-radius: 100%;
+	border: 5px solid rgb(217, 83, 79);
+}
+.loader:after {
+	content: '';
+	background: transparent;
+	width: 140%;
+	height: 140%;
+	position: absolute;
+	border-radius: 100%;
+	top: -20%;
+	left: -20%;
+	box-shadow: rgb(240, 173, 78) -4px -5px 5px -3px;
+	-webkit-animation:rloader 1s infinite linear;
+	-moz-animation:rloader 1s infinite linear;
+	animation:rloader 1s infinite linear;
+	
+}
+@keyframes rloader
+{
+	0% {
+		-webkit-transform: rotateZ(0deg);
+		transform: rotateZ(0deg);
+		
+	}
+	100% {
+		-webkit-transform: rotateZ(360deg);
+		transform: rotateZ(360deg);
+		
+	}
+}
+@-webkit-keyframes rloader
+{
+	0% {
+		-webkit-transform: rotateZ(0deg);
+		transform: rotateZ(0deg);
+		
+	}
+	100% {
+		-webkit-transform: rotateZ(360deg);
+		transform: rotateZ(360deg);
+		
+	}		
 }

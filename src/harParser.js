@@ -311,6 +311,8 @@ module.exports = function(har, htmlEncode) {
 	
 	entries = convertProgress(entries);
 	
+	entries.title = page.title;
+	
 	entries.info = '<th>' + entries.length + ' requests</th>' + 
 						'<th colspan="3" class="text-right">~' + formatSize(totalSize / 1024, 2) + ' KB ' + 
 						'(~' + formatSize(totalCompressedSize / 1024, 2) + ' KB compressed)</th>' + 

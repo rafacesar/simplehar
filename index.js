@@ -58,7 +58,8 @@
 				html = tableTemplate
 						.toString()
 						.replace('{har}', html)
-						.replace('{info}', newHar.info);
+						.replace('{info}', newHar.info)
+						.replace('{title}', newHar.title);
 				
 				var tpl, css, js;
 				
