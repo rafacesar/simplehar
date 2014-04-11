@@ -5,6 +5,14 @@
 	width:350px;
 	white-space:nowrap;
 	position:relative;
+	padding:0 !important;
+}
+.url > div,
+.timeline > div {
+	position:relative;
+}
+.url > div {
+	padding:5px;
 }
 .url strong {
 	display:block;
