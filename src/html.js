@@ -37,7 +37,7 @@ $(function($) {
 	
 	var runHar = function(har) {
 		window.har = har;
-		window.newHar = module.exports(window.har, function(content) {
+		var newHar = module.exports(window.har, function(content) {
 			var elm = document.createElement('span');
 			elm.appendChild(document.createTextNode(content));
 			return elm.innerHTML;
@@ -51,10 +51,10 @@ $(function($) {
 		$.get('src/requestTemplate.html', function(template) {
 			var html =  '',
 				i = 0,
-				ilen = newHar.entries.length,
+				ilen = newHar.length,
 				prop, nHar, _html;
 			for(;i<ilen;i++) {
-				nHar = newHar.entries[i];
+				nHar = newHar[i];
 				_html = template;
 				for(prop in nHar) {
 					_html = _html.replace(new RegExp('{' + prop + '}','g'), nHar[prop]);

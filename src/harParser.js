@@ -1,400 +1,233 @@
 module.exports = function(har, htmlEncode) {
 	'use strict';
 	
-	// har = har.log;
-	// var page = har.pages[0],
-	// 	harEntries = har.entries,
-	// 	entries = [],
-	// 	id = page.id,
-	// 	sign = 'glyphicon-arrow-right',
-	// 	toggleSign = 'glyphicon-arrow-down',
-	// 	onContentLoad = page.pageTimings.onContentLoad || false,
-	// 	onLoad = page.pageTimings.onLoad,
-	// 	i, ilen, onContentLoadText, onLoadText;
+	har = har.log;
 	
 	
-	// if(onContentLoad) {
-	// 	onContentLoadText = (onContentLoad / onLoad) * 100;
-	// 	onContentLoadText = '<span class="domloaded" data-toggle="tooltip" title="DOMContentLoaded (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
-	// }
-	// else
-	// 	onContentLoadText = '';
-	// onLoadText = '<span class="windowloaded" data-toggle="tooltip" title="Page Loaded (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>';
-	
-	
-	
-	
-	// if(id && id !== '') {
-	// 	for(i=0, ilen=harEntries.length;i<ilen;i++) {
-	// 		if(harEntries[i].pageref && harEntries[i].pageref == page.id)
-	// 			entries.push(harEntries[i]);
-	// 	}
-	// }
-	
-	// var strong = function(str,cname) {
-	// 	if(cname)
-	// 		cname = ' class="' + cname + '"';
-	// 	return '<strong' + cname + '>' + str + '</strong>';
-	// };
-	
-	// var em = function(str, cname) {
-	// 	if(cname)
-	// 		cname = ' class="' + cname + '"';
-	// 	return '<em' + cname + '>' + str + '</em>';
-	// };
-	
-	
-	// var convertHar = function(entrie, i) {
-		
-		
-	// 	var method = entrie.request.method,
-		
-	// 		url = entrie.request.url.match(/([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i),
-			
-	// 		status = entrie.response.status,
-	// 		statusText = entrie.response.statusText || '',
-			
-	// 		mimeType = entrie.response.content.mimeType && entrie.response.content.mimeType.split(';'),
-			
-	// 		completeSize = entrie.response.content.size,
-	// 		compressedSize = entrie.response.bodySize,
-	// 		sizeToShow = compressedSize,
-		
-	// 		_tabs = ['headers', 'cookies'], tabs = '', content = '',
-	// 		_request = {}, _response = {}, contentText = entrie.response.content.text,
-			
-	// 		progress = {
-	// 			startedDateTime:entrie.startedDateTime,
-	// 			time: entrie.time,
-	// 			blocked: entrie.timings.blocked,
-	// 			dns: entrie.timings.dns,
-	// 			connect: entrie.timings.connect,
-	// 			send: entrie.timings.send,
-	// 			wait: entrie.timings.wait,
-	// 			receive: entrie.timings.receive,
-	// 			ssl: entrie.timings.ssl
-	// 		};
-		
-		
-		
-		
-	// 	// METHOD
-	// 	if(method != 'GET')
-	// 		method = strong(method);
-		
-		
-	// 	// URL
-	// 	if(url[4] === '') {
-	// 		if(i > 1)
-	// 			url[4] = url.splice(1,3).join('');
-	// 		else
-	// 			url[4] = url[3];
-	// 	}
-		
-		
-	// 	// STATUS
-	// 	if(status >= 500)
-	// 		statusText = strong(status + ' ' + statusText, 'text-error');
-	// 	else if(status >= 400)
-	// 		statusText = strong(status + ' ' + statusText, 'text-warning');
-	// 	else if(status < 100)
-	// 		statusText = em(status + ' ' + statusText, 'text-muted');
-	// 	else
-	// 		statusText = status + ' ' + statusText;
-		
-		
-		
-		
-	// 	// SIZE
-	// 	if(compressedSize < 0)
-	// 		sizeToShow = 0;
-	// 	else if(compressedSize === 0)
-	// 		sizeToShow = completeSize;
-			
-
-	// 	if(status == 304)
-	// 		sizeToShow = em(formatSize(sizeToShow / 1024) + ' KB');
-	// 	else if(status == 200 && size === 0)
-	// 		sizeToShow = strong(formatSize(sizeToShow / 1024) + ' KB');
-	// 	else
-	// 		sizeToShow = formatSize(sizeToShow / 1024) + ' KB';
-		
-		
-		
-		
-		
-		
-		
-	// 	// TABS INFO
-	// 	for(var j=0, jlen=_tabs.length, _tab, _tabCapital;j<jlen;j++) {
-			
-	// 		_tab = _tabs[j];
-	// 		_request[_tab] = objListToHtml(entrie.request[_tab], _tab=='headers'?['ookie']:undefined);
-	// 		_response[_tab] = objListToHtml(entrie.response[_tab], _tab=='headers'?['ookie']:undefined);
-			
-	// 		if(_request[_tab] || _response[_tab]) {
-	// 			_tabCapital = _tab.charAt(0).toUpperCase() + _tab.substr(1);
-	// 			tabs += '<li><a href="#' + _tab + '">' + _tabCapital + '</a></li>';
-	// 			content += '<div class="' + _tab + '">';
-				
-	// 			if(_request[_tab])
-	// 				content += '<h3><small>Request ' + _tabCapital + '</small></h3>' + _request[_tab];
-				
-	// 			if(_response[_tab])
-	// 				content += '<h3><small>Response ' + _tabCapital + '</small></h3>' + _response[_tab];
-				
-	// 			content += '</div>';	
-	// 		}
-	// 	}
-		
-	// 	// CONTENT
-	// 	if(contentText) {
-	// 		tabs += '<li><a href="#content">Content</a></li>';
-	// 		content += '<div class="content">';
-	// 		if(mimeType && mimeType[0].split('/')[0] == 'image') {
-	// 			content += '<img src="data:' + mimeType[0] + ';base64,' + contentText + '" />';
-	// 		}
-	// 		else {
-	// 			content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
-	// 		}
-	// 		content += '</div>';
-	// 	}
-		
-		
-	// 	// TODO: PROGRESS
-	// 	return {
-	// 		sign: sign,
-	// 		toggleSign: toggleSign,
-	// 		method: method,
-	// 		fullUrl: url[0],
-	// 		fileName: url[4],
-	// 		params: url[5],
-	// 		statusToShow: statusText,
-	// 		mimeType: mimeType[0],
-	// 		charset: mimeType[1] || '',
-	// 		size: formatSize(compressedSize,'0') + ' Bytes',
-	// 		fullSize: formatSize(completeSize,'0') + ' Bytes',
-	// 		sizeToShow: sizeToShow,
-	// 		formatedFullSize: formatSize(completeSize / 1024) + ' KB',
-	// 		tabs: tabs,
-	// 		tabContainers: content,
-	// 		progress:progress,
-	// 		progressTitle:'',
-	// 		progressDetails:'',
-	// 		domloaded:onContentLoadText,
-	// 		windowloaded:onLoadText
-	// 	};
-	// };
-	
-	
-	
-	var prepareHar = function(har) {
-		var newHar = {
-			entries:[]
-		},
-		entries = har.log.entries,
-		i = 0, ilen = entries.length,
-		sign = 'glyphicon-arrow-right',
-		toggleSign = 'glyphicon-arrow-down',
-		//TODO: check this later to get from the page ID
-		onLoad = har.log.pages[0].pageTimings.onLoad,
-		domTime = har.log.pages[0].pageTimings.onContentLoad,
-		fullSize, sizeToShow, entrie, url, filename, size, responseHeaders, progressStart,
-		responseCookies, requestCookies, progressContent, startedTime, domloaded, domain,
-		requestHeaders, charset, tabs, content, responseContent, mimeType, windowloaded,
-		_responseContent, progress, startTimeBefore, startTime, startPosition, status,
-		blockedWidth, dnsWidth, connectWidth, sendWidth, waitWidth, receiveWidth, params,
-		requests = ilen, totalSize = 0, totalTime = onLoad, totalSizeCache = 0;
-
-		
-		if(typeof domTime !== 'undefined') {
-			domloaded = (domTime / onLoad) * 100;
-			domloaded = '<span class="domloaded" data-toggle="tooltip" title="DOMContentLoaded (' + formatSize(domTime, 2) + ' ms)" style="left:' + domloaded + '%"></span>';
-		}
+	var strong = function(str,cname) {
+		if(cname)
+			cname = ' class="' + cname + '"';
 		else
-			domloaded = '';
-		windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="Page Loaded (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>';
+			cname = '';
+		return '<strong' + cname + '>' + str + '</strong>';
+	},
+	
+	em = function(str, cname) {
+		if(cname)
+			cname = ' class="' + cname + '"';
+		else
+			cname = '';
+		return '<em' + cname + '>' + str + '</em>';
+	},
+	
+	
+	convertHar = function(entry, i) {
+		
+		
+		var method = entry.request.method,
+		
+			url = entry.request.url.match(/([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i),
+			
+			status = entry.response.status,
+			statusText = entry.response.statusText || '',
+			
+			mimeType = entry.response.content.mimeType && entry.response.content.mimeType.split(';'),
+			
+			completeSize = entry.response.content.size,
+			compressedSize = entry.response.bodySize,
+			sizeToShow = compressedSize,
+		
+			_tabs = ['headers', 'cookies'], tabs = '', content = '',
+			_request = {}, _response = {}, contentText = entry.response.content.text,
+			
+			progress = {
+				startedDateTime:entry.startedDateTime,
+				time: entry.time,
+				blocked: entry.timings.blocked,
+				dns: entry.timings.dns,
+				connect: entry.timings.connect,
+				send: entry.timings.send,
+				wait: entry.timings.wait,
+				receive: entry.timings.receive,
+				ssl: entry.timings.ssl
+			};
+		
+		
+		
+		
+		// METHOD
+		if(method != 'GET')
+			method = strong(method);
+		
+		
+		// URL
+		if(url[4] === '' || !url[4]) {
+			if(i > 1)
+				url[4] = url.splice(1,3).join('');
+			else
+				url[4] = url[3];
+		}
+		
+		
+		// STATUS
+		if(status >= 500)
+			statusText = strong(status + ' ' + statusText, 'text-error');
+		else if(status >= 400)
+			statusText = strong(status + ' ' + statusText, 'text-warning');
+		else if(status < 100)
+			statusText = em(status + ' ' + statusText, 'text-muted');
+		else
+			statusText = status + ' ' + statusText;
+		
+		
+		
+		
+		// SIZE
+		if(compressedSize < 0)
+			sizeToShow = 0;
+		else if(compressedSize === 0)
+			sizeToShow = completeSize;
+			
 
-// debugger;
-
-		for(;i<ilen;i++) {
-			entrie = entries[i];
+		if(status == 304)
+			sizeToShow = em(formatSize(sizeToShow / 1024) + ' KB');
+		else if(status == 200 && compressedSize === 0)
+			sizeToShow = strong(formatSize(sizeToShow / 1024) + ' KB');
+		else
+			sizeToShow = formatSize(sizeToShow / 1024) + ' KB';
+		
+		
+		
+		
+		
+		
+		
+		// TABS INFO
+		for(var j=0, jlen=_tabs.length, _tab, _tabCapital;j<jlen;j++) {
 			
-			url = entrie.request.url;
+			_tab = _tabs[j];
+			_request[_tab] = objListToHtml(entry.request[_tab], _tab=='headers'?['ookie']:undefined);
+			_response[_tab] = objListToHtml(entry.response[_tab], _tab=='headers'?['ookie']:undefined);
 			
-			filename = url.split('?')[0].split('#')[0].split('/');
-			filename = filename[filename.length - 1];
-			
-			if(filename === '')
-				domain = url.split('?')[0].split('#')[0];
-			else {
-				domain = url.split('?')[0].split('#')[0].split('/');
-				domain.pop();
-				domain = domain.join('/');
-			}
-			
-			if(url.split('?').length > 1) {
-				params = url.split('?');
-				params.shift();
-				params = '?' + params.join('?');
-			}
-			else if(url.split('#').length > 1) {
-				params = url.split('#');
-				params.shift();
-				params = '#' + params.join('#');
-			}
-			else {
-				params = '';
-			}
+			if(_request[_tab] || _response[_tab]) {
+				_tabCapital = _tab.charAt(0).toUpperCase() + _tab.substr(1);
+				tabs += '<li><a href="#' + _tab + '">' + _tabCapital + '</a></li>';
+				content += '<div class="' + _tab + '">';
 				
-			
-			// filename = url[url.length - 1].split('#')[0].split('?')[0];
-			
-			responseHeaders = objListToHtml(entrie.response.headers, ['cookie', 'Cookie', 'cookies', 'Cookies']);
-			requestHeaders = objListToHtml(entrie.request.headers, ['cookie', 'Cookie', 'cookies', 'Cookies']);
-			responseCookies = objListToHtml(entrie.response.cookies);
-			requestCookies = objListToHtml(entrie.request.cookies);
-			responseContent = entrie.response.content.text;
-			
-			
-			totalSize += entrie.response.content.size;
-			totalSizeCache += entrie.response.bodySize;
-			
-			
-			fullSize = entrie.response.content.size;
-			size = entrie.response.bodySize;
-			if(size < 0)
-				sizeToShow = 0;
-			else if(size === 0)
-				sizeToShow = fullSize;
-			else
-				sizeToShow = size;
-			
-			status = entrie.response.status;
-			
-			if(status == 304)
-				sizeToShow = '<em>' + formatSize(parseInt(sizeToShow,10) / 1024) + ' KB</em>';
-			else if(status == 200 && size === 0)
-				sizeToShow = '<strong>' + formatSize(parseInt(sizeToShow,10) / 1024) + ' KB</strong>';
-			else
-				sizeToShow = formatSize(parseInt(sizeToShow,10) / 1024) + ' KB';
-			
-			mimeType = entrie.response.content.mimeType && entrie.response.content.mimeType.split(";")[0];
-			tabs = '';
-			content = '';
-			
-			if(responseHeaders || requestHeaders) {
-				tabs += '<li><a href="#headers">Headers</a></li>';
-				content += '<div class="headers"><h3><small>Request Headers</small></h3>' + requestHeaders + '<h3><small>Response Headers</small></h3>' + responseHeaders + '</div>';
+				if(_request[_tab])
+					content += '<h3><small>Request ' + _tabCapital + '</small></h3>' + _request[_tab];
+				
+				if(_response[_tab])
+					content += '<h3><small>Response ' + _tabCapital + '</small></h3>' + _response[_tab];
+				
+				content += '</div>';	
 			}
-			
-			if(requestCookies || responseCookies) {
-				tabs += '<li><a href="#cookies">Cookies</a></li>';
-				content += '<div class="cookies"><h3><small>Request Cookies</small></h3>' + requestCookies + '<h3><small>Response Cookies</small></h3>' + responseCookies + '</div>';
-			}
-			
-			if(responseContent) {
-				tabs += '<li><a href="#content">Content</a></li>';
-				content += '<div class="content">';
-				if(mimeType && mimeType.split('/')[0] == 'image') {
-					content += '<img src="data:' + mimeType + ';base64,' + responseContent + '" />';
-				}
-				else {
-					content += '<pre class="pre-scrollable">' + htmlEncode(responseContent) + '</pre>';
-				}
-				content += '</div>';
-			}
-			
-			progress = '<div class="progress">';
-			
-			if(!startTimeBefore) {
-				startTimeBefore = (new Date(entrie.startedDateTime)).getTime();
-				startedTime = startPosition = 0;
+		}
+		
+		// CONTENT
+		if(contentText) {
+			tabs += '<li><a href="#content">Content</a></li>';
+			content += '<div class="content">';
+			if(mimeType && mimeType[0].split('/')[0] == 'image') {
+				content += '<img src="data:' + mimeType[0] + ';base64,' + contentText + '" />';
 			}
 			else {
-				startTime = (new Date(entrie.startedDateTime)).getTime();
-				startedTime = startTime - startTimeBefore;
-				startPosition = (startedTime / onLoad) * 100;
+				content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
 			}
+			content += '</div>';
+		}
+		
+		
+		
+		return {
+			sign: sign,
+			toggleSign: toggleSign,
+			method: method,
+			fullUrl: url[0],
+			fileName: url[4],
+			params: url[5],
+			statusToShow: statusText,
+			mimeType: mimeType && mimeType[0] || '',
+			charset: mimeType && mimeType[1] || '',
+			size: formatSize(compressedSize,'0') + ' Bytes',
+			fullSize: formatSize(completeSize,'0') + ' Bytes',
+			sizeToShow: sizeToShow,
+			formatedFullSize: formatSize(completeSize / 1024) + ' KB',
+			tabs: tabs,
+			tabContainers: content,
+			progress:progress,
+			completeSize:completeSize,
+			completeCompressedSize:compressedSize,
+			// progressTitle:'',
+			// progressDetails:'',
+			domloaded:onContentLoadText,
+			windowloaded:onLoadText
+		};
+		
+	},
+	pct = function(value, pct) {
+		if(!value)
+			return 0;
+		return ((value / pct) * 100) + '%';
+	},
+	convertProgress = function(entries) {
+		
+		var startedDateTimeBefore = (new Date(entries[0].progress.startedDateTime)).getTime(),
+			progressContent, startedDateTime, startPosition, startedTime,
+			blocked, dns, connect, send, wait, receive;
+		
+		// debugger;
+		
+		for(var i=0, ilen=entries.length, entry;i<ilen;i++) {
 			
-			blockedWidth = (entrie.timings.blocked / onLoad) * 100;
-			dnsWidth = (entrie.timings.dns / onLoad) * 100;
-			connectWidth = (entrie.timings.connect / onLoad) * 100;
-			sendWidth = (entrie.timings.send / onLoad) * 100;
-			waitWidth = (entrie.timings.wait / onLoad) * 100;
-			receiveWidth = (entrie.timings.receive / onLoad) * 100;
+			entry = entries[i];
 			
-			progress += '<div class="progress-bar progress-bar-space" style="width: ' + startPosition + '%"></div>' + 
-						'<div class="progress-bar progress-bar-warning" style="width: ' + blockedWidth + '%"></div>' + 
-						'<div class="progress-bar progress-bar-last" style="width: ' + dnsWidth + '%"></div>' + 
-						'<div class="progress-bar progress-bar-info" style="width: ' + connectWidth + '%"></div>' + 
-						'<div class="progress-bar progress-bar-primary" style="width: ' + sendWidth + '%"></div>' + 
-						'<div class="progress-bar progress-bar-danger" style="width: ' + waitWidth + '%"></div>' + 
-						'<div class="progress-bar progress-bar-success" style="width: ' + receiveWidth + '%"></div></div>';
+			startedDateTime = (new Date(entry.progress.startedDateTime)).getTime();
+			startedTime = startedDateTime - startedDateTimeBefore;
 			
-			progressStart = '<p class=\'clearfix start-time\'><strong>Start Time:</strong> <em>' + startedTime + ' ms</em></p>';
+			// startedDateTimeBefore = startedDateTime;
+			
+			blocked = entry.progress.blocked;
+			dns = entry.progress.dns;
+			connect = entry.progress.connect;
+			send = entry.progress.send;
+			wait = entry.progress.wait;
+			receive = entry.progress.receive;
+			
 			
 			progressContent = '';
-			if(entrie.timings.blocked >= 0)
-				progressContent += '<p class=\'clearfix bg-warning\'><strong>Blocking: </strong> <em> ~' + formatSize(entrie.timings.blocked,5) + ' ms</em></p>';
-			if(entrie.timings.dns >= 0)
-				progressContent += '<p class=\'clearfix bg-last\'><strong>DNS: </strong> <em> ~' + formatSize(entrie.timings.dns,5) + ' ms</em></p>';
-			if(entrie.timings.connect >= 0)
-				progressContent += '<p class=\'clearfix bg-info\'><strong>Connect: </strong> <em> ~' + formatSize(entrie.timings.connect,5) + ' ms</em></p>';
-			if(entrie.timings.send >= 0)
-				progressContent += '<p class=\'clearfix bg-primary\'><strong>Send: </strong> <em> ~' + formatSize(entrie.timings.send,5) + ' ms</em></p>';
-			if(entrie.timings.wait >= 0)
-				progressContent += '<p class=\'clearfix bg-danger\'><strong>Wait: </strong> <em> ~' + formatSize(entrie.timings.wait,5) + ' ms</em></p>';
-			if(entrie.timings.receive >= 0)
-				progressContent += '<p class=\'clearfix bg-success\'><strong>Receive: </strong> <em> ~' + formatSize(entrie.timings.receive,5) + ' ms</em></p>';
+			
+			if(blocked >= 0)
+				progressContent += '<p class=\'clearfix bg-warning\'><strong>Blocking: </strong> <em> ~' + formatSize(blocked,5) + ' ms</em></p>';
+			if(dns >= 0)
+				progressContent += '<p class=\'clearfix bg-last\'><strong>DNS: </strong> <em> ~' + formatSize(dns,5) + ' ms</em></p>';
+			if(connect >= 0)
+				progressContent += '<p class=\'clearfix bg-info\'><strong>Connect: </strong> <em> ~' + formatSize(connect,5) + ' ms</em></p>';
+			if(send >= 0)
+				progressContent += '<p class=\'clearfix bg-primary\'><strong>Send: </strong> <em> ~' + formatSize(send,5) + ' ms</em></p>';
+			if(wait >= 0)
+				progressContent += '<p class=\'clearfix bg-danger\'><strong>Wait: </strong> <em> ~' + formatSize(wait,5) + ' ms</em></p>';
+			if(receive >= 0)
+				progressContent += '<p class=\'clearfix bg-success\'><strong>Receive: </strong> <em> ~' + formatSize(receive,5) + ' ms</em></p>';
 			
 			
+			entries[i].progressStart = '<strong>Start Time:</strong> <em>' + startedTime + ' ms</em>';
 			
-			if(status >= 500)
-				status = '<strong>' + status + ' ' + entrie.response.statusText + '</strong>';
-			else if(status >= 400)
-				status = '<em>' + status + ' ' + entrie.response.statusText + '</em>';
-			else if(status < 100)
-				status = '<b><i>' + status + ' ' + (entrie.response.statusText || '') + '</i></b>';
-			else
-				status = status + ' ' + entrie.response.statusText;
+			entries[i].progressContent = progressContent;
 			
 			
+			entries[i].startPosition = pct(startedTime, onLoad);
+			entries[i].blockedWidth = pct(blocked, onLoad);
+			entries[i].dnsWidth = pct(dns, onLoad);
+			entries[i].connectWidth = pct(connect, onLoad);
+			entries[i].sendWidth = pct(send, onLoad);
+			entries[i].waitWidth = pct(wait, onLoad);
+			entries[i].receiveWidth = pct(receive, onLoad);
 			
-			newHar.entries.push({
-				sign:sign,
-				toggleSign:toggleSign,
-				method: (entrie.request.method=='GET')?(entrie.request.method):('<strong>' + entrie.request.method + '</strong>'),
-				fullUrl: url,
-				//TODO: check when the domain is different
-				fileName: filename || (i>1?domain:'/'),
-				params:params,
-				statusToShow:status,
-				responseStatus:entrie.response.status,
-				responseTextStatus:entrie.response.statusText,
-				mimeType:mimeType,
-				charset:(mimeType && entrie.response.content.mimeType.split(";")[1]) || '',
-				size:formatSize(size,'0') + ' Bytes',
-				fullSize:formatSize(fullSize,'0') + ' Bytes',
-				sizeToShow:sizeToShow,
-				formatedFullSize:formatSize(parseInt(fullSize,10) / 1024) + ' KB',
-				tabs:tabs,
-				tabContainers:content,
-				progress:progress,
-				progressStart:progressStart,
-				progressContent:progressContent,
-				domloaded:domloaded,
-				windowloaded:windowloaded
-			});
+			
 		}
 		
-		
-		newHar.info = '<th>' + requests + ' requests</th>' + 
-						'<th colspan="3" class="text-right">~' + formatSize(totalSize / 1024, 2) + ' KB ' + 
-						'(~' + formatSize(totalSizeCache / 1024, 2) + ' KB compressed)</th>' + 
-						'<th class="text-center">' + (domTime?'(' + formatSize(domTime / 1000, 2) + 's) ':'') + formatSize(totalTime / 1000, 2) + 's</th>';
-		
-		return newHar;
+		return entries;
 		
 	},
 	objListToHtml = function(arr, filters) {
@@ -425,6 +258,58 @@ module.exports = function(har, htmlEncode) {
 		}
 	};
 	
-	return prepareHar(har);
+	
+	
+	var page = har.pages[0],
+		harEntries = har.entries,
+		entries = [],
+		id = page.id,
+		sign = 'glyphicon-arrow-right',
+		toggleSign = 'glyphicon-arrow-down',
+		onContentLoad = page.pageTimings.onContentLoad || false,
+		onLoad = page.pageTimings.onLoad,
+		onContentLoadText = '',
+		onLoadText = '<span class="windowloaded" data-toggle="tooltip" title="Page Loaded (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>',
+		i, ilen;
+	
+	
+	if(onContentLoad) {
+		onContentLoadText = (onContentLoad / onLoad) * 100;
+		onContentLoadText = '<span class="domloaded" data-toggle="tooltip" title="DOMContentLoaded (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
+	}
+	
+	
+	
+	
+	var totalSize = 0,
+		totalCompressedSize = 0;
+	
+	if(id && id !== '') {
+		for(i=0, ilen=harEntries.length;i<ilen;i++) {
+			if(harEntries[i].pageref && harEntries[i].pageref == page.id) {
+				entries.push(convertHar(harEntries[i], i));
+				totalSize += entries[entries.length - 1].completeSize;
+				totalCompressedSize += entries[entries.length - 1].completeCompressedSize;
+			}
+		}
+	}
+	else {
+		for(i=0, ilen=harEntries.length;i<ilen;i++) {
+			entries.push(convertHar(harEntries[i], i));
+			totalSize += entries[entries.length - 1].completeSize;
+			totalCompressedSize += entries[entries.length - 1].completeCompressedSize;
+		}
+	}
+	
+	
+	entries = convertProgress(entries);
+	
+	entries.info = '<th>' + entries.length + ' requests</th>' + 
+						'<th colspan="3" class="text-right">~' + formatSize(totalSize / 1024, 2) + ' KB ' + 
+						'(~' + formatSize(totalCompressedSize / 1024, 2) + ' KB compressed)</th>' + 
+						'<th class="text-center">' + (onContentLoad?'(' + formatSize(onContentLoad / 1000, 2) + 's) ':'') + formatSize(onLoad / 1000, 2) + 's</th>';
+	
+	return entries;
+	
 	
 };
