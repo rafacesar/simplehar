@@ -5,8 +5,84 @@ window.module = {};
 	d.body.appendChild(s);
 })(document);
 $(function($) {
-	var stop;
-	if(~navigator.userAgent.indexOf('Chrome') && location.href.indexOf('file:') === 0 && !$('.top').length) {
+	
+	$.get('src/template.html', function() {
+		$('.container').load('src/template.html table');
+		
+		
+		$('body').on('dragover', function(evt) {
+			var $drop = $('#drop');
+			if($drop.length) {
+				$drop.css('display', 'table');
+			}
+			else {
+				$(document.createElement('div'))
+				.attr('id', 'drop')
+				.css({
+					width:'100%',
+					height:'100%',
+					position:'absolute',
+					left:0,
+					top:0,
+					border:'7px dashed #666',
+					display:'table',
+					textAlign:'center',
+					backgroundColor:'rgba(0,0,0,.3)'
+				})
+				.append(
+					$(document.createElement('span'))
+					.text('Drop Here! :)')
+					.css({
+						color: '#EEE',
+						display:'table-cell',
+						'text-shadow': '2px 2px 5px #066',
+						fontSize:'50px',
+						verticalAlign:'middle'
+					})
+				)
+				.appendTo(document.body);
+			}
+			$drop.data('hide','false');
+			return false;
+		}).on('dragend', function(evt) {
+			return false;
+		}).on('dragleave', function(evt) {
+			var $drop = $('#drop');
+			$drop.data('hide','true');
+			setTimeout(function() {
+				if($drop.data('hide') == 'true')
+					$drop.css('display', 'none');
+			}, 50);
+			return false;
+		}).on('drop', function(evt) {
+			evt.stopPropagation();
+			evt.preventDefault();
+			// debugger;
+			$('#drop').css('display', 'none');
+			
+			var file = evt.originalEvent.dataTransfer.files[0],
+				reader = new FileReader();
+			
+			reader.onload = function (evt) {
+				var har;
+				try {
+					har = JSON.parse(evt.target.result);
+				}
+				catch(e) {
+					alert('Arquivo fora do formato JSON');
+					return;
+				}
+				
+				runHar(har);
+			};
+			reader.readAsText(file);
+			
+			
+			return false;
+		});
+		
+		
+	}).fail(function() {
 		$(document.createElement('p')).css({
 			width:'100%',
 			height:'100%',
@@ -20,7 +96,7 @@ $(function($) {
 		})
 		.append(
 			$(document.createElement('span'))
-			.text('Chrome + Ajax + Local = :(')
+			.text('Local Ajax is not supported :(')
 			.css({
 				display:'table-cell',
 				'text-shadow': '2px 2px 5px #333',
@@ -30,9 +106,10 @@ $(function($) {
 				fontWeight:'bold'
 			})
 		).appendTo(document.body);
-		return;
-	}
-	$('.container').load('src/template.html table');
+		$('body').html($('body').html().replace('{content}', ''));
+	});
+	
+	
 	
 	
 	var runHar = function(har) {
@@ -70,78 +147,6 @@ $(function($) {
 		
 	};
 	
-	$('body').on('dragover', function(evt) {
-		var $drop = $('#drop');
-		if($drop.length) {
-			$drop.css('display', 'table');
-		}
-		else {
-			$(document.createElement('div'))
-			.attr('id', 'drop')
-			.css({
-				width:'100%',
-				height:'100%',
-				position:'absolute',
-				left:0,
-				top:0,
-				border:'7px dashed #666',
-				display:'table',
-				textAlign:'center',
-				backgroundColor:'rgba(0,0,0,.3)'
-			})
-			.append(
-				$(document.createElement('span'))
-				.text('Drop Here! :)')
-				.css({
-					color: '#EEE',
-					display:'table-cell',
-					'text-shadow': '2px 2px 5px #066',
-					fontSize:'50px',
-					verticalAlign:'middle'
-				})
-			)
-			.appendTo(document.body);
-		}
-		$drop.data('hide','false');
-		return false;
-	}).on('dragend', function(evt) {
-		return false;
-	}).on('dragleave', function(evt) {
-		var $drop = $('#drop');
-		$drop.data('hide','true');
-		setTimeout(function() {
-			if($drop.data('hide') == 'true')
-				$drop.css('display', 'none');
-		}, 50);
-		return false;
-	});
-	
-	$('body').on('drop', function(evt) {
-		evt.stopPropagation();
-		evt.preventDefault();
-		
-		$('#drop').css('display', 'none');
-		
-		var file = evt.originalEvent.dataTransfer.files[0],
-			reader = new FileReader();
-		
-		reader.onload = function (evt) {
-			var har;
-			try {
-				har = JSON.parse(evt.target.result);
-			}
-			catch(e) {
-				alert('Arquivo fora do formato JSON');
-				return;
-			}
-			
-			runHar(har);
-		};
-		reader.readAsText(file);
-		
-		
-		return false;
-	});
 	
 	
 });
