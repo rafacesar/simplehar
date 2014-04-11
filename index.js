@@ -27,13 +27,13 @@
 		
 		har = JSON.parse(har);
 		
-		var encode = (function() {
+		var encode = function() {
 			var Ent = require('html-entities').XmlEntities,ent;
 			ent = new Ent();
 			return ent.encode;
-		})();
+		};
 		
-		var newHar = hth(har, encode);
+		var newHar = hth(har, encode());
 		
 		
 		fs.readFile('src/requestTemplate.html', function(err,template) {
@@ -41,10 +41,10 @@
 			
 			var html =  '',
 				i = 0,
-				ilen = newHar.entries.length,
+				ilen = newHar.length,
 				prop, nHar, _html;
 			for(;i<ilen;i++) {
-				nHar = newHar.entries[i];
+				nHar = newHar[i];
 				_html = template.toString();
 				for(prop in nHar) {
 					_html = _html.replace(new RegExp('{' + prop + '}','g'), nHar[prop]);
