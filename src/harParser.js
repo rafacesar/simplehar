@@ -106,8 +106,8 @@ module.exports = function(har, htmlEncode) {
 		for(var j=0, jlen=_tabs.length, _tab, _tabCapital;j<jlen;j++) {
 			
 			_tab = _tabs[j];
-			_request[_tab] = objListToHtml(entry.request[_tab], _tab=='headers'?['ookie']:undefined);
-			_response[_tab] = objListToHtml(entry.response[_tab], _tab=='headers'?['ookie']:undefined);
+			_request[_tab] = objListToHtml(entry.request[_tab], _tab=='headers'?['cookie']:undefined);
+			_response[_tab] = objListToHtml(entry.response[_tab], _tab=='headers'?['cookie']:undefined);
 			
 			if(_request[_tab] || _response[_tab]) {
 				_tabCapital = _tab.charAt(0).toUpperCase() + _tab.substr(1);
@@ -234,13 +234,20 @@ module.exports = function(har, htmlEncode) {
 		if(arr.length) {
 			var dl = '<dl class="dl-horizontal">';
 			for(var i=0,ilen=arr.length;i<ilen;i++) {
-				if(!filters || !filters.length || filters.indexOf(arr[i].name) == -1)
+				if(!filters || !filters.length || _indexOf(arr[i].name, filters) == -1)
 					dl += '<dt>' + arr[i].name + '</dt><dd>' + arr[i].value.split(';').join(';<br>') + '</dd>';
 			}
 			dl += '</dl>';
 			return dl;
 		}
 		return '';
+	},
+	_indexOf = function(pattern, arr) {
+		for(var i=0, ilen=arr.length;i<ilen;i++) {
+			if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) != -1)
+				return i;
+		}
+		return -1;
 	},
 	formatSize = function(number, precision) {
 		var matcher, fPoint;
