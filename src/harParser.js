@@ -63,7 +63,7 @@ module.exports = function(har, htmlEncode) {
 		// URL
 		if(url[4] === '' || !url[4]) {
 			if(i > 1)
-				url[4] = url.splice(1,3).join('');
+				url[4] = url[1] + url[2] + url[3];//.splice(1,3).join('');
 			else
 				url[4] = url[3];
 		}
