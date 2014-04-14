@@ -37,7 +37,7 @@ module.exports = function(har, htmlEncode) {
 			compressedSize = entry.response.bodySize,
 			sizeToShow = compressedSize,
 		
-			_tabs = ['headers', 'cookies'], tabs = '', content = '',
+			_tabs = ['headers', 'cookies', 'queryString'], tabs = '', content = '',
 			_request = {}, _response = {}, contentText = entry.response.content.text,
 			
 			progress = {
