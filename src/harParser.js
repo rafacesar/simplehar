@@ -232,7 +232,7 @@ module.exports = function(har, htmlEncode) {
 		
 	},
 	objListToHtml = function(arr, filters) {
-		if(arr.length) {
+		if(arr && arr.length) {
 			var dl = '<dl class="dl-horizontal">';
 			for(var i=0,ilen=arr.length;i<ilen;i++) {
 				if(!filters || !filters.length || _indexOf(arr[i].name, filters) == -1)
