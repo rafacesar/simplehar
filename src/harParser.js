@@ -145,7 +145,7 @@ module.exports = function(har, htmlEncode) {
 			method: method,
 			fullUrl: url[0],
 			fileName: url[4],
-			params: url[5],
+			params: url[5] || '',
 			statusToShow: statusText,
 			mimeType: mimeType && mimeType[0] || '',
 			charset: mimeType && mimeType[1] || '',
@@ -158,8 +158,6 @@ module.exports = function(har, htmlEncode) {
 			progress:progress,
 			completeSize:completeSize,
 			completeCompressedSize:compressedSize,
-			// progressTitle:'',
-			// progressDetails:'',
 			domloaded:onContentLoadText,
 			windowloaded:onLoadText,
 			rId:Math.floor((Math.random()*(new Date()).getTime())+1)
