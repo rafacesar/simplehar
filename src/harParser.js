@@ -161,7 +161,8 @@ module.exports = function(har, htmlEncode) {
 			// progressTitle:'',
 			// progressDetails:'',
 			domloaded:onContentLoadText,
-			windowloaded:onLoadText
+			windowloaded:onLoadText,
+			rId:Math.floor((Math.random()*(new Date()).getTime())+1)
 		};
 		
 	},

@@ -59,13 +59,20 @@
 				$i = $this.find('i'),
 				classname = $i.get(0).className,
 				toggleClass = $i.data('toggle-sign'),
-				$next = $this.next();
+				$next = $('#inside-' + $this.attr('id').substr(4));
+			
+			
+			
 			
 			if($this.hasClass('opened')) {
 				$this.removeClass('opened');
 				$next.addClass('hidden');
 			}
 			else {
+				
+				if($this.next() != $next)
+					$this.after($next);
+				
 				$this.addClass('opened');
 				$next.removeClass('hidden');
 			}
@@ -91,6 +98,39 @@
 			container:$table.parent()
 		});
 		
+		$table.stupidtable({
+			url:function(a, b) {
+				console.log(this);
+				console.log(arguments);
+				var _a = a.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0],
+					_b = b.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0];
+					
+				if(_a < _b)
+					return -1;
+				else if(_a > _b)
+					return 1;
+				else
+					return 0;
+			},
+			size:function(a, b) {
+				var _a = parseFloat(a.replace(',','.')),
+					_b = parseFloat(b.replace(',','.'));
+				
+				return _a - _b;
+				
+			}
+		});
+		$table.bind('beforetablesort', function() {
+			$('tr.top.opened').click();
+			$('.loader').show();
+		});
+		$table.bind('aftertablesort', function() {
+			$('.loader').hide();
+		});
+		
+		
+		$('.loader').hide();
+		
 	};
 	
 
@@ -101,6 +141,9 @@
 		jQuery(addInteraction);
 	};
 	if(!document.getElementById('harParser')) {
+		var div = document.createElement('div');
+		div.className = 'loader';
+		document.body.appendChild(div);
 		waiting();
 	}
 	window.addInteraction = addInteraction;

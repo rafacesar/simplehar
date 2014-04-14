@@ -1,4 +1,4 @@
-<tr class="top">
+<tr class="top" id="top-{rId}">
 	<td class="url">
 		<div>
 			<i class="glyphicon {sign}" data-toggle-sign="glyphicon {toggleSign}"></i>
@@ -12,7 +12,7 @@
 	<td class="timeline" data-toggle="popover" title="{progressStart}" data-content="{progressContent}">
 		<div>
 			<div class="progress">
-				<div class="progress-bar progress-bar-space" style="width:{startPosition}"></div>
+				<div class="progress-bar progress-bar-space" style="width:{startPosition}">{startPosition}</div>
 				<div class="progress-bar progress-bar-warning" style="width:{blockedWidth}"></div>
 				<div class="progress-bar progress-bar-last" style="width:{dnsWidth}"></div>
 				<div class="progress-bar progress-bar-info" style="width:{connectWidth}"></div>
@@ -25,7 +25,7 @@
 		</div>
 	</td>
 </tr>
-<tr class="inside">
+<tr class="inside" id="inside-{rId}">
 	<td colspan="5">
 		<ul class="nav nav-tabs">
 			{tabs}

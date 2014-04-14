@@ -137,6 +137,8 @@
 }
 .progress-bar-space {
 	background:transparent;
+	overflow:hidden;
+	text-indent:-5000px;
 }
 
 .bg-secondary {
@@ -202,6 +204,26 @@ tfoot td {
 	background-color:#000;
 }
 
+.sorting-asc:after, .sorting-desc:after {
+	display:inline-block;
+	font-family:'Glyphicons Halflings';
+	font-weight:400;
+	line-height:1;
+	-webkit-font-smoothing:antialiased;
+	
+	content:"\e155";
+	padding-left:4px;
+	font-size:12px;
+}
+.sorting-desc:after {
+	content:"\e156";
+}
+.container thead th {
+	cursor:pointer;
+}
+.container thead th:hover {
+	text-decoration:underline;
+}
 
 
 .loader {
