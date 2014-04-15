@@ -111,14 +111,14 @@ module.exports = function(har, htmlEncode) {
 			
 			if(_request[_tab] || _response[_tab]) {
 				_tabCapital = _tab.charAt(0).toUpperCase() + _tab.substr(1);
-				tabs += '<li><a href="#' + _tab + '">' + _tabCapital + '</a></li>';
+				tabs += '<li><a href="#' + _tab + '">[' + _tabCapital + ']</a></li>';
 				content += '<div class="' + _tab + '">';
 				
 				if(_request[_tab])
-					content += '<h3><small>Request ' + _tabCapital + '</small></h3>' + _request[_tab];
+					content += '<h3><small>[Request ' + _tabCapital + ']</small></h3>' + _request[_tab];
 				
 				if(_response[_tab])
-					content += '<h3><small>Response ' + _tabCapital + '</small></h3>' + _response[_tab];
+					content += '<h3><small>[Response ' + _tabCapital + ']</small></h3>' + _response[_tab];
 				
 				content += '</div>';	
 			}
@@ -126,7 +126,7 @@ module.exports = function(har, htmlEncode) {
 		
 		// CONTENT
 		if(contentText) {
-			tabs += '<li><a href="#content">Content</a></li>';
+			tabs += '<li><a href="#content">[Content]</a></li>';
 			content += '<div class="content">';
 			if(mimeType && mimeType[0].split('/')[0] == 'image') {
 				content += '<img src="data:' + mimeType[0] + ';base64,' + contentText + '" />';
@@ -197,20 +197,20 @@ module.exports = function(har, htmlEncode) {
 			progressContent = '';
 			
 			if(blocked >= 0)
-				progressContent += '<p class=\'clearfix bg-warning\'><strong>Blocking: </strong> <em> ~' + formatSize(blocked,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> ~' + formatSize(blocked,5) + ' ms</em></p>';
 			if(dns >= 0)
-				progressContent += '<p class=\'clearfix bg-last\'><strong>DNS: </strong> <em> ~' + formatSize(dns,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> ~' + formatSize(dns,5) + ' ms</em></p>';
 			if(connect >= 0)
-				progressContent += '<p class=\'clearfix bg-info\'><strong>Connect: </strong> <em> ~' + formatSize(connect,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> ~' + formatSize(connect,5) + ' ms</em></p>';
 			if(send >= 0)
-				progressContent += '<p class=\'clearfix bg-primary\'><strong>Send: </strong> <em> ~' + formatSize(send,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> ~' + formatSize(send,5) + ' ms</em></p>';
 			if(wait >= 0)
-				progressContent += '<p class=\'clearfix bg-danger\'><strong>Wait: </strong> <em> ~' + formatSize(wait,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> ~' + formatSize(wait,5) + ' ms</em></p>';
 			if(receive >= 0)
-				progressContent += '<p class=\'clearfix bg-success\'><strong>Receive: </strong> <em> ~' + formatSize(receive,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> ~' + formatSize(receive,5) + ' ms</em></p>';
 			
 			
-			entries[i].progressStart = '<strong>Start Time:</strong> <em>' + startedTime + ' ms</em>';
+			entries[i].progressStart = '<strong>[Start Time]:</strong> <em>' + startedTime + ' ms</em>';
 			
 			entries[i].progressContent = progressContent;
 			
@@ -275,13 +275,13 @@ module.exports = function(har, htmlEncode) {
 		onContentLoad = page.pageTimings.onContentLoad || false,
 		onLoad = page.pageTimings.onLoad,
 		onContentLoadText = '',
-		onLoadText = '<span class="windowloaded" data-toggle="tooltip" title="Page Loaded (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>',
+		onLoadText = '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>',
 		i, ilen;
 	
 	
 	if(onContentLoad) {
 		onContentLoadText = (onContentLoad / onLoad) * 100;
-		onContentLoadText = '<span class="domloaded" data-toggle="tooltip" title="DOMContentLoaded (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
+		onContentLoadText = '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
 	}
 	
 	
@@ -312,9 +312,9 @@ module.exports = function(har, htmlEncode) {
 	
 	entries.title = page.title;
 	
-	entries.info = '<th>' + entries.length + ' requests</th>' + 
+	entries.info = '<th>' + entries.length + ' [requests]</th>' + 
 						'<th colspan="3" class="text-right">~' + formatSize(totalSize / 1024, 2) + ' KB ' + 
-						'(~' + formatSize(totalCompressedSize / 1024, 2) + ' KB compressed)</th>' + 
+						'(~' + formatSize(totalCompressedSize / 1024, 2) + ' KB [compressed])</th>' + 
 						'<th class="text-center">' + (onContentLoad?'(' + formatSize(onContentLoad / 1000, 2) + 's) ':'') + formatSize(onLoad / 1000, 2) + 's</th>';
 	
 	return entries;

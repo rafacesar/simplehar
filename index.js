@@ -61,7 +61,8 @@
 						.replace('{info}', newHar.info)
 						.replace('{title}', newHar.title);
 				
-				var tpl, css, js;
+				var tpl, css, js, replacer, translations,
+					lng = args.lng || false;
 				
 				
 				if(!args.frame) {
@@ -79,6 +80,33 @@
 					js = fs.readFileSync('src/script.js');
 					html = html.replace('{script}', '<script>' + js + '</script>');
 				}
+				
+				
+				
+				if(fs.existsSync('src/translate.json') && lng) {
+					translations = fs.readFileSync('src/translate.json');
+					try {
+						translations = JSON.parse(translations);
+					}
+					catch(e) {
+						translations = false;
+					}
+					
+					
+					if(translations && translations[lng]) {
+						replacer = function(complete, match) {
+							return (translations[lng][match]) || match;
+						};
+					}
+					else if(translations === false) {
+						replacer = "$1";
+					}
+				}
+				else {
+					replacer = "$1";
+				}
+				
+				html = html.replace(/\[([^\]]+)\]/g, replacer);
 				
 				
 				fs.writeFile(args.html, html, function(err) {

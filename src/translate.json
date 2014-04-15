@@ -1,0 +1,16 @@
+{
+	"pt-BR":{
+		"Size":"Tamanho",
+		"Timeline":"Tempo",
+		"compressed":"comprimido",
+		"Content":"Conteúdo",
+		"Start Time":"Momento inicial",
+		"Blocking":"Bloqueado",
+		"Connect":"Conectando",
+		"Send":"Enviando",
+		"Wait":"Aguardando",
+		"Receive":"Recebendo",
+		"Headers":"Cabeçalhos",
+		"requests":"requisições"
+	}
+}
