@@ -5,10 +5,13 @@ window.module = {};
 	d.body.appendChild(s);
 })(document);
 $(function($) {
-	
+	$.getJSON('src/translate.json', function(data) {
+		window.translations = data || false;
+	});
 	$.get('src/template.html', function() {
 		$('.container').load('src/template.html table', function() {
 			$('caption').html('');
+			translateTemplate($('.har-table'));
 		});
 		
 		
@@ -124,7 +127,28 @@ $(function($) {
 		$('body').html($('body').html().replace('{content}', ''));
 	});
 	
-	
+	var translateTemplate = function($elm) {
+		var html = $elm.html(),
+			translations = window.translations,
+			lng = navigator.language,
+			replacer;
+		if(translations && translations[lng]) {
+			replacer = function(complete, match) {
+				return (translations[lng][match]) || match;
+			};
+		}
+		else if(translations === false) {
+			replacer = "$1";
+		}
+		else {
+			return setTimeout(function() {translateTemplate($elm);}, 500);
+		}
+		
+		$elm.html(
+			html.replace(/\[([^\]]+)\]/g, replacer)
+		);
+		
+	};
 	
 	
 	var runHar = function(har) {
@@ -155,7 +179,7 @@ $(function($) {
 			$('tfoot tr').html(newHar.info);
 			$('caption').html(newHar.title);
 			// $('.har-table').html(newHar.title);
-			
+			translateTemplate($('tbody').parent());
 			$('.loader').hide();
 			
 			addInteraction($);
