@@ -1,8 +1,8 @@
 {
   "name": "simplehar",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Har viewer made simple",
-  "main": "index.js",
+  "main": "./lib/simplehar.js",
   "scripts": {
     "test": "grunt test"
   },
@@ -10,6 +10,7 @@
     "type": "git",
     "url": "https://github.com/rafacesar/simplehar.git"
   },
+  "bin": "./bin/simplehar",
   "keywords": [
     "har",
     "viewer",
