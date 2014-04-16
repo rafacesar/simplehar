@@ -98,36 +98,37 @@
 			container:$table.parent()
 		});
 		
-		$table.stupidtable({
-			url:function(a, b) {
-				console.log(this);
-				console.log(arguments);
-				var _a = a.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0],
-					_b = b.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0];
+		if($table.stupidtable) {
+			$table.stupidtable({
+				url:function(a, b) {
+					console.log(this);
+					console.log(arguments);
+					var _a = a.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0],
+						_b = b.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0];
+						
+					if(_a < _b)
+						return -1;
+					else if(_a > _b)
+						return 1;
+					else
+						return 0;
+				},
+				size:function(a, b) {
+					var _a = parseFloat(a.replace(',','.')),
+						_b = parseFloat(b.replace(',','.'));
 					
-				if(_a < _b)
-					return -1;
-				else if(_a > _b)
-					return 1;
-				else
-					return 0;
-			},
-			size:function(a, b) {
-				var _a = parseFloat(a.replace(',','.')),
-					_b = parseFloat(b.replace(',','.'));
-				
-				return _a - _b;
-				
-			}
-		});
-		$table.bind('beforetablesort', function() {
-			$('tr.top.opened').click();
-			$('.loader').show();
-		});
-		$table.bind('aftertablesort', function() {
-			$('.loader').hide();
-		});
-		
+					return _a - _b;
+					
+				}
+			});
+			$table.bind('beforetablesort', function() {
+				$('tr.top.opened').click();
+				$('.loader').show();
+			});
+			$table.bind('aftertablesort', function() {
+				$('.loader').hide();
+			});
+		}
 		
 		$('.loader').hide();
 		
