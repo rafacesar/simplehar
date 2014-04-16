@@ -131,6 +131,9 @@
 		
 		$('.loader').hide();
 		
+		if(ga)
+			ga('send', 'event', 'dropped');
+		
 	};
 	
 
