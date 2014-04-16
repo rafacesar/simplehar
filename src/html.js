@@ -137,7 +137,7 @@ $(function($) {
 				return (translations[lng][match]) || match;
 			};
 		}
-		else if(translations === false) {
+		else if(translations === false || !translations[lng]) {
 			replacer = "$1";
 		}
 		else {
