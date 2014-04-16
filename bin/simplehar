@@ -33,7 +33,7 @@ while(!args.html && i<ilen) {
 
 
 if(!args.html)
-	args.html = args.har.substr(0, args.har.lastIndexOf('.har')) + '.html';
+	args.html = path.basename(args.har.substr(0, args.har.lastIndexOf('.har')) + '.html');
 
 
 i=0;
