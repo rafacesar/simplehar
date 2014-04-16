@@ -1,0 +1,35 @@
+<tr class="top" id="top-{rId}">
+	<td class="url">
+		<div>
+			<i class="glyphicon {sign}" data-toggle-sign="glyphicon {toggleSign}"></i>
+			<a>{fullUrl}</a>
+			<strong>{method} {fileName}<em>{params}</em></strong>
+		</div>
+	</td>
+	<td class="status">{statusToShow}</td>
+	<td class="type" data-toggle="tooltip" title="{charset}">{mimeType}</td>
+	<td class="size" data-toggle="tooltip" title="{size} ([compressed])<br>{fullSize} ([normal])">{sizeToShow}</td>
+	<td class="timeline" data-toggle="popover" title="{progressStart}" data-content="{progressContent}">
+		<div>
+			<div class="progress">
+				<div class="progress-bar progress-bar-space" style="width:{startPosition}">{startPosition}</div>
+				<div class="progress-bar progress-bar-warning" style="width:{blockedWidth}"></div>
+				<div class="progress-bar progress-bar-last" style="width:{dnsWidth}"></div>
+				<div class="progress-bar progress-bar-info" style="width:{connectWidth}"></div>
+				<div class="progress-bar progress-bar-primary" style="width:{sendWidth}"></div>
+				<div class="progress-bar progress-bar-danger" style="width:{waitWidth}"></div>
+				<div class="progress-bar progress-bar-success" style="width:{receiveWidth}"></div>
+			</div>
+			{domloaded}
+			{windowloaded}
+		</div>
+	</td>
+</tr>
+<tr class="inside" id="inside-{rId}">
+	<td colspan="5">
+		<ul class="nav nav-tabs">
+			{tabs}
+		</ul>
+		{tabContainers}
+	</td>
+</tr>
