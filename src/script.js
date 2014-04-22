@@ -11,7 +11,7 @@
 			$top = $table.find('.top'),
 			$timeline = $top.find('.timeline'),
 			$div = $inside.find('div'),
-			tableWidth;
+			tableWidth, i, ilen, half;
 		
 		$div.hide();
 		tableWidth = $table.width();
@@ -89,8 +89,14 @@
 		});
 		
 		
-		for(var i=0, ilen=$timeline.length, half=ilen/2;i<ilen;i++)
-			$timeline.eq(i).data('placement', i<half?'bottom':'top');
+		if($timeline.length > 15) {
+			for(i=0, ilen=$timeline.length, half=ilen/2;i<ilen;i++)
+				$timeline.eq(i).data('placement', i<half?'bottom':'top');
+		}
+		else {
+			for(i=0, ilen=$timeline.length;i<ilen;i++)
+				$timeline.eq(i).data('placement', 'bottom');
+		}
 		
 		$timeline.popover({
 			html:true,

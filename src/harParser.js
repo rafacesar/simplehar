@@ -26,7 +26,9 @@ module.exports = function(har, htmlEncode) {
 		
 		var method = entry.request.method,
 		
-			url = entry.request.url.match(/([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i),
+			urlComplete = entry.request.url,
+			url = urlComplete.match(/([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i),
+			urlFile, urlParams,
 			
 			status = entry.response.status,
 			statusText = entry.response.statusText || '',
@@ -61,11 +63,24 @@ module.exports = function(har, htmlEncode) {
 		
 		
 		// URL
-		if(url[4] === '' || !url[4]) {
-			if(i > 1)
-				url[4] = url[1] + url[2] + url[3];//.splice(1,3).join('');
+		if(!url) {
+			if(!urlComplete.indexOf('data:')) {
+				urlFile = '<strong>Data:</strong>';
+				urlComplete = urlComplete.split(';')[0];
+			}
+			else {
+				urlFile = urlComplete;
+			}
+		}
+		else {
+			if(url[4] === '' || !url[4]) {
+				if(i > 1)
+					urlFile = url[1] + url[2] + url[3];
+				else
+					urlFile = url[3];
+			}
 			else
-				url[4] = url[3];
+				urlFile = url[4];
 		}
 		
 		
@@ -136,6 +151,22 @@ module.exports = function(har, htmlEncode) {
 			}
 			content += '</div>';
 		}
+		else if(!contentText && urlFile === '<strong>Data:</strong>') {
+			tabs += '<li><a href="#content">[Content]</a></li>';
+			content += '<div class="content">';
+				content += '<pre class="pre-scrollable">' + htmlEncode(entry.request.url) + '</pre>';
+			content += '</div>';
+		}
+		
+		if(!mimeType && urlFile === '<strong>Data:</strong>') {
+			mimeType = entry.request.url.match(/^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i);
+			if(mimeType && mimeType[1]) {
+				mimeType[0] = mimeType[1];
+				if(mimeType[2])
+					mimeType[1] = mimeType[2].substr(0,mimeType[2].length-1);
+			}
+		}
+		
 		
 		
 		
@@ -143,9 +174,9 @@ module.exports = function(har, htmlEncode) {
 			sign: sign,
 			toggleSign: toggleSign,
 			method: method,
-			fullUrl: url[0],
-			fileName: url[4],
-			params: url[5] || '',
+			fullUrl: urlComplete,
+			fileName: urlFile,
+			params: url && url[5] || '',
 			statusToShow: statusText,
 			mimeType: mimeType && mimeType[0] || '',
 			charset: mimeType && mimeType[1] || '',
@@ -210,7 +241,10 @@ module.exports = function(har, htmlEncode) {
 				progressContent += '<p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> ~' + formatSize(receive,5) + ' ms</em></p>';
 			
 			
-			entries[i].progressStart = '<strong>[Start Time]:</strong> <em>' + startedTime + ' ms</em>';
+			if(progressContent !== '' && startedTime >= 0)
+				entries[i].progressStart = '<strong>[Start Time]:</strong> <em>' + startedTime + ' ms</em>';
+			else
+				entries[i].progressStart = '';
 			
 			entries[i].progressContent = progressContent;
 			
@@ -313,8 +347,8 @@ module.exports = function(har, htmlEncode) {
 	entries.title = page.title;
 	
 	entries.info = '<th>' + entries.length + ' [requests]</th>' + 
-						'<th colspan="3" class="text-right">~' + formatSize(totalSize / 1024, 2) + ' KB ' + 
-						'(~' + formatSize(totalCompressedSize / 1024, 2) + ' KB [compressed])</th>' + 
+						'<th colspan="3" class="text-right">~' + formatSize(totalSize>=0?totalSize:0 / 1024, 2) + ' KB ' + 
+						'(~' + formatSize(totalCompressedSize>=0?totalCompressedSize:0 / 1024, 2) + ' KB [compressed])</th>' + 
 						'<th class="text-center">' + (onContentLoad?'(' + formatSize(onContentLoad / 1000, 2) + 's) ':'') + formatSize(onLoad / 1000, 2) + 's</th>';
 	
 	return entries;
