@@ -344,8 +344,8 @@ module.exports = function(har, htmlEncode) {
 	entries.title = page.title;
 	
 	entries.info = '<th>' + entries.length + ' [requests]</th>' + 
-						'<th colspan="3" class="text-right">~' + formatSize(totalSize / 1024, 2) + ' KB ' + 
-						'(~' + formatSize(totalCompressedSize / 1024, 2) + ' KB [compressed])</th>' + 
+						'<th colspan="3" class="text-right">~' + formatSize(totalSize>=0?totalSize:0 / 1024, 2) + ' KB ' + 
+						'(~' + formatSize(totalCompressedSize>=0?totalCompressedSize:0 / 1024, 2) + ' KB [compressed])</th>' + 
 						'<th class="text-center">' + (onContentLoad?'(' + formatSize(onContentLoad / 1000, 2) + 's) ':'') + formatSize(onLoad / 1000, 2) + 's</th>';
 	
 	return entries;
