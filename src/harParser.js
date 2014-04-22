@@ -26,7 +26,9 @@ module.exports = function(har, htmlEncode) {
 		
 		var method = entry.request.method,
 		
-			url = entry.request.url.match(/([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i),
+			urlComplete = entry.request.url,
+			url = urlComplete.match(/([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i),
+			urlFile, urlParams,
 			
 			status = entry.response.status,
 			statusText = entry.response.statusText || '',
@@ -61,11 +63,24 @@ module.exports = function(har, htmlEncode) {
 		
 		
 		// URL
-		if(url[4] === '' || !url[4]) {
-			if(i > 1)
-				url[4] = url[1] + url[2] + url[3];//.splice(1,3).join('');
+		if(!url) {
+			if(!urlComplete.indexOf('data:')) {
+				urlFile = '<strong>Data:</strong>';
+				urlComplete = urlComplete.split(';')[0];
+			}
+			else {
+				urlFile = urlComplete;
+			}
+		}
+		else {
+			if(url[4] === '' || !url[4]) {
+				if(i > 1)
+					urlFile = url[1] + url[2] + url[3];
+				else
+					urlFile = url[3];
+			}
 			else
-				url[4] = url[3];
+				urlFile = url[4];
 		}
 		
 		
@@ -136,6 +151,22 @@ module.exports = function(har, htmlEncode) {
 			}
 			content += '</div>';
 		}
+		else if(!contentText && urlFile === '<strong>Data:</strong>') {
+			tabs += '<li><a href="#content">[Content]</a></li>';
+			content += '<div class="content">';
+				content += '<pre class="pre-scrollable">' + htmlEncode(entry.request.url) + '</pre>';
+			content += '</div>';
+		}
+		
+		if(!mimeType && urlFile === '<strong>Data:</strong>') {
+			mimeType = entry.request.url.match(/^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i);
+			if(mimeType && mimeType[1]) {
+				mimeType[0] = mimeType[1];
+				if(mimeType[2])
+					mimeType[1] = mimeType[2].substr(0,mimeType[2].length-1);
+			}
+		}
+		
 		
 		
 		
@@ -143,9 +174,9 @@ module.exports = function(har, htmlEncode) {
 			sign: sign,
 			toggleSign: toggleSign,
 			method: method,
-			fullUrl: url[0],
-			fileName: url[4],
-			params: url[5] || '',
+			fullUrl: urlComplete,
+			fileName: urlFile,
+			params: url && url[5] || '',
 			statusToShow: statusText,
 			mimeType: mimeType && mimeType[0] || '',
 			charset: mimeType && mimeType[1] || '',
