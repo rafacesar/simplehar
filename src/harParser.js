@@ -241,7 +241,10 @@ module.exports = function(har, htmlEncode) {
 				progressContent += '<p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> ~' + formatSize(receive,5) + ' ms</em></p>';
 			
 			
-			entries[i].progressStart = '<strong>[Start Time]:</strong> <em>' + startedTime + ' ms</em>';
+			if(progressContent !== '' && startedTime >= 0)
+				entries[i].progressStart = '<strong>[Start Time]:</strong> <em>' + startedTime + ' ms</em>';
+			else
+				entries[i].progressStart = '';
 			
 			entries[i].progressContent = progressContent;
 			
