@@ -81,6 +81,29 @@
 			return false;
 		});
 		
+		$top.each(function() {
+			var $this = $(this),
+				$bars = $this.find('.progress-bar'),
+				$totalTime = $this.find('.totalTime'),
+				left = 0,
+				marginLeft = 0;
+
+			for(var i=0, ilen=$bars.length;i<ilen;i++) {
+				left += parseFloat($bars.eq(i).attr('style').replace('width:', ''));
+			}
+
+			if(left > 80) {
+				for(i=1;i<ilen;i++) {
+					marginLeft += parseFloat($bars.eq(i).css('width'));
+				}
+				marginLeft += $totalTime.width() + 5;
+				$totalTime.css('marginLeft', marginLeft * -1);
+			}
+
+			$totalTime.css('left', (left + 0.5) + '%');
+
+		});
+		
 		$top.find('td[class!="timeline"], .timeline span').tooltip({
 			placement:'right',
 			trigger: 'hover',
