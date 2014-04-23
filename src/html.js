@@ -62,37 +62,41 @@ $(function($) {
 		}).on('drop', function(evt) {
 			evt.stopPropagation();
 			evt.preventDefault();
-
+			
+			var files = evt.originalEvent.dataTransfer.files;
+			
 			$('#drop').css('display', 'none');
-
 			
-			if($('.loader').length)
-				$('.loader').show();
-			else
-				$(document.createElement('div')).addClass('loader').appendTo(document.body);
-			
-			var file = evt.originalEvent.dataTransfer.files[0],
-				reader = new FileReader();
-			
-			reader.onload = function (evt) {
-				var har;
-				try {
-					har = JSON.parse(evt.target.result);
-				}
-				catch(e) {
-					alert('Arquivo fora do formato JSON');
-					$('.loader').hide();
-					return;
-				}
-				$('tbody, tfoot tr, caption').html('');
-				$('.tooltip, .popover').remove();
+			if(files.length) {
 				
-				
-				runHar(har);
-				
-			};
-			reader.readAsText(file);
+				if($('.loader').length)
+					$('.loader').show();
+				else
+					$(document.createElement('div')).addClass('loader').appendTo(document.body);
 			
+			
+				var file = files[0],
+					reader = new FileReader();
+				
+				reader.onload = function (evt) {
+					var har;
+					try {
+						har = JSON.parse(evt.target.result);
+					}
+					catch(e) {
+						alert('Invalid JSON');
+						$('.loader').hide();
+						return;
+					}
+					$('tbody, tfoot tr, caption').html('');
+					$('.tooltip, .popover').remove();
+					
+					
+					runHar(har);
+					
+				};
+				reader.readAsText(file);
+			}
 			
 			return false;
 		});

@@ -11,6 +11,12 @@
 			$top = $table.find('.top'),
 			$timeline = $top.find('.timeline'),
 			$div = $inside.find('div'),
+			tooltipOpt = {
+				placement:'right',
+				trigger: 'hover',
+				html:true,
+				container:$table.parent()
+			},
 			tableWidth, i, ilen, half;
 		
 		$div.hide();
@@ -87,11 +93,11 @@
 				$totalTime = $this.find('.totalTime'),
 				left = 0,
 				marginLeft = 0;
-
+			
 			for(var i=0, ilen=$bars.length;i<ilen;i++) {
 				left += parseFloat($bars.eq(i).attr('style').replace('width:', ''));
 			}
-
+			
 			if(left > 80) {
 				for(i=1;i<ilen;i++) {
 					marginLeft += parseFloat($bars.eq(i).css('width'));
@@ -99,17 +105,14 @@
 				marginLeft += $totalTime.width() + 5;
 				$totalTime.css('marginLeft', marginLeft * -1);
 			}
-
+			
 			$totalTime.css('left', (left + 0.5) + '%');
-
+			
 		});
 		
-		$top.find('td[class!="timeline"], .timeline span').tooltip({
-			placement:'right',
-			trigger: 'hover',
-			html:true,
-			container:$table.parent()
-		});
+		$top.find('td.size, .timeline span.domloaded').tooltip(tooltipOpt);
+		tooltipOpt.placement = 'left';
+		$top.find('td.status, td.type, .timeline span.windowloaded').tooltip(tooltipOpt);
 		
 		
 		if($timeline.length > 15) {
@@ -127,41 +130,39 @@
 			container:$table.parent()
 		});
 		
-		$table.stupidtable({
-			url:function(a, b) {
-				console.log(this);
-				console.log(arguments);
-				var _a = a.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0],
-					_b = b.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0];
+		if($table.stupidtable) {
+			$table.stupidtable({
+				url:function(a, b) {
+					console.log(this);
+					console.log(arguments);
+					var _a = a.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0],
+						_b = b.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0];
+						
+					if(_a < _b)
+						return -1;
+					else if(_a > _b)
+						return 1;
+					else
+						return 0;
+				},
+				size:function(a, b) {
+					var _a = parseFloat(a.replace(',','.')),
+						_b = parseFloat(b.replace(',','.'));
 					
-				if(_a < _b)
-					return -1;
-				else if(_a > _b)
-					return 1;
-				else
-					return 0;
-			},
-			size:function(a, b) {
-				var _a = parseFloat(a.replace(',','.')),
-					_b = parseFloat(b.replace(',','.'));
-				
-				return _a - _b;
-				
-			}
-		});
-		$table.bind('beforetablesort', function() {
-			$('tr.top.opened').click();
-			$('.loader').show();
-		});
-		$table.bind('aftertablesort', function() {
-			$('.loader').hide();
-		});
-		
+					return _a - _b;
+					
+				}
+			});
+			$table.bind('beforetablesort', function() {
+				$('tr.top.opened').click();
+				$('.loader').show();
+			});
+			$table.bind('aftertablesort', function() {
+				$('.loader').hide();
+			});
+		}
 		
 		$('.loader').hide();
-		
-		if(ga)
-			ga('send', 'event', 'dropped');
 		
 	};
 	

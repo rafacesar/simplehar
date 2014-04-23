@@ -12,7 +12,7 @@ tr.top {
 	font-size:12px;
 }
 .url {
-	width:350px;
+	width:300px;
 	white-space:nowrap;
 	position:relative;
 	padding:0 !important;
@@ -58,9 +58,9 @@ tr.top {
 	background-color:#f5f5f5;
 	font-weight:bold;
 	z-index:5;
-	left:12px;
+	left:14px;
 	top:0;
-	padding:5px;
+	padding:5px 5px 5px 3px;
 }
 .container .url:hover a {
 	display:block;
@@ -72,12 +72,13 @@ tr.top {
 .container .status {
 	white-space:nowrap;
 	text-overflow:ellipsis;
-	width:100px;
+	width:55px;
+	text-align:center;
 }
 .container .type {
 	white-space:nowrap;
 	text-overflow:ellipsis;
-	width:150px;
+	width:70px;
 }
 
 
@@ -93,7 +94,7 @@ tr.top {
 	font-weight:normal;
 }
 .container .timeline {
-	width:500px;
+	width:600px;
 	position:relative;
 	padding-left:0;
 	padding-right:0;
@@ -184,6 +185,9 @@ tr.top {
 tfoot td {
 	position:relative;
 }
+tfoot th {
+	font-size:12px;
+}
 
 .domloaded {
 	display:block;
@@ -226,9 +230,9 @@ tfoot td {
 }
 
 .totalTime {
-    position:absolute;
-    font-size:11px;
-    line-height:20px;
+	position:absolute;
+	font-size:11px;
+	line-height:20px;
 }
 
 
