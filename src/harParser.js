@@ -52,7 +52,13 @@ module.exports = function(har, htmlEncode) {
 				wait: entry.timings.wait,
 				receive: entry.timings.receive,
 				ssl: entry.timings.ssl
-			};
+			},
+			totalTime = progress.blocked +
+						progress.dns +
+						progress.connect +
+						progress.send +
+						progress.wait +
+						progress.receive;
 		
 		
 		
@@ -193,6 +199,7 @@ module.exports = function(har, htmlEncode) {
 			completeCompressedSize:compressedSize,
 			domloaded:onContentLoadText,
 			windowloaded:onLoadText,
+			totalTime:formatSize(totalTime >= 0? totalTime : 0, 2) + 'ms',
 			rId:Math.floor((Math.random()*(new Date()).getTime())+1)
 		};
 		
