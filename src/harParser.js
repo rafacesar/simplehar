@@ -60,6 +60,8 @@ module.exports = function(har, htmlEncode) {
 		// METHOD
 		if(method != 'GET')
 			method = strong(method);
+		else
+			method = '';
 		
 		
 		// URL
