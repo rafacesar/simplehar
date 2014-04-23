@@ -32,8 +32,10 @@ module.exports = function(har, htmlEncode) {
 			
 			status = entry.response.status,
 			statusText = entry.response.statusText || '',
+			fullStatus = status + ' ' + statusText,
 			
 			mimeType = entry.response.content.mimeType && entry.response.content.mimeType.split(';'),
+			mime = '', fullMimeType = '',
 			
 			completeSize = entry.response.content.size,
 			compressedSize = entry.response.bodySize,
@@ -94,14 +96,11 @@ module.exports = function(har, htmlEncode) {
 		
 		// STATUS
 		if(status >= 500)
-			statusText = strong(status + ' ' + statusText, 'text-danger');
+			status = strong(status, 'text-danger');
 		else if(status >= 400)
-			statusText = strong(status + ' ' + statusText, 'text-warning');
+			status = strong(status, 'text-warning');
 		else if(status < 100)
-			statusText = em(status + ' ' + statusText, 'text-muted');
-		else
-			statusText = status + ' ' + statusText;
-		
+			status = em(status, 'text-muted');
 		
 		
 		
@@ -120,8 +119,22 @@ module.exports = function(har, htmlEncode) {
 			sizeToShow = formatSize(sizeToShow / 1024) + ' KB';
 		
 		
-		
-		
+		//MIME TYPE
+		if(!mimeType && urlFile === '<strong>Data:</strong>') {
+			mimeType = entry.request.url.match(/^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i);
+			if(mimeType && mimeType[1]) {
+				mime = mimeType[1].split('/')[1];
+				fullMimeType = mimeType[1];
+				if(mimeType[2])
+					fullMimeType += '; ' + mimeType[2].substr(0,mimeType[2].length-1);
+			}
+		}
+		else if(mimeType && mimeType.length) {
+			mime = mimeType[0].split('/')[1];
+			fullMimeType = mimeType[0];
+			if(mimeType.length > 1)
+				fullMimeType += '; ' + mimeType[1];
+		}
 		
 		
 		
@@ -164,16 +177,7 @@ module.exports = function(har, htmlEncode) {
 			content += '<div class="content">';
 				content += '<pre class="pre-scrollable">' + htmlEncode(entry.request.url) + '</pre>';
 			content += '</div>';
-		}
-		
-		if(!mimeType && urlFile === '<strong>Data:</strong>') {
-			mimeType = entry.request.url.match(/^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i);
-			if(mimeType && mimeType[1]) {
-				mimeType[0] = mimeType[1];
-				if(mimeType[2])
-					mimeType[1] = mimeType[2].substr(0,mimeType[2].length-1);
 			}
-		}
 		
 		
 		
@@ -185,7 +189,10 @@ module.exports = function(har, htmlEncode) {
 			fullUrl: urlComplete,
 			fileName: urlFile,
 			params: url && url[5] || '',
-			statusToShow: statusText,
+			status: status,
+			fullStatus: fullStatus,
+			mime: mime,
+			fullMimeType: fullMimeType,
 			mimeType: mimeType && mimeType[0] || '',
 			charset: mimeType && mimeType[1] || '',
 			size: formatSize(compressedSize,'0') + ' Bytes',

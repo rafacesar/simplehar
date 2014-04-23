@@ -11,6 +11,12 @@
 			$top = $table.find('.top'),
 			$timeline = $top.find('.timeline'),
 			$div = $inside.find('div'),
+			tooltipOpt = {
+				placement:'right',
+				trigger: 'hover',
+				html:true,
+				container:$table.parent()
+			},
 			tableWidth, i, ilen, half;
 		
 		$div.hide();
@@ -104,12 +110,9 @@
 			
 		});
 		
-		$top.find('td[class!="timeline"], .timeline span').tooltip({
-			placement:'right',
-			trigger: 'hover',
-			html:true,
-			container:$table.parent()
-		});
+		$top.find('td.size, .timeline span.domloaded').tooltip(tooltipOpt);
+		tooltipOpt.placement = 'left';
+		$top.find('td.status, td.type, .timeline span.windowloaded').tooltip(tooltipOpt);
 		
 		
 		if($timeline.length > 15) {
