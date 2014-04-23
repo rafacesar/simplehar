@@ -45,7 +45,7 @@ module.exports = function(har, htmlEncode) {
 			_request = {}, _response = {}, contentText = entry.response.content.text,
 			
 			progress = {
-				startedDateTime:entry.startedDateTime,
+				startedDateTime:(new Date(entry.startedDateTime)).getTime(),
 				time: entry.time,
 				blocked: entry.timings.blocked,
 				dns: entry.timings.dns,
@@ -206,6 +206,7 @@ module.exports = function(har, htmlEncode) {
 			completeCompressedSize:compressedSize,
 			domloaded:onContentLoadText,
 			windowloaded:onLoadText,
+			_totalTime:totalTime >= 0? totalTime : 0,
 			totalTime:formatSize(totalTime >= 0? totalTime : 0, 2) + 'ms',
 			rId:Math.floor((Math.random()*(new Date()).getTime())+1)
 		};
@@ -229,7 +230,7 @@ module.exports = function(har, htmlEncode) {
 	},
 	convertProgress = function(entries) {
 		
-		var startedDateTimeBefore = (new Date(entries[0].progress.startedDateTime)).getTime(),
+		var startedDateTimeBefore = entries[0].progress.startedDateTime,
 			progressContent, startedDateTime, startPosition, startedTime,
 			blocked, dns, connect, send, wait, receive;
 		
@@ -239,7 +240,7 @@ module.exports = function(har, htmlEncode) {
 			
 			entry = entries[i];
 			
-			startedDateTime = (new Date(entry.progress.startedDateTime)).getTime();
+			startedDateTime = entry.progress.startedDateTime;
 			startedTime = startedDateTime - startedDateTimeBefore;
 			
 			// startedDateTimeBefore = startedDateTime;
@@ -276,13 +277,13 @@ module.exports = function(har, htmlEncode) {
 			entries[i].progressContent = progressContent;
 			
 			
-			entries[i].startPosition = pct(startedTime, onLoad);
-			entries[i].blockedWidth = pct(blocked, onLoad);
-			entries[i].dnsWidth = pct(dns, onLoad);
-			entries[i].connectWidth = pct(connect, onLoad);
-			entries[i].sendWidth = pct(send, onLoad);
-			entries[i].waitWidth = pct(wait, onLoad);
-			entries[i].receiveWidth = pct(receive, onLoad);
+			entries[i].startPosition = pct(startedTime, lastTime);
+			entries[i].blockedWidth = pct(blocked, lastTime);
+			entries[i].dnsWidth = pct(dns, lastTime);
+			entries[i].connectWidth = pct(connect, lastTime);
+			entries[i].sendWidth = pct(send, lastTime);
+			entries[i].waitWidth = pct(wait, lastTime);
+			entries[i].receiveWidth = pct(receive, lastTime);
 			
 			
 		}
@@ -335,38 +336,56 @@ module.exports = function(har, htmlEncode) {
 		toggleSign = 'glyphicon-arrow-down',
 		onContentLoad = page.pageTimings.onContentLoad || false,
 		onLoad = page.pageTimings.onLoad,
+		lastTime = onLoad,
 		onContentLoadText = '',
-		onLoadText = '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (' + formatSize(onLoad, 2) + ' ms)" style="left:100%"></span>',
-		i, ilen;
-	
-	
-	if(onContentLoad) {
-		onContentLoadText = (onContentLoad / onLoad) * 100;
-		onContentLoadText = '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
-	}
+		onLoadText,
+		totalSize = 0,
+		totalCompressedSize = 0,
+		lastTimeArray = [onLoad],
+		_i, i, ilen;
 	
 	
 	
 	
-	var totalSize = 0,
-		totalCompressedSize = 0;
+	
+	
+	
+	
+
 	
 	if(id && id !== '') {
 		for(i=0, ilen=harEntries.length;i<ilen;i++) {
 			if(harEntries[i].pageref && harEntries[i].pageref == page.id) {
+				_i = entries.length;
 				entries.push(convertHar(harEntries[i], i));
-				totalSize += entries[entries.length - 1].completeSize;
-				totalCompressedSize += entries[entries.length - 1].completeCompressedSize;
+				totalSize += entries[_i].completeSize;
+				totalCompressedSize += entries[_i].completeCompressedSize;
+				lastTimeArray.push((entries[_i]._totalTime + entries[_i].progress.startedDateTime) - entries[0].progress.startedDateTime);
 			}
 		}
 	}
 	else {
 		for(i=0, ilen=harEntries.length;i<ilen;i++) {
+			_i = entries.length;
 			entries.push(convertHar(harEntries[i], i));
-			totalSize += entries[entries.length - 1].completeSize;
-			totalCompressedSize += entries[entries.length - 1].completeCompressedSize;
+			totalSize += entries[_i].completeSize;
+			totalCompressedSize += entries[_i].completeCompressedSize;
+			lastTimeArray.push((entries[_i]._totalTime + entries[_i].progress.startedDateTime) - entries[0].progress.startedDateTime);
 		}
 	}
+	
+	lastTime = Math.max.apply(null, lastTimeArray);
+	
+	if(onContentLoad)
+		onContentLoadText = (onContentLoad / lastTime) * 100;
+	
+	for(i=0, ilen=entries.length;i<ilen;i++) {
+		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (' + formatSize(onLoad, 2) + ' ms)" style="left:' + (onLoad / lastTime * 100) + '%"></span>';
+		if(onContentLoad)
+			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
+	}
+	
+	
 	
 	
 	entries = convertProgress(entries);
