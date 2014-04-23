@@ -230,17 +230,17 @@ module.exports = function(har, htmlEncode) {
 			progressContent = '';
 			
 			if(blocked >= 0)
-				progressContent += '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> ~' + formatSize(blocked,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> ~' + formatSize(blocked,3) + ' ms</em></p>';
 			if(dns >= 0)
-				progressContent += '<p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> ~' + formatSize(dns,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> ~' + formatSize(dns,3) + ' ms</em></p>';
 			if(connect >= 0)
-				progressContent += '<p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> ~' + formatSize(connect,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> ~' + formatSize(connect,3) + ' ms</em></p>';
 			if(send >= 0)
-				progressContent += '<p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> ~' + formatSize(send,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> ~' + formatSize(send,3) + ' ms</em></p>';
 			if(wait >= 0)
-				progressContent += '<p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> ~' + formatSize(wait,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> ~' + formatSize(wait,3) + ' ms</em></p>';
 			if(receive >= 0)
-				progressContent += '<p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> ~' + formatSize(receive,5) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> ~' + formatSize(receive,3) + ' ms</em></p>';
 			
 			
 			if(progressContent !== '' && startedTime >= 0)
