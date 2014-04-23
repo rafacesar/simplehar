@@ -185,6 +185,9 @@ tr.top {
 tfoot td {
 	position:relative;
 }
+tfoot th {
+	font-size:12px;
+}
 
 .domloaded {
 	display:block;

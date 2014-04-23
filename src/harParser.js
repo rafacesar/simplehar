@@ -112,11 +112,11 @@ module.exports = function(har, htmlEncode) {
 			
 
 		if(status == 304)
-			sizeToShow = em(formatSize(sizeToShow / 1024) + ' KB');
+			sizeToShow = em(sizeFormatter(sizeToShow));
 		else if(status == 200 && (compressedSize === 0 || compressedSize < 0))
-			sizeToShow = strong(formatSize(sizeToShow / 1024) + ' KB');
+			sizeToShow = strong(sizeFormatter(sizeToShow));
 		else
-			sizeToShow = formatSize(sizeToShow / 1024) + ' KB';
+			sizeToShow = sizeFormatter(sizeToShow);
 		
 		
 		//MIME TYPE
@@ -215,6 +215,17 @@ module.exports = function(har, htmlEncode) {
 		if(!value)
 			return 0;
 		return ((value / pct) * 100) + '%';
+	},
+	sizeFormatter = function(value, precision) {
+		var ext = [' Bytes', ' KB', ' MB', ' GB'],
+			i = 0;
+		
+		while(value > 1024) {
+			value /= 1024;
+			i++;
+		}
+		
+		return formatSize(value, precision || 2) + ext[i];
 	},
 	convertProgress = function(entries) {
 		
@@ -363,9 +374,9 @@ module.exports = function(har, htmlEncode) {
 	entries.title = page.title;
 	
 	entries.info = '<th>' + entries.length + ' [requests]</th>' + 
-						'<th colspan="3" class="text-right">~' + formatSize(totalSize>=0?totalSize:0 / 1024, 2) + ' KB ' + 
-						'(~' + formatSize(totalCompressedSize>=0?totalCompressedSize:0 / 1024, 2) + ' KB [compressed])</th>' + 
-						'<th class="text-center">' + (onContentLoad?'(' + formatSize(onContentLoad / 1000, 2) + 's) ':'') + formatSize(onLoad / 1000, 2) + 's</th>';
+						'<th colspan="3" class="text-right">' + sizeFormatter(totalSize>=0?totalSize:0) + 
+						' (' + sizeFormatter(totalCompressedSize>=0?totalCompressedSize:0) + ' [compressed])</th>' + 
+						'<th class="text-center">' + (onContentLoad >= 0?'(' + formatSize(onContentLoad / 1000, 2) + 's) ':'') + formatSize(onLoad / 1000, 2) + 's</th>';
 	
 	return entries;
 	
