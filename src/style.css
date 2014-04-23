@@ -191,7 +191,7 @@ tfoot td {
 	height:31px;
 	width:1px;
 	position:absolute;
-	bottom:0;
+	bottom:-5px;
 	background-color:#000;
 }
 .windowloaded {
@@ -200,7 +200,7 @@ tfoot td {
 	height:31px;
 	width:1px;
 	position:absolute;
-	bottom:0;
+	bottom:-5px;
 	background-color:#000;
 }
 
@@ -223,6 +223,12 @@ tfoot td {
 }
 .container thead th:hover {
 	text-decoration:underline;
+}
+
+.totalTime {
+	position:absolute;
+	font-size:11px;
+	line-height:20px;
 }
 
 
