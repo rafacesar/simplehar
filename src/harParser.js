@@ -259,7 +259,6 @@ module.exports = function(har, htmlEncode) {
 			progressContent, startedDateTime, startPosition, startedTime,
 			blocked, dns, connect, send, wait, receive;
 		
-		// debugger;
 		
 		for(var i=0, ilen=entries.length, entry;i<ilen;i++) {
 			
@@ -268,7 +267,6 @@ module.exports = function(har, htmlEncode) {
 			startedDateTime = entry.progress.startedDateTime;
 			startedTime = startedDateTime - startedDateTimeBefore;
 			
-			// startedDateTimeBefore = startedDateTime;
 			
 			blocked = entry.progress.blocked;
 			dns = entry.progress.dns;
@@ -1930,44 +1928,60 @@ module.exports = function(har, htmlEncode) {
 		totalSize = 0,
 		totalCompressedSize = 0,
 		lastTimeArray = [onLoad],
-		_i, i, ilen;
+		ilen = harEntries.length,
+		i, hEntry;
 	
 	
 	
-	
-	
-	
-	
-	
-
 	
 	if(id && id !== '') {
-		for(i=0, ilen=harEntries.length;i<ilen;i++) {
-			if(harEntries[i].pageref && harEntries[i].pageref == page.id) {
-				_i = entries.length;
-				entries.push(convertHar(harEntries[i], i));
-				totalSize += entries[_i].completeSize;
-				totalCompressedSize += entries[_i].completeCompressedSize;
-				lastTimeArray.push((entries[_i]._totalTime + entries[_i].progress.startedDateTime) - entries[0].progress.startedDateTime);
-			}
+		for(i=0;i<ilen;i++) {
+			hEntry = harEntries[i];
+			if(hEntry.pageref && hEntry.pageref == id)
+				entries.push(hEntry);
 		}
 	}
 	else {
-		for(i=0, ilen=harEntries.length;i<ilen;i++) {
-			_i = entries.length;
-			entries.push(convertHar(harEntries[i], i));
-			totalSize += entries[_i].completeSize;
-			totalCompressedSize += entries[_i].completeCompressedSize;
-			lastTimeArray.push((entries[_i]._totalTime + entries[_i].progress.startedDateTime) - entries[0].progress.startedDateTime);
-		}
+		for(i=0;i<ilen;i++)
+			entries.push(harEntries[i]);
 	}
+	
+	
+	entries.sort(function(a, b) {
+		var _a = a.startedDateTime,
+			_b = b.startedDateTime;
+		
+		if(_a)
+			_a = (new Date(_a)).getTime();
+		else
+			_a = 0;
+		
+		if(_b)
+			_b = (new Date(_b)).getTime();
+		else
+			_b = 0;
+		
+		
+		return _a - _b;
+		
+	});
+	
+	
+	for(i=0,ilen=entries.length;i<ilen;i++) {
+		entries[i] = hEntry = convertHar(entries[i], i);
+		
+		totalSize += hEntry.completeSize;
+		totalCompressedSize += hEntry.completeCompressedSize;
+		lastTimeArray.push((hEntry._totalTime + hEntry.progress.startedDateTime) - entries[0].progress.startedDateTime);
+	}
+
 	
 	lastTime = Math.max.apply(null, lastTimeArray);
 	
 	if(onContentLoad)
 		onContentLoadText = (onContentLoad / lastTime) * 100;
 	
-	for(i=0, ilen=entries.length;i<ilen;i++) {
+	for(i=0;i<ilen;i++) {
 		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (' + formatSize(onLoad, 2) + ' ms)" style="left:' + (onLoad / lastTime * 100) + '%"></span>';
 		if(onContentLoad)
 			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
