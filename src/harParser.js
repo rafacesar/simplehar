@@ -31,11 +31,11 @@ module.exports = function(har, htmlEncode) {
 			urlFile, urlParams,
 			
 			status = entry.response.status,
-			statusText = entry.response.statusText || '',
-			fullStatus = status + ' ' + statusText,
+			fullStatus = status + ' ' + (entry.response.statusText || ''),
 			
-			mimeType = entry.response.content.mimeType && entry.response.content.mimeType.split(';'),
-			mime = '', fullMimeType = '',
+			fullMimeType = entry.response.content.mimeType || '',
+			mimeType = fullMimeType && fullMimeType.split(';')[0] || '',
+			mime = mimeType && mimeType.split('/')[1] || '',
 			
 			completeSize = entry.response.content.size,
 			compressedSize = entry.response.bodySize,
@@ -120,7 +120,7 @@ module.exports = function(har, htmlEncode) {
 		
 		
 		//MIME TYPE
-		if(!mimeType && urlFile === '<strong>Data:</strong>') {
+		if(!fullMimeType && urlFile === '<strong>Data:</strong>') {
 			mimeType = entry.request.url.match(/^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i);
 			if(mimeType && mimeType[1]) {
 				mime = mimeType[1].split('/')[1];
@@ -128,12 +128,6 @@ module.exports = function(har, htmlEncode) {
 				if(mimeType[2])
 					fullMimeType += '; ' + mimeType[2].substr(0,mimeType[2].length-1);
 			}
-		}
-		else if(mimeType && mimeType.length) {
-			mime = mimeType[0].split('/')[1];
-			fullMimeType = mimeType[0];
-			if(mimeType.length > 1)
-				fullMimeType += '; ' + mimeType[1];
 		}
 		
 		
@@ -164,20 +158,20 @@ module.exports = function(har, htmlEncode) {
 		if(contentText) {
 			tabs += '<li><a href="#content">[Content]</a></li>';
 			content += '<div class="content">';
-			if(mimeType && mimeType[0].split('/')[0] == 'image') {
-				content += '<img src="data:' + mimeType[0] + ';base64,' + contentText + '" />';
+			if(mimeType && mimeType.split('/')[0] == 'image') {
+				content += '<img src="data:' + mimeType + ';base64,' + contentText + '" />';
 			}
 			else {
 				content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
 			}
 			content += '</div>';
-			if(mimeType && mimeType[0].split('/')[0] != 'image') {
+			if(mimeType && mimeType.split('/')[0] != 'image') {
 				tabs += '<li><a href="#parsedcontent">[Parsed Content]</a></li>';
 				content += '<div class="parsedcontent">';
 				
-				if(mimeType && mimeType[0].toLowerCase() == 'text/css')
+				if(mime.toLowerCase() == 'css')
 					contentText = cssUnminify(contentText);
-				else if(mimeType && mimeType[0].split('/')[1].toLowerCase() == 'javascript')
+				else if(mime.toLowerCase() == 'javascript')
 					contentText = jsUnminify(contentText);
 				
 				content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
@@ -202,7 +196,7 @@ module.exports = function(har, htmlEncode) {
 					tabs += '<li><a href="#parsedcontent">[Parsed Content]</a></li>';
 					content += '<div class="parsedcontent">';
 					contentText = decodeURIComponent(contentText[2]);
-					if(mimeType && mimeType[0].toLowerCase() == 'text/css')
+					if(mime.toLowerCase() == 'css')
 						contentText = cssUnminify(contentText);
 					content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
 					content += '</div>';
