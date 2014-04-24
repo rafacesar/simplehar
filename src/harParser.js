@@ -20,115 +20,296 @@ module.exports = function(har, htmlEncode) {
 		return '<em' + cname + '>' + str + '</em>';
 	},
 	
+	pct = function(value, pct, symbol) {
+		if(!value)
+			return 0;
+		symbol = symbol || '%';
+		return ((value / pct) * 100) + symbol;
+	},
+	objToDl = function(arr, filters) {
+		if(arr && arr.length) {
+			var dl = '<dl class="dl-horizontal">';
+			for(var i=0,ilen=arr.length;i<ilen;i++) {
+				if(!filters || !filters.length || _indexOf(arr[i].name, filters) == -1)
+					dl += '<dt>' + arr[i].name + '</dt><dd>' + arr[i].value.split(';').join(';<br>') + '</dd>';
+			}
+			dl += '</dl>';
+			return dl;
+		}
+		return '';
+	},
+	lowerReverseIndexOf = function(pattern, arr) {
+		for(var i=0, ilen=arr.length;i<ilen;i++) {
+			if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) != -1)
+				return i;
+		}
+		return -1;
+	},
+	dataSizeFormatter = function(value, precision) {
+		var ext = [' Bytes', ' KB', ' MB', ' GB'],
+			i = 0;
+		
+		while(value > 1024) {
+			value /= 1024;
+			i++;
+		}
+		
+		return formatSize(value, precision || 2) + ext[i];
+	},
+	precisionFormatter = function(number, precision) {
+		var matcher, fPoint;
+		precision = precision || 2;
+		
+		
+		number = number.toFixed(precision);
+		
+		if(precision === '0')
+			return number;
+		
+		fPoint = number.split('.')[1];
+		
+		matcher = fPoint.match(/0+/);
+		
+		if(matcher && matcher[0].length == fPoint.length) {
+			return number.split('.')[0];
+		}
+		else {
+			//Need to think on how to make this 'translatable'
+			//Not everyone use dot (.) as separator
+			return number;//.replace('.', ',');
+		}
+	},
+	objListToHtml = objToDl,
+	_indexOf = lowerReverseIndexOf,
+	sizeFormatter = dataSizeFormatter,
+	formatSize = precisionFormatter,
+	urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i,
+	urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i,
+	
+	parseUrl = function(url, complete) {
+		
+		var urlMatch = url.match(urlRe),
+			urlFile;
+		
+		if(!urlMatch) {
+			if(!url.indexOf('data:')) {
+				urlFile = strong('Data:');
+				url = url.split(';')[0];
+			}
+			else {
+				urlFile = url;
+			}
+		}
+		else {
+			if(!urlMatch[4]) {
+				urlFile = urlMatch[3];
+				
+				if(complete)
+					urlFile = urlMatch[1] + urlMatch[2] + urlFile;
+			}
+			else
+				urlFile = urlMatch[4];
+		}
+		
+		return {
+			params: urlMatch[5] || '',
+			file: urlFile,
+			complete:url
+		};
+	},
+	
+	parseMethod = function(method) {
+		if(method.toLowerCase() === 'get')
+			return '';
+		
+		return method && strong(method) || '';
+	},
+	
+	parseStatus = function(code, statusText) {
+		
+		var status = code;
+		
+		statusText = statusText || '';
+		
+		if(code >= 500)
+			status = strong(code, 'text-danger');
+		else if(code >= 400)
+			status = strong(code, 'text-warning');
+		else if(code < 100)
+			status = em(code, 'text-muted');
+		
+		
+		return {
+			code: code,
+			status: status,
+			complete: code + ' ' + statusText
+		};
+		
+	},
+	
+	parseSize = function(size, compressed, status) {
+		
+		var mainSize = compressed;
+		
+		if(compressed < 0)
+			mainSize = 0;
+		else if(compressed === 0)
+			mainSize = size;
+		
+		mainSize = sizeFormatter(mainSize);
+
+		if(status == 304)
+			mainSize = em(mainSize);
+		else if(status == 200 && (!compressed || compressed < 0))
+			mainSize = strong(mainSize);
+		
+		
+		return {
+			originalSize: size + ' Bytes',
+			originalCompressed: compressed + ' Bytes',
+			size: mainSize,
+			complete: size,
+			compressed: compressed
+		};
+	},
+	
+	parseMime = function(mimeType, url) {
+		
+		var inline = false,
+			mime;
+		
+		if(!mimeType && !url.indexOf('data:')) {
+			mimeType = url.match(urlDataRe);
+			
+			if(mimeType && mimeType[1])
+				mimeType = mimeType[1] + '; ' + (mimeType[2] && mimeType[2].substr(0,mimeType[2].length-1) || '');
+			else
+				mimeType = false;
+			
+			inline = true;
+		}
+		
+		
+		if(mimeType) {
+			mime = mimeType.split(';')[0].split('/');
+			
+			return {
+				complete: mimeType,
+				type: mime[1],
+				base: mime[0],
+				inline: inline
+			};
+		}
+		else {
+			return {
+				complete: '',
+				type: '',
+				base: '',
+				inline: inline
+			};
+		}
+	},
+	parseContent = function(content, url, mime) {
+		var tabs = '',
+			result = '';
+		
+		if(content || !url.indexOf('data:')) {
+			tabs += '<li><a href="#content">[Content]</a></li>';
+			result += '<div class="content">';
+			
+			
+			if(mime.base == 'image') {
+				if(content)
+					result += '<img src="data:' + mime.base + '/' + mime.type + ';base64,' + content + '" />';
+				else
+					result += '<img src="' + url + '" />';
+			}
+			else {
+				if(content)
+					result += '<pre class="pre-scrollable">' + htmlEncode(content) + '</pre>';
+				else
+					result += '<pre class="pre-scrollable">' + htmlEncode(url) + '</pre>';
+			}
+			
+			result += '</div>';
+			
+			if(!content) {
+				content = url.match(urlDataRe);
+				if(content && content[1] && content[2])
+					content = decodeURIComponent(content[2]);
+				else
+					content = false;
+			}
+			
+			
+			if(mime.base != 'image' && content) {
+				tabs += '<li><a href="#parsedcontent">[Parsed Content]</a></li>';
+				result += '<div class="parsedcontent">';
+				
+				if(mime.type == 'css')
+					content = cssUnminify(content);
+				else if(~mime.type.indexOf('javascript'))
+					content = jsUnminify(content);
+				
+				result += '<pre class="pre-scrollable">' + htmlEncode(content) + '</pre>';
+				result += '</div>';
+			}
+		}
+		return {
+			tabs: tabs,
+			result: result
+		};
+	},
+	
+	parseProgress = function(entry) {
+		var timings = entry.timings;
+		
+		return {
+			startedDateTime:(new Date(entry.startedDateTime)).getTime(),
+			time: entry.time,
+			blocked: timings.blocked,
+			dns: timings.dns,
+			connect: timings.connect,
+			send: timings.send,
+			wait: timings.wait,
+			receive: timings.receive,
+			ssl: timings.ssl,
+			total:	timings.blocked +
+					timings.dns +
+					timings.connect +
+					timings.send +
+					timings.wait +
+					timings.receive
+		};
+	},
 	
 	convertHar = function(entry, i) {
 		
 		
-		var method = entry.request.method,
-		
-			urlComplete = entry.request.url,
-			url = urlComplete.match(/([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i),
-			urlFile, urlParams,
+		var __request = entry.request,
+			__response = entry.response,
 			
-			status = entry.response.status,
-			fullStatus = status + ' ' + (entry.response.statusText || ''),
+			method = parseMethod(__request.method),
+			url = parseUrl(__request.url, i > 1),
+			status = parseStatus(__response.status, __response.statusText),
+			size = parseSize(__response.content.size, __response.bodySize, status.code),
+			mime = parseMime(__response.content.mimeType || '', url.complete),
+			contextTextContent = parseContent(entry.response.content.text, url.complete, mime),
+		
 			
-			fullMimeType = entry.response.content.mimeType || '',
-			mimeType = fullMimeType && fullMimeType.split(';')[0] || '',
-			mime = mimeType && mimeType.split('/')[1] || '',
 			
-			completeSize = entry.response.content.size,
-			compressedSize = entry.response.bodySize,
-			sizeToShow = compressedSize,
-		
-			_tabs = ['headers', 'cookies', 'queryString'], tabs = '', content = '',
-			_request = {}, _response = {}, contentText = entry.response.content.text,
 			
-			progress = {
-				startedDateTime:(new Date(entry.startedDateTime)).getTime(),
-				time: entry.time,
-				blocked: entry.timings.blocked,
-				dns: entry.timings.dns,
-				connect: entry.timings.connect,
-				send: entry.timings.send,
-				wait: entry.timings.wait,
-				receive: entry.timings.receive,
-				ssl: entry.timings.ssl
-			},
-			totalTime = progress.blocked +
-						progress.dns +
-						progress.connect +
-						progress.send +
-						progress.wait +
-						progress.receive;
-		
-		
-		
-		
-		// METHOD
-		if(method != 'GET')
-			method = strong(method);
-		else
-			method = '';
-		
-		
-		// URL
-		if(!url) {
-			if(!urlComplete.indexOf('data:')) {
-				urlFile = '<strong>Data:</strong>';
-				urlComplete = urlComplete.split(';')[0];
-			}
-			else {
-				urlFile = urlComplete;
-			}
-		}
-		else {
-			if(url[4] === '' || !url[4]) {
-				if(i > 1)
-					urlFile = url[1] + url[2] + url[3];
-				else
-					urlFile = url[3];
-			}
-			else
-				urlFile = url[4];
-		}
-		
-		
-		// STATUS
-		if(status >= 500)
-			status = strong(status, 'text-danger');
-		else if(status >= 400)
-			status = strong(status, 'text-warning');
-		else if(status < 100)
-			status = em(status, 'text-muted');
-		
-		
-		
-		// SIZE
-		if(compressedSize < 0)
-			sizeToShow = 0;
-		else if(compressedSize === 0)
-			sizeToShow = completeSize;
 			
-
-		if(status == 304)
-			sizeToShow = em(sizeFormatter(sizeToShow));
-		else if(status == 200 && (compressedSize === 0 || compressedSize < 0))
-			sizeToShow = strong(sizeFormatter(sizeToShow));
-		else
-			sizeToShow = sizeFormatter(sizeToShow);
+			_tabs = ['headers', 'cookies', 'queryString'],
+			tabs = '', content = '', _request = {}, _response = {},
+			
+			progress = parseProgress(entry),
+			
+			totalTime = progress.total;
 		
 		
-		//MIME TYPE
-		if(!fullMimeType && urlFile === '<strong>Data:</strong>') {
-			mimeType = entry.request.url.match(/^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i);
-			if(mimeType && mimeType[1]) {
-				mime = mimeType[1].split('/')[1];
-				fullMimeType = mimeType[1];
-				if(mimeType[2])
-					fullMimeType += '; ' + mimeType[2].substr(0,mimeType[2].length-1);
-			}
-		}
+		
+		
 		
 		
 		
@@ -154,55 +335,8 @@ module.exports = function(har, htmlEncode) {
 			}
 		}
 		
-		// CONTENT
-		if(contentText) {
-			tabs += '<li><a href="#content">[Content]</a></li>';
-			content += '<div class="content">';
-			if(mimeType && mimeType.split('/')[0] == 'image') {
-				content += '<img src="data:' + mimeType + ';base64,' + contentText + '" />';
-			}
-			else {
-				content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
-			}
-			content += '</div>';
-			if(mimeType && mimeType.split('/')[0] != 'image') {
-				tabs += '<li><a href="#parsedcontent">[Parsed Content]</a></li>';
-				content += '<div class="parsedcontent">';
-				
-				if(mime.toLowerCase() == 'css')
-					contentText = cssUnminify(contentText);
-				else if(mime.toLowerCase() == 'javascript')
-					contentText = jsUnminify(contentText);
-				
-				content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
-				content += '</div>';
-			}
-		}
-		else if(!contentText && urlFile === '<strong>Data:</strong>') {
-			tabs += '<li><a href="#content">[Content]</a></li>';
-			
-			content += '<div class="content">';
-			if(mimeType && mimeType[0].split('/')[0] == 'image') {
-				content += '<img src="' + entry.request.url + '" />';
-			}
-			else {
-				content += '<pre class="pre-scrollable">' + htmlEncode(entry.request.url) + '</pre>';
-			}
-			content += '</div>';
-			
-			if(mimeType && mimeType[0].split('/')[0] != 'image') {
-				contentText = entry.request.url.match(/^data:(\w+\/\w+);(?:base64,)?(?:charset=[^,]+,)?(.+)$/i);
-				if(contentText && contentText[1] && contentText[2]) {
-					tabs += '<li><a href="#parsedcontent">[Parsed Content]</a></li>';
-					content += '<div class="parsedcontent">';
-					contentText = decodeURIComponent(contentText[2]);
-					if(mime.toLowerCase() == 'css')
-						contentText = cssUnminify(contentText);
-					content += '<pre class="pre-scrollable">' + htmlEncode(contentText) + '</pre>';
-					content += '</div>';
-				}
-			}
-		}
+		tabs += contextTextContent.tabs;
+		content += contextTextContent.content;
 		
 		
 		
@@ -211,24 +345,22 @@ module.exports = function(har, htmlEncode) {
 			sign: sign,
 			toggleSign: toggleSign,
 			method: method,
-			fullUrl: urlComplete,
-			fileName: urlFile,
-			params: url && url[5] || '',
-			status: status,
-			fullStatus: fullStatus,
-			mime: mime,
-			fullMimeType: fullMimeType,
-			mimeType: mimeType && mimeType[0] || '',
-			charset: mimeType && mimeType[1] || '',
-			size: formatSize(compressedSize,'0') + ' Bytes',
-			fullSize: formatSize(completeSize,'0') + ' Bytes',
-			sizeToShow: sizeToShow,
-			formatedFullSize: formatSize(completeSize / 1024) + ' KB',
+			fullUrl: url.complete,
+			fileName: url.file,
+			params: url.params,
+			status: status.status,
+			fullStatus: status.complete,
+			mime: mime.type,
+			fullMimeType: mime.complete,
+			mimeType: mime.base + '/' + mime.type,
+			size: size.originalCompressed,
+			fullSize: size.originalSize,
+			sizeToShow: size.size,
 			tabs: tabs,
 			tabContainers: content,
 			progress:progress,
-			completeSize:completeSize,
-			completeCompressedSize:compressedSize,
+			completeSize:size.complete,
+			completeCompressedSize:size.compressed,
 			domloaded:onContentLoadText,
 			windowloaded:onLoadText,
 			_totalTime:totalTime >= 0? totalTime : 0,
@@ -237,22 +369,7 @@ module.exports = function(har, htmlEncode) {
 		};
 		
 	},
-	pct = function(value, pct) {
-		if(!value)
-			return 0;
-		return ((value / pct) * 100) + '%';
-	},
-	sizeFormatter = function(value, precision) {
-		var ext = [' Bytes', ' KB', ' MB', ' GB'],
-			i = 0;
-		
-		while(value > 1024) {
-			value /= 1024;
-			i++;
-		}
-		
-		return formatSize(value, precision || 2) + ext[i];
-	},
+	
 	convertProgress = function(entries) {
 		
 		var startedDateTimeBefore = entries[0].progress.startedDateTime,
@@ -314,40 +431,7 @@ module.exports = function(har, htmlEncode) {
 		return entries;
 		
 	},
-	objListToHtml = function(arr, filters) {
-		if(arr && arr.length) {
-			var dl = '<dl class="dl-horizontal">';
-			for(var i=0,ilen=arr.length;i<ilen;i++) {
-				if(!filters || !filters.length || _indexOf(arr[i].name, filters) == -1)
-					dl += '<dt>' + arr[i].name + '</dt><dd>' + arr[i].value.split(';').join(';<br>') + '</dd>';
-			}
-			dl += '</dl>';
-			return dl;
-		}
-		return '';
-	},
-	_indexOf = function(pattern, arr) {
-		for(var i=0, ilen=arr.length;i<ilen;i++) {
-			if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) != -1)
-				return i;
-		}
-		return -1;
-	},
-	formatSize = function(number, precision) {
-		var matcher, fPoint;
-		precision = precision || 2;
-		number = number.toFixed(precision);
-		if(precision === '0')
-			return number;
-		fPoint = number.split('.')[1];
-		matcher = fPoint.match(/0+/);
-		if(matcher && matcher[0].length == fPoint.length) {
-			return number.split('.')[0];
-		}
-		else {
-			return number.replace('.', ',');
-		}
-	},
+	
 	cssUnminify = function(code, tab) {
 		var defaultTab = 4,
 			space = '';
