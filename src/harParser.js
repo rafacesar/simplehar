@@ -365,7 +365,9 @@ module.exports = function(har, htmlEncode) {
 			windowloaded:onLoadText,
 			_totalTime:totalTime >= 0? totalTime : 0,
 			totalTime:formatSize(totalTime >= 0? totalTime : 0, 2) + 'ms',
-			rId:Math.floor((Math.random()*(new Date()).getTime())+1)
+			rId:Math.floor((Math.random()*(new Date()).getTime())+1),
+			order: i,
+			bgstatus: status >= 300?'redirect':status >= 400?'warning':status >= 500?'danger':''
 		};
 		
 	},

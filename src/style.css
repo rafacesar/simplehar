@@ -81,6 +81,16 @@ tr.top {
 	width:70px;
 }
 
+.order {
+	position:absolute;
+	left:0;
+	top:0;
+	display:none;
+}
+
+.bg-redirect {
+	background-color:#FBFBFB;
+}
 
 .container .size {
 	text-align:right;
