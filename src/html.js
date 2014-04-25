@@ -14,54 +14,11 @@ $(function($) {
 			translateTemplate($('.har-table'));
 		});
 		
-		
-		$('body').on('dragover', function(evt) {
-			var $drop = $('#drop');
-			if($drop.length) {
-				$drop.css('display', 'table');
-			}
-			else {
-				$(document.createElement('div'))
-				.attr('id', 'drop')
-				.css({
-					width:'100%',
-					height:'100%',
-					position:'absolute',
-					left:0,
-					top:0,
-					border:'7px dashed #666',
-					display:'table',
-					textAlign:'center',
-					backgroundColor:'rgba(0,0,0,.3)'
-				})
-				.append(
-					$(document.createElement('span'))
-					.text('Drop Here! :)')
-					.css({
-						color: '#EEE',
-						display:'table-cell',
-						'text-shadow': '2px 2px 5px #066',
-						fontSize:'50px',
-						verticalAlign:'middle'
-					})
-				)
-				.appendTo(document.body);
-			}
-			$drop.data('hide','false');
-			return false;
-		}).on('dragend', function(evt) {
-			return false;
-		}).on('dragleave', function(evt) {
-			var $drop = $('#drop');
-			$drop.data('hide','true');
-			setTimeout(function() {
-				if($drop.data('hide') == 'true')
-					$drop.css('display', 'none');
-			}, 50);
-			return false;
-		}).on('drop', function(evt) {
+		var drop = function(evt) {
 			evt.stopPropagation();
 			evt.preventDefault();
+			
+			window.scrollTo(0,0);
 			
 			var files = evt.originalEvent.dataTransfer.files;
 			
@@ -99,7 +56,61 @@ $(function($) {
 			}
 			
 			return false;
-		});
+		};
+		
+		$('body').on('dragover', function(evt) {
+			var $drop = $('#drop');
+			if($drop.length) {
+				$drop.css('display', 'table');
+			}
+			else {
+				$(document.createElement('div'))
+				.attr('id', 'drop')
+				.css({
+					width:'100%',
+					height:'100%',
+					position:'fixed',
+					left:0,
+					top:0,
+					border:'7px dashed #666',
+					display:'table',
+					textAlign:'center',
+					backgroundColor:'rgba(0,0,0,.3)'
+				})
+				.append(
+					$(document.createElement('span'))
+					.text('Drop Here! :)')
+					.css({
+						color: '#EEE',
+						display:'table-cell',
+						'text-shadow': '2px 2px 5px #066',
+						fontSize:'50px',
+						verticalAlign:'middle'
+					})
+				)
+				.on('drop', function(evt) {
+					var $loader = $('.loader');
+					if($loader.length && $loader.is(':visible'))
+						return;
+					
+					return drop(evt);
+					
+				})
+				.appendTo(document.body);
+			}
+			$drop.data('hide','false');
+			return false;
+		}).on('dragend', function(evt) {
+			return false;
+		}).on('dragleave', function(evt) {
+			var $drop = $('#drop');
+			$drop.data('hide','true');
+			setTimeout(function() {
+				if($drop.data('hide') == 'true')
+					$drop.css('display', 'none');
+			}, 50);
+			return false;
+		}).on('drop', drop);
 		
 		
 		
