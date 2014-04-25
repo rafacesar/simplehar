@@ -30,7 +30,7 @@ module.exports = function(har, htmlEncode) {
 		if(arr && arr.length) {
 			var dl = '<dl class="dl-horizontal">';
 			for(var i=0,ilen=arr.length;i<ilen;i++) {
-				if(!filters || !filters.length || _indexOf(arr[i].name, filters) == -1)
+				if(!filters || !filters.length || lowerReverseIndexOf(arr[i].name, filters) == -1)
 					dl += '<dt>' + arr[i].name + '</dt><dd>' + arr[i].value.split(';').join(';<br>') + '</dd>';
 			}
 			dl += '</dl>';
@@ -49,12 +49,29 @@ module.exports = function(har, htmlEncode) {
 		var ext = [' Bytes', ' KB', ' MB', ' GB'],
 			i = 0;
 		
+		value = value >= 0 ? value : 0;
+		
 		while(value > 1024) {
 			value /= 1024;
 			i++;
 		}
 		
-		return formatSize(value, precision || 2) + ext[i];
+		return precisionFormatter(value, precision || 2) + ext[i];
+	},
+	
+	timeFormatter = function(time, precision) {
+		var ext = ['ms', 's', 'min'],
+			div = [1000, 60, 60],
+			i = 0;
+		
+		time = time >= 0 ? time : 0;
+		
+		while(time > div[i]) {
+			time /= div[i];
+			i++;
+		}
+		
+		return precisionFormatter(time, precision || 2) + ext[i];
 	},
 	precisionFormatter = function(number, precision) {
 		var matcher, fPoint;
@@ -79,10 +96,10 @@ module.exports = function(har, htmlEncode) {
 			return number;//.replace('.', ',');
 		}
 	},
-	objListToHtml = objToDl,
-	_indexOf = lowerReverseIndexOf,
-	sizeFormatter = dataSizeFormatter,
-	formatSize = precisionFormatter,
+	// objListToHtml = objToDl,
+	// _indexOf = lowerReverseIndexOf,
+	// sizeFormatter = dataSizeFormatter,
+	// formatSize = precisionFormatter,
 	urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i,
 	urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i,
 	
@@ -157,7 +174,7 @@ module.exports = function(har, htmlEncode) {
 		else if(compressed === 0)
 			mainSize = size;
 		
-		mainSize = sizeFormatter(mainSize);
+		mainSize = dataSizeFormatter(mainSize);
 
 		if(status == 304)
 			mainSize = em(mainSize);
@@ -236,7 +253,6 @@ module.exports = function(har, htmlEncode) {
 			
 			if(!content) {
 				content = url.match(urlDataRe);
-				console.log(content);
 				if(content && content[3])
 					content = decodeURIComponent(content[3]);
 				else
@@ -319,8 +335,8 @@ module.exports = function(har, htmlEncode) {
 		for(var j=0, jlen=_tabs.length, _tab, _tabCapital;j<jlen;j++) {
 			
 			_tab = _tabs[j];
-			_request[_tab] = objListToHtml(entry.request[_tab], _tab=='headers'?['cookie']:undefined);
-			_response[_tab] = objListToHtml(entry.response[_tab], _tab=='headers'?['cookie']:undefined);
+			_request[_tab] = objToDl(entry.request[_tab], _tab=='headers'?['cookie']:undefined);
+			_response[_tab] = objToDl(entry.response[_tab], _tab=='headers'?['cookie']:undefined);
 			
 			if(_request[_tab] || _response[_tab]) {
 				_tabCapital = _tab.charAt(0).toUpperCase() + _tab.substr(1);
@@ -361,12 +377,9 @@ module.exports = function(har, htmlEncode) {
 			tabs: tabs,
 			tabContainers: content,
 			progress:progress,
-			completeSize:size.complete,
-			completeCompressedSize:size.compressed,
 			domloaded:onContentLoadText,
 			windowloaded:onLoadText,
-			_totalTime:totalTime >= 0? totalTime : 0,
-			totalTime:formatSize(totalTime >= 0? totalTime : 0, 2) + 'ms',
+			totalTime:timeFormatter(totalTime),
 			rId:Math.floor((Math.random()*(new Date()).getTime())+1),
 			order: i,
 			bgstatus: (status.code >= 500?'danger':(status.code >= 400?'warning':(status.code >= 300?'redirect':'')))
@@ -400,21 +413,21 @@ module.exports = function(har, htmlEncode) {
 			progressContent = '';
 			
 			if(blocked >= 0)
-				progressContent += '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> ~' + formatSize(blocked,3) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> ' + timeFormatter(blocked, 3) + '</em></p>';
 			if(dns >= 0)
-				progressContent += '<p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> ~' + formatSize(dns,3) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> ~' + timeFormatter(dns, 3) + '</em></p>';
 			if(connect >= 0)
-				progressContent += '<p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> ~' + formatSize(connect,3) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> ~' + timeFormatter(connect, 3) + '</em></p>';
 			if(send >= 0)
-				progressContent += '<p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> ~' + formatSize(send,3) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> ~' + timeFormatter(send, 3) + '</em></p>';
 			if(wait >= 0)
-				progressContent += '<p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> ~' + formatSize(wait,3) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> ~' + timeFormatter(wait, 3) + '</em></p>';
 			if(receive >= 0)
-				progressContent += '<p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> ~' + formatSize(receive,3) + ' ms</em></p>';
+				progressContent += '<p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> ~' + timeFormatter(receive, 3) + '</em></p>';
 			
 			
 			if(progressContent !== '' && startedTime >= 0)
-				entries[i].progressStart = '<strong>[Start Time]:</strong> <em>' + startedTime + ' ms</em>';
+				entries[i].progressStart = '<strong>[Start Time]:</strong> <em>' + timeFormatter(startedTime, 3) + '</em>';
 			else
 				entries[i].progressStart = '';
 			
@@ -2036,43 +2049,46 @@ module.exports = function(har, htmlEncode) {
 	
 	
 	entries.sort(function(a, b) {
-		var _a = a.startedDateTime,
-			_b = b.startedDateTime;
+		a = a.startedDateTime;
+		b = b.startedDateTime;
 		
-		if(_a)
-			_a = (new Date(_a)).getTime();
+		if(a)
+			a = (new Date(a)).getTime();
 		else
-			_a = 0;
+			a = 0;
 		
-		if(_b)
-			_b = (new Date(_b)).getTime();
+		if(b)
+			b = (new Date(b)).getTime();
 		else
-			_b = 0;
+			b = 0;
 		
 		
-		return _a - _b;
+		return a - b;
 		
 	});
 	
 	
 	for(i=0,ilen=entries.length;i<ilen;i++) {
-		entries[i] = hEntry = convertHar(entries[i], i);
+		hEntry = entries[i];
 		
-		totalSize += hEntry.completeSize;
-		totalCompressedSize += hEntry.completeCompressedSize;
-		lastTimeArray.push((hEntry._totalTime + hEntry.progress.startedDateTime) - entries[0].progress.startedDateTime);
+		totalSize += hEntry.response.content.size;
+		totalCompressedSize += hEntry.response.bodySize;
+		
+		hEntry = entries[i] = convertHar(entries[i], i);
+
+		lastTimeArray.push((hEntry.progress.total + hEntry.progress.startedDateTime) - entries[0].progress.startedDateTime);
 	}
 
 	
 	lastTime = Math.max.apply(null, lastTimeArray);
 	
 	if(onContentLoad)
-		onContentLoadText = (onContentLoad / lastTime) * 100;
+		onContentLoadText = pct(onContentLoad, lastTime);
 	
 	for(i=0;i<ilen;i++) {
-		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (' + formatSize(onLoad, 2) + ' ms)" style="left:' + (onLoad / lastTime * 100) + '%"></span>';
+		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (' + timeFormatter(onLoad) + ')" style="left:' + pct(onLoad,lastTime) + '"></span>';
 		if(onContentLoad)
-			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (' + formatSize(onContentLoad, 2) + ' ms)" style="left:' + onContentLoadText + '%"></span>';
+			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (' + timeFormatter(onContentLoad) + ')" style="left:' + onContentLoadText + '"></span>';
 	}
 	
 	
@@ -2083,9 +2099,9 @@ module.exports = function(har, htmlEncode) {
 	entries.title = page.title;
 	
 	entries.info = '<th>' + entries.length + ' [requests]</th>' + 
-						'<th colspan="3" class="text-right">' + sizeFormatter(totalSize>=0?totalSize:0) + 
-						' (' + sizeFormatter(totalCompressedSize>=0?totalCompressedSize:0) + ' [compressed])</th>' + 
-						'<th class="text-center">' + (onContentLoad >= 0?'(' + formatSize(onContentLoad / 1000, 2) + 's) ':'') + formatSize(onLoad / 1000, 2) + 's</th>';
+						'<th colspan="3" class="text-right">' + dataSizeFormatter(totalSize) + 
+						' (' + dataSizeFormatter(totalCompressedSize) + ' [compressed])</th>' + 
+						'<th class="text-center">' + (onContentLoad !== false?'(' + timeFormatter(onContentLoad) + ') ':'') + timeFormatter(onLoad) + '</th>';
 	
 	return entries;
 	
