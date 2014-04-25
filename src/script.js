@@ -1,4 +1,5 @@
 (function() {
+	'use strict';
 	var addInteraction = function() {
 		
 		if(typeof jQuery == 'undefined' || !jQuery('.inside').length)
@@ -133,24 +134,29 @@
 		if($table.stupidtable) {
 			$table.stupidtable({
 				url:function(a, b) {
-					console.log(this);
-					console.log(arguments);
-					var _a = a.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0],
-						_b = b.split('\n')[4].split(' ')[1].split('?')[0].split('#')[0];
+					a = a.split('\n')[5].replace(/^\s*/g, '').split('?')[0].split('#')[0];
+					b = b.split('\n')[5].replace(/^\s*/g, '').split('?')[0].split('#')[0];
 						
-					if(_a < _b)
+					if(a < b)
 						return -1;
-					else if(_a > _b)
+					else if(a > b)
 						return 1;
 					else
 						return 0;
 				},
 				size:function(a, b) {
-					var _a = parseFloat(a.replace(',','.')),
-						_b = parseFloat(b.replace(',','.'));
+					a = parseFloat(a.replace(',','.'));
+					b = parseFloat(b.replace(',','.'));
 					
-					return _a - _b;
+					return a - b;
 					
+				},
+				timeline:function(a, b) {
+					
+					a = parseInt(a.split('\n')[3].replace(/^\s*/g, ''),10);
+					b = parseInt(b.split('\n')[3].replace(/^\s*/g, ''),10);
+					
+					return b - a;
 				}
 			});
 			$table.bind('beforetablesort', function() {
