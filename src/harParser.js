@@ -94,7 +94,7 @@ module.exports = function(har, htmlEncode) {
 		if(!urlMatch) {
 			if(!url.indexOf('data:')) {
 				urlFile = strong('Data:');
-				url = url.split(';')[0];
+				// url = url.split(';')[0];
 			}
 			else {
 				urlFile = url;
@@ -112,8 +112,9 @@ module.exports = function(har, htmlEncode) {
 		}
 		
 		return {
-			params: urlMatch[5] || '',
+			params: urlMatch && urlMatch[5] || '',
 			file: urlFile,
+			//Should i use: decodeURIComponent here ??
 			complete:url
 		};
 	},
@@ -235,8 +236,9 @@ module.exports = function(har, htmlEncode) {
 			
 			if(!content) {
 				content = url.match(urlDataRe);
-				if(content && content[1] && content[2])
-					content = decodeURIComponent(content[2]);
+				console.log(content);
+				if(content && content[3])
+					content = decodeURIComponent(content[3]);
 				else
 					content = false;
 			}
@@ -336,7 +338,7 @@ module.exports = function(har, htmlEncode) {
 		}
 		
 		tabs += contextTextContent.tabs;
-		content += contextTextContent.content;
+		content += contextTextContent.result;
 		
 		
 		
