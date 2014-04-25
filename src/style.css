@@ -81,6 +81,16 @@ tr.top {
 	width:70px;
 }
 
+.order {
+	position:absolute;
+	left:0;
+	top:0;
+	display:none;
+}
+
+.bg-redirect {
+	background-color:#F0F0F0;
+}
 
 .container .size {
 	text-align:right;
@@ -208,7 +218,7 @@ tfoot th {
 	background-color:#000;
 }
 
-.sorting-asc:after, .sorting-desc:after {
+.sorting-asc:after, .sorting-desc:after, .timeline.sorting-desc:after {
 	display:inline-block;
 	font-family:'Glyphicons Halflings';
 	font-weight:400;
@@ -219,9 +229,10 @@ tfoot th {
 	padding-left:4px;
 	font-size:12px;
 }
-.sorting-desc:after {
+.sorting-desc:after, .timeline.sorting-asc:after {
 	content:"\e156";
 }
+
 .container thead th {
 	cursor:pointer;
 }
