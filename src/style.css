@@ -82,6 +82,10 @@ tr.top {
 }
 
 
+.bg-redirect {
+	background-color:#FBFBFB;
+}
+
 .container .size {
 	text-align:right;
 	width:95px;
