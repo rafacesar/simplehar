@@ -96,10 +96,6 @@ module.exports = function(har, htmlEncode) {
 			return number;//.replace('.', ',');
 		}
 	},
-	// objListToHtml = objToDl,
-	// _indexOf = lowerReverseIndexOf,
-	// sizeFormatter = dataSizeFormatter,
-	// formatSize = precisionFormatter,
 	urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i,
 	urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i,
 	
@@ -130,7 +126,7 @@ module.exports = function(har, htmlEncode) {
 		
 		urlFile = urlFile.replace(/^\s*/g,'').replace(/\s*$/g,'');
 		
-		if(!urlFile.indexOf('https'))
+		if(!url.indexOf('https'))
 			urlFile = '<strong class="text-success">' + urlFile + '</strong>';
 		
 		return {
@@ -360,8 +356,6 @@ module.exports = function(har, htmlEncode) {
 		
 		tabs += contextTextContent.tabs;
 		content += contextTextContent.result;
-		
-		
 		
 		
 		return {
