@@ -57,7 +57,14 @@
 			return false;
 		});
 		
-		
+		$top.find('.url > div > a').click(function(evt) {
+			if(evt.which == 2)
+				evt.stopPropagation();
+			else {
+				$(this).parents('tr.top').click();
+				return false;
+			}
+		});
 		
 		$nav.find('li:first-child').addClass('active');
 		
@@ -143,13 +150,6 @@
 						return 1;
 					else
 						return 0;
-				},
-				size:function(a, b) {
-					a = parseFloat(a.replace(',','.'));
-					b = parseFloat(b.replace(',','.'));
-					
-					return a - b;
-					
 				},
 				timeline:function(a, b) {
 					

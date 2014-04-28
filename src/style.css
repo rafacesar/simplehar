@@ -21,14 +21,15 @@ tr.top {
 .timeline > div {
 	position:relative;
 }
+.table-condensed>tbody>tr>td,
 .url > div {
-	padding:5px;
+	padding:3px 5px;
 }
 .url strong {
 	display:block;
 	overflow:hidden;
 	width:350px;
-	text-indent:10px;
+	text-indent:11px;
 	text-overflow:ellipsis;
 	font-weight:normal;
 }
@@ -48,7 +49,7 @@ tr.top {
 	position:absolute;
 	left:3px;
 	font-size:10px;
-	top:9px;
+	top:6px;
 }
 
 .container .url a {
@@ -60,7 +61,7 @@ tr.top {
 	z-index:5;
 	left:14px;
 	top:0;
-	padding:5px 5px 5px 3px;
+	padding:3px 5px 3px 2px;
 }
 .container .url:hover a {
 	display:block;
@@ -83,9 +84,12 @@ tr.top {
 
 .order {
 	position:absolute;
-	left:0;
-	top:0;
-	display:none;
+	left:-28px;
+	top:3px;
+	display:block;
+	width:25px;
+	text-align:right;
+	text-indent:0;
 }
 
 .bg-redirect {
@@ -106,8 +110,7 @@ tr.top {
 .container .timeline {
 	width:600px;
 	position:relative;
-	padding-left:0;
-	padding-right:0;
+	padding:0;
 }
 
 .inside div {
@@ -138,7 +141,10 @@ tr.top {
 }
 .inside .content {overflow:hidden}
 
-.progress {margin-bottom:0;}
+.progress {
+	margin-bottom:0;
+	height:23px;
+}
 
 .progress-bar-secondary {
   background-color:#B45CB8;
@@ -218,7 +224,7 @@ tfoot th {
 	background-color:#000;
 }
 
-.sorting-asc:after, .sorting-desc:after, .timeline.sorting-desc:after {
+.sorting-asc:after, .sorting-desc:after {
 	display:inline-block;
 	font-family:'Glyphicons Halflings';
 	font-weight:400;
@@ -229,7 +235,7 @@ tfoot th {
 	padding-left:4px;
 	font-size:12px;
 }
-.sorting-desc:after, .timeline.sorting-asc:after {
+.sorting-desc:after {
 	content:"\e156";
 }
 

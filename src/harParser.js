@@ -128,6 +128,11 @@ module.exports = function(har, htmlEncode) {
 				urlFile = urlMatch[4];
 		}
 		
+		urlFile = urlFile.replace(/^\s*/g,'').replace(/\s*$/g,'');
+		
+		if(!urlFile.indexOf('https'))
+			urlFile = '<strong class="text-success">' + urlFile + '</strong>';
+		
 		return {
 			params: urlMatch && urlMatch[5] || '',
 			file: urlFile,
@@ -381,7 +386,7 @@ module.exports = function(har, htmlEncode) {
 			windowloaded:onLoadText,
 			totalTime:timeFormatter(totalTime),
 			rId:Math.floor((Math.random()*(new Date()).getTime())+1),
-			order: i,
+			order: i+1,
 			bgstatus: (status.code >= 500?'danger':(status.code >= 400?'warning':(status.code >= 300?'redirect':'')))
 		};
 		
