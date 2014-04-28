@@ -57,7 +57,14 @@
 			return false;
 		});
 		
-		
+		$top.find('.url > div > a').click(function(evt) {
+			if(evt.which == 2)
+				evt.stopPropagation();
+			else {
+				$(this).parents('tr.top').click();
+				return false;
+			}
+		});
 		
 		$nav.find('li:first-child').addClass('active');
 		
