@@ -218,7 +218,7 @@ tfoot th {
 	background-color:#000;
 }
 
-.sorting-asc:after, .sorting-desc:after, .timeline.sorting-desc:after {
+.sorting-asc:after, .sorting-desc:after {
 	display:inline-block;
 	font-family:'Glyphicons Halflings';
 	font-weight:400;
@@ -229,7 +229,7 @@ tfoot th {
 	padding-left:4px;
 	font-size:12px;
 }
-.sorting-desc:after, .timeline.sorting-asc:after {
+.sorting-desc:after {
 	content:"\e156";
 }
 

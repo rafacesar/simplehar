@@ -144,13 +144,6 @@
 					else
 						return 0;
 				},
-				size:function(a, b) {
-					a = parseFloat(a.replace(',','.'));
-					b = parseFloat(b.replace(',','.'));
-					
-					return a - b;
-					
-				},
 				timeline:function(a, b) {
 					
 					a = parseInt(a.split('\n')[3].replace(/^\s*/g, ''),10);
