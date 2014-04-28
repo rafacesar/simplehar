@@ -28,7 +28,7 @@ tr.top {
 	display:block;
 	overflow:hidden;
 	width:350px;
-	text-indent:10px;
+	text-indent:11px;
 	text-overflow:ellipsis;
 	font-weight:normal;
 }
@@ -83,9 +83,12 @@ tr.top {
 
 .order {
 	position:absolute;
-	left:0;
-	top:0;
-	display:none;
+	left:-28px;
+	top:3px;
+	display:block;
+	width:25px;
+	text-align:right;
+	text-indent:0;
 }
 
 .bg-redirect {
