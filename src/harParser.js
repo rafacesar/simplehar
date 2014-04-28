@@ -128,6 +128,11 @@ module.exports = function(har, htmlEncode) {
 				urlFile = urlMatch[4];
 		}
 		
+		urlFile = urlFile.replace(/^\s*/g,'').replace(/\s*$/g,'');
+		
+		if(!urlFile.indexOf('https'))
+			urlFile = '<strong class="text-success">' + urlFile + '</strong>';
+		
 		return {
 			params: urlMatch && urlMatch[5] || '',
 			file: urlFile,
