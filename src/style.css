@@ -23,7 +23,7 @@ tr.top {
 }
 .table-condensed>tbody>tr>td,
 .url > div {
-	padding:3px 5px;
+	padding:2px 5px;
 }
 .url strong {
 	display:block;
@@ -142,8 +142,16 @@ tr.top {
 .inside .content {overflow:hidden}
 
 .progress {
-	margin-bottom:0;
-	height:23px;
+  margin-bottom:0;
+  height:23px;
+  border-radius:0;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.progress-bar {
+  -webkit-box-shadow: none;
+  box-shadow: none;
 }
 
 .progress-bar-secondary {
@@ -230,7 +238,7 @@ tfoot th {
 	font-weight:400;
 	line-height:1;
 	-webkit-font-smoothing:antialiased;
-	
+
 	content:"\e155";
 	padding-left:4px;
 	font-size:12px;
@@ -277,19 +285,19 @@ tfoot th {
 	-webkit-animation:rloader 1s infinite linear;
 	-moz-animation:rloader 1s infinite linear;
 	animation:rloader 1s infinite linear;
-	
+
 }
 @keyframes rloader
 {
 	0% {
 		-webkit-transform: rotateZ(0deg);
 		transform: rotateZ(0deg);
-		
+
 	}
 	100% {
 		-webkit-transform: rotateZ(360deg);
 		transform: rotateZ(360deg);
-		
+
 	}
 }
 @-webkit-keyframes rloader
@@ -297,11 +305,11 @@ tfoot th {
 	0% {
 		-webkit-transform: rotateZ(0deg);
 		transform: rotateZ(0deg);
-		
+
 	}
 	100% {
 		-webkit-transform: rotateZ(360deg);
 		transform: rotateZ(360deg);
-		
-	}		
+
+	}
 }
