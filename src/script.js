@@ -38,9 +38,9 @@
 				$div.eq(i).addClass('hidden');
 			}
 		});
+		
+		$nav.on('click', 'a', function(evt) {
 			
-			
-		$nav.find('a').click(function() {
 			
 			var $this = $(this),
 				$inside = $this.parents('.inside'),
