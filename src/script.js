@@ -129,10 +129,10 @@
 			
 		}
 		
-		$top.find('td.size, .timeline span.domloaded').tooltip(tooltipOpt);
+		var $_timeline = $top.find('.timeline');
+		$top.find('td.size').add($_timeline.find('span.domloaded')).tooltip(tooltipOpt);
 		tooltipOpt.placement = 'left';
-		$top.find('td.status, td.type, .timeline span.windowloaded').tooltip(tooltipOpt);
-		
+		$top.find('td.status, td.type').add($_timeline.find('span.windowloaded')).tooltip(tooltipOpt);
 		
 		if($timeline.length > 15) {
 			for(i=0, ilen=$timeline.length, half=ilen/2;i<ilen;i++)
