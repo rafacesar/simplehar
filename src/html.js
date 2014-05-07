@@ -9,9 +9,10 @@ $(function($) {
 		window.translations = data || false;
 	});
 	$.get('src/template.html', function() {
-		$('.container').load('src/template.html table', function() {
-			$('caption').html('');
-			translateTemplate($('.har-table'));
+		$('.container').load('src/template.html table', function(html) {
+			var $table = $('table.har-table');
+			$table.find('caption').html('');
+			$table.html(translateTemplate($table.html()));
 		});
 		
 		var drop = function(evt) {
@@ -142,29 +143,53 @@ $(function($) {
 		$('body').html($('body').html().replace('{content}', ''));
 	});
 	
-	var translateTemplate = function($elm) {
-		var html = $elm.html(),
-			translations = window.translations,
+	var translateTemplate = function(html) {
+		var translations = window.translations,
 			lng = navigator.language,
 			replacer;
 		if(translations && translations[lng]) {
+			translations = translations[lng];
 			replacer = function(complete, match) {
-				return (translations[lng][match]) || match;
+				return (translations[match]) || match;
 			};
 		}
 		else if(translations === false || !translations[lng]) {
 			replacer = "$1";
 		}
 		else {
-			return setTimeout(function() {translateTemplate($elm);}, 500);
+			return setTimeout(function() {translateTemplate(elm);}, 500);
 		}
 		
-		$elm.html(
-			html.replace(/\[([^\]]+)\]/g, replacer)
-		);
+		return html.replace(/\[([^\]]+)\]/g, replacer);
 		
 	};
 	
+	var replaceAll = function(_s, _f, _r, _c){ 
+
+		var o = _s.toString(),
+			r = '',
+			s = o,
+			b = 0,
+			e = -1;
+		
+		if(_c) {
+			_f = _f.toLowerCase();
+			s = o.toLowerCase();
+		}
+
+		while((e=s.indexOf(_f)) > -1) {
+			r += o.substring(b, b+e) + _r;
+			s = s.substring(e+_f.length, s.length);
+			b += e+_f.length;
+		}
+
+		// Add Leftover
+		if(s.length>0)
+			r += o.substring(o.length-s.length, o.length);
+
+		// Return New String
+		return r;
+	};
 	
 	var runHar = function(har) {
 		window.har = har;
@@ -176,25 +201,28 @@ $(function($) {
 		
 		
 		
-		
 		$.get('src/requestTemplate.html', function(template) {
 			var html =  '',
 				i = 0,
 				ilen = newHar.length,
-				prop, nHar, _html;
+				table = $('table.har-table')[0],
+				prop, nHar = newHar[0], _html, res = {};
+			
+			// for(prop in nHar)
+			//	res[prop] = new RegExp('{' + prop + '}','g');
+			
 			for(;i<ilen;i++) {
 				nHar = newHar[i];
 				_html = template;
 				for(prop in nHar) {
-					_html = _html.replace(new RegExp('{' + prop + '}','g'), nHar[prop]);
+					_html = replaceAll(_html, '{' + prop + '}', nHar[prop]);
+					// _html = _html.replace(res[prop], nHar[prop]);
 				}
 				html += _html;
 			}
-			$('tbody').html(html);
-			$('tfoot tr').html(newHar.info);
-			$('caption').html(newHar.title);
-			// $('.har-table').html(newHar.title);
-			translateTemplate($('tbody').parent());
+			table.getElementsByTagName('tbody')[0].innerHTML = translateTemplate(html);
+			table.getElementsByTagName('tfoot')[0].getElementsByTagName('tr')[0].innerHTML = translateTemplate(newHar.info);
+			table.getElementsByTagName('caption')[0].innerHTML = (newHar.title);
 			$('.loader').hide();
 			
 			
