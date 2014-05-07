@@ -24,13 +24,21 @@
 		tableWidth = $table.width();
 		$div.show();
 		
-		$inside.find('dt').css('width', 'auto').each(function() {
-			var $this = $(this);
-			if($this.width() > 160)
-				$this.attr('title', $this.text());
-		}).css('width', '').end().addClass('hidden');
+		
+		var $dt = $inside.find('dt'), $_dt, _dtLength;
+		
+		ilen = $dt.length;
+		while(ilen--) {
+			$_dt = $dt[ilen];
+			_dtLength = $_dt.textContent.length;
+			if(_dtLength > 18) {
+				//if($_dt.clientWidth > 160)
+				$_dt.title = $_dt.textContent;
+			}
+		}
 		
 		
+		$inside.addClass('hidden');
 		
 		$div.css('width', tableWidth - 10).end().each(function() {
 			var $div = $(this).find('div');
@@ -38,9 +46,9 @@
 				$div.eq(i).addClass('hidden');
 			}
 		});
+		
+		$nav.on('click', 'a', function(evt) {
 			
-			
-		$nav.find('a').click(function() {
 			
 			var $this = $(this),
 				$inside = $this.parents('.inside'),
@@ -95,33 +103,36 @@
 			return false;
 		});
 		
-		$top.each(function() {
-			var $this = $(this),
-				$bars = $this.find('.progress-bar'),
-				$totalTime = $this.find('.totalTime'),
-				left = 0,
-				marginLeft = 0;
+		var $_top, $_bars, $_totalTime, _left, _marginLeft, j, jlen;
+		ilen = $top.length;
+		while(ilen--) {
+			$_top = $top.eq(ilen);
+			$_bars = $_top.find('div.progress-bar');
+			$_totalTime = $_top.find('span.totalTime');
+			_left = 0;
+			_marginLeft = 0;
 			
-			for(var i=0, ilen=$bars.length;i<ilen;i++) {
-				left += parseFloat($bars.eq(i).attr('style').replace('width:', ''));
+			j = jlen = $_bars.length;
+			
+			while(j--)
+				_left += parseFloat($_bars.eq(j).attr('style').replace('width:', ''));
+			
+			if(_left > 80) {
+				for(j=1;j<jlen;j++)
+					_marginLeft += parseFloat($_bars.eq(j).width());
+				
+				_marginLeft += $_totalTime.width() + 5;
+				$_totalTime.css('marginLeft', _marginLeft * -1);
 			}
 			
-			if(left > 80) {
-				for(i=1;i<ilen;i++) {
-					marginLeft += parseFloat($bars.eq(i).css('width'));
-				}
-				marginLeft += $totalTime.width() + 5;
-				$totalTime.css('marginLeft', marginLeft * -1);
-			}
+			$_totalTime.css('left', (_left + 0.5) + '%');
 			
-			$totalTime.css('left', (left + 0.5) + '%');
-			
-		});
+		}
 		
-		$top.find('td.size, .timeline span.domloaded').tooltip(tooltipOpt);
+		var $_timeline = $top.find('.timeline');
+		$top.find('td.size').add($_timeline.find('span.domloaded')).tooltip(tooltipOpt);
 		tooltipOpt.placement = 'left';
-		$top.find('td.status, td.type, .timeline span.windowloaded').tooltip(tooltipOpt);
-		
+		$top.find('td.status, td.type').add($_timeline.find('span.windowloaded')).tooltip(tooltipOpt);
 		
 		if($timeline.length > 15) {
 			for(i=0, ilen=$timeline.length, half=ilen/2;i<ilen;i++)
