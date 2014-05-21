@@ -208,15 +208,11 @@ $(function($) {
 				table = $('table.har-table')[0],
 				prop, nHar = newHar[0], _html, res = {};
 			
-			// for(prop in nHar)
-			//	res[prop] = new RegExp('{' + prop + '}','g');
-			
 			for(;i<ilen;i++) {
 				nHar = newHar[i];
 				_html = template;
 				for(prop in nHar) {
 					_html = replaceAll(_html, '{' + prop + '}', nHar[prop]);
-					// _html = _html.replace(res[prop], nHar[prop]);
 				}
 				html += _html;
 			}

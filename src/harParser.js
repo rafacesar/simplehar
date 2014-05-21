@@ -230,7 +230,8 @@ module.exports = function(har, htmlEncode) {
 	},
 	parseContent = function(content, url, mime) {
 		var tabs = '',
-			result = '';
+			result = '',
+			_result = '';
 		
 		if(content || !url.indexOf('data:')) {
 			tabs += '<li><a href="#content">[Content]</a></li>';
@@ -244,10 +245,14 @@ module.exports = function(har, htmlEncode) {
 					result += '<img src="' + url + '" />';
 			}
 			else {
-				if(content)
-					result += '<pre class="pre-scrollable">' + htmlEncode(content) + '</pre>';
-				else
-					result += '<pre class="pre-scrollable">' + htmlEncode(url) + '</pre>';
+				if(content) {
+					_result = htmlEncode(content);
+					result += '<pre class="pre-scrollable">' + _result + '</pre>';
+				}
+				else {
+					_result = htmlEncode(url);
+					result += '<pre class="pre-scrollable">' + _result + '</pre>';
+				}
 			}
 			
 			result += '</div>';
@@ -255,7 +260,8 @@ module.exports = function(har, htmlEncode) {
 		}
 		return {
 			tabs: tabs,
-			result: result
+			result: result,
+			_result: _result
 		};
 	},
 	
@@ -354,6 +360,7 @@ module.exports = function(har, htmlEncode) {
 			sizeToShow: size.size,
 			tabs: tabs,
 			tabContainers: content,
+			fileContent: contextTextContent._result,
 			progress:progress,
 			domloaded:onContentLoadText,
 			windowloaded:onLoadText,
