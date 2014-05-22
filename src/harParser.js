@@ -26,18 +26,153 @@ module.exports = function(har, htmlEncode) {
 		symbol = symbol || '%';
 		return ((value / pct) * 100) + symbol;
 	},
-	objToDl = function(arr, filters) {
-		if(arr && arr.length) {
-			var dl = '<dl class="dl-horizontal">';
-			for(var i=0,ilen=arr.length;i<ilen;i++) {
-				if(!filters || !filters.length || lowerReverseIndexOf(arr[i].name, filters) == -1)
-					dl += '<dt>' + arr[i].name + '</dt><dd>' + arr[i].value.split(';').join(';<br>') + '</dd>';
-			}
-			dl += '</dl>';
-			return dl;
+	objToDl = function(arr, decode, filters) {
+		
+		if(decode && decode.length && typeof decode[0] == 'string') {
+			filters = decode;
+			decode = false;
 		}
-		return '';
+		
+		if(filters && !filters.length)
+			filters = false;
+		
+		var newArr = decodeObj(arr, decode, filters),
+			dl = '',
+			i, ilen, _arr, name;
+		
+		if((ilen=newArr.length)) {
+			dl = '<dl class="dl-horizontal">';
+			for(i=0;i<ilen;i++) {
+				_arr = newArr[i];
+				dl += '<dt>' + _arr.name + '</dt><dd>' + _arr.value.split(';').join(';<br>') + '</dd>';
+			}
+			dl += '</dl>';	
+		}
+		return dl;
+		
 	},
+	decode = function(str) {
+		var _str;
+		try {
+			_str = decodeURIComponent(str);
+		}
+		catch(e) {
+			try {
+				_str = decodeURI(str);
+			}
+			catch(ee) {
+				try {
+					_str = unescape(str);
+				}
+				catch(eee) {
+					_str = str;
+				}
+			}
+		}
+		return _str;
+	},
+	
+	decodeObj = function(arr, needDecode, filters) {
+		var newArr = [],
+			name, value, i, ilen, j, _arr;
+		
+		if(arr && arr.length) {
+			for(i=0, ilen=arr.length;i<ilen;i++) {
+				_arr = arr[i];
+				name = _arr.name;
+				if(!filters || lowerReverseIndexOf(name, filters) == -1) {
+					value = _arr.value;
+					if(needDecode) {
+						j = 5;
+						while(j-- && ~value.indexOf('%') && value !== '')
+							value = decode(value);
+					}
+					newArr.push({name:name, value:value});
+				}
+			}
+			return newArr;
+		}
+		return [];
+	},
+	
+	tabsAndContainers = function(tabs, request, response, decode, filters) {
+		
+		var i = 0,
+			ilen = tabs.length,
+			rq = {},
+			rp = {},
+			tab, tabCapitalized,
+			result = {
+				tabs:'',
+				containers:''
+			};
+		
+		if(decode && decode.length && typeof decode[0] == 'string') {
+			filters = decode;
+			decode = false;
+		}
+		
+		if(filters && !filters.length)
+			filters = false;
+		
+		
+		
+		for(;i<ilen;i++) {
+			tab = tabs[i];
+			
+			
+			rq[tab] = objToDl(request[tab], filters);
+			rp[tab] = objToDl(response[tab], filters);
+			
+			if((rq[tab] || rp[tab]) && decode) {
+				rq['d' + tab] = objToDl(request[tab], decode, filters);
+				rp['d' + tab] = objToDl(response[tab], decode, filters);
+			}
+			
+			
+			
+			if(rq[tab] || rp[tab]) {
+				tabCapitalized = tab.charAt(0).toUpperCase() + tab.substr(1);
+				
+				result.tabs += '<li><a href="#' + tab + '">[' + tabCapitalized + ']</a></li>';
+				
+				result.containers += '<div class="' + tab + '">';
+				
+				if(rq[tab])
+					result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>' + rq[tab];
+				
+				if(rp[tab])
+					result.containers += '<h3><small>[Response ' + tabCapitalized + ']</small></h3>' + rp[tab];
+				
+				result.containers += '</div>';
+				
+				
+				if(decode) {
+					
+					result.tabs += '<li><a href="#parsed' + tab + '">[Parsed ' + tabCapitalized + ']</a></li>';
+				
+					result.containers += '<div class="parsed' + tab + '">';
+					
+					if(rq['d'+tab])
+						result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>' + rq['d' + tab];
+					
+					if(rp['d'+tab])
+						result.containers += '<h3><small>[Response ' + tabCapitalized + ']</small></h3>' + rp['d' + tab];
+					
+					result.containers += '</div>';
+					
+					
+				}
+				
+				
+				
+			}
+			
+			
+		}
+		return result;
+	},
+	
 	lowerReverseIndexOf = function(pattern, arr) {
 		for(var i=0, ilen=arr.length;i<ilen;i++) {
 			if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) != -1)
@@ -298,49 +433,30 @@ module.exports = function(har, htmlEncode) {
 			status = parseStatus(__response.status, __response.statusText),
 			size = parseSize(__response.content.size, __response.bodySize, status.code),
 			mime = parseMime(__response.content.mimeType || '', url.complete),
-			contextTextContent = parseContent(entry.response.content.text, url.complete, mime),
-		
-			
-			
-			
-			
-			_tabs = ['headers', 'cookies', 'queryString'],
-			tabs = '', content = '', _request = {}, _response = {},
-			
+			responseContent = parseContent(__response.content.text, url.complete, mime),
 			progress = parseProgress(entry),
-			
-			totalTime = progress.total;
-		
-		
-		
-		
-		
+			totalTime = progress.total,
+			infos = [
+				{tab:['headers'], decode:false, filters:['cookie']},
+				{tab:['cookies', 'queryString'], decode:true, filters:false}
+			],
+			tabs = '',
+			containers = '',
+			j = 0,
+			jlen = infos.length,
+			info, _info;
 		
 		
 		// TABS INFO
-		for(var j=0, jlen=_tabs.length, _tab, _tabCapital;j<jlen;j++) {
-			
-			_tab = _tabs[j];
-			_request[_tab] = objToDl(entry.request[_tab], _tab=='headers'?['cookie']:undefined);
-			_response[_tab] = objToDl(entry.response[_tab], _tab=='headers'?['cookie']:undefined);
-			
-			if(_request[_tab] || _response[_tab]) {
-				_tabCapital = _tab.charAt(0).toUpperCase() + _tab.substr(1);
-				tabs += '<li><a href="#' + _tab + '">[' + _tabCapital + ']</a></li>';
-				content += '<div class="' + _tab + '">';
-				
-				if(_request[_tab])
-					content += '<h3><small>[Request ' + _tabCapital + ']</small></h3>' + _request[_tab];
-				
-				if(_response[_tab])
-					content += '<h3><small>[Response ' + _tabCapital + ']</small></h3>' + _response[_tab];
-				
-				content += '</div>';	
-			}
+		for(;j<jlen;j++) {
+			info = infos[j];
+			_info = tabsAndContainers(info.tab, __request, __response, info.decode, info.filters);
+			tabs += _info.tabs;
+			containers += _info.containers;
 		}
+		tabs += responseContent.tabs;
+		containers += responseContent.result;
 		
-		tabs += contextTextContent.tabs;
-		content += contextTextContent.result;
 		
 		
 		return {
@@ -359,8 +475,8 @@ module.exports = function(har, htmlEncode) {
 			fullSize: size.originalSize,
 			sizeToShow: size.size,
 			tabs: tabs,
-			tabContainers: content,
-			fileContent: contextTextContent._result,
+			tabContainers: containers,
+			fileContent: responseContent._result,
 			progress:progress,
 			domloaded:onContentLoadText,
 			windowloaded:onLoadText,
