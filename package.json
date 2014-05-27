@@ -1,0 +1,32 @@
+{
+  "name": "simplehar",
+  "version": "0.10.2",
+  "description": "Har viewer made simple",
+  "main": "./lib/simplehar.js",
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rafacesar/simplehar.git"
+  },
+  "bin": "./bin/simplehar",
+  "keywords": [
+    "har",
+    "viewer",
+    "network",
+    "performance"
+  ],
+  "author": "Rafael Cesar",
+  "license": "GPL-3",
+  "bugs": {
+    "url": "https://github.com/rafacesar/simplehar/issues"
+  },
+  "homepage": "https://github.com/rafacesar/simplehar",
+  "devDependencies": {
+    "grunt": "~0.4.4"
+  },
+  "dependencies": {
+    "html-entities": "~1.0.10"
+  }
+}
