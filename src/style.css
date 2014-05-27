@@ -208,19 +208,19 @@ tfoot th {
 .domloaded {
 	display:block;
 	border-left:1px solid #5cb85c;
-	height:31px;
+	height:24px;
 	width:1px;
 	position:absolute;
-	bottom:-5px;
+	bottom:0px;
 	background-color:#000;
 }
 .windowloaded {
 	display:block;
 	border-left:1px solid #d9534f;
-	height:31px;
+	height:24px;
 	width:1px;
 	position:absolute;
-	bottom:-5px;
+	bottom:0px;
 	background-color:#000;
 }
 
