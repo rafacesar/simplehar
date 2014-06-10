@@ -560,6 +560,7 @@ module.exports = function(har, htmlEncode) {
 		sign = 'glyphicon-chevron-down',
 		toggleSign = 'glyphicon-chevron-up',
 		onContentLoad = page.pageTimings.onContentLoad || false,
+		startRender = page.pageTimings._startRender || false,
 		onLoad = page.pageTimings.onLoad,
 		lastTime = onLoad,
 		onContentLoadText = '',
@@ -624,8 +625,16 @@ module.exports = function(har, htmlEncode) {
 	
 	for(i=0;i<ilen;i++) {
 		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (' + timeFormatter(onLoad) + ')" style="left:' + pct(onLoad,lastTime) + '"></span>';
+		
 		if(onContentLoad)
 			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (' + timeFormatter(onContentLoad) + ')" style="left:' + onContentLoadText + '"></span>';
+		else
+			entries[i].domloaded = '';
+		
+		if(startRender)
+			entries[i].renderstarted = '<span class="renderstarted" data-toggle="tooltip" title="[Start Render] (' + timeFormatter(startRender) + ')" style="left:' + pct(startRender,lastTime) + '"></span>';
+		else
+			entries[i].renderstarted = '';
 	}
 	
 	
