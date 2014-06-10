@@ -3,6 +3,8 @@ module.exports = function(har, htmlEncode) {
 	
 	har = har.log;
 	
+	// if(!htmlEncode)
+	// 	console.error('htmlEncode not found. The content tab will not be displayed');
 	
 	var strong = function(str,cname) {
 		if(cname)
@@ -368,30 +370,32 @@ module.exports = function(har, htmlEncode) {
 			result = '',
 			_result = '';
 		
-		if(content || !url.indexOf('data:')) {
-			tabs += '<li><a href="#content">[Content]</a></li>';
-			result += '<div class="content">';
-			
-			
-			if(mime.base == 'image') {
-				if(content)
-					result += '<img src="data:' + mime.base + '/' + mime.type + ';base64,' + content + '" />';
-				else
-					result += '<img src="' + url + '" />';
-			}
-			else {
-				if(content) {
-					_result = htmlEncode(content);
-					result += '<pre class="pre-scrollable">' + _result + '</pre>';
+		if(mime.base == 'image' || htmlEncode) {
+			if(content || !url.indexOf('data:')) {
+				tabs += '<li><a href="#content">[Content]</a></li>';
+				result += '<div class="content">';
+				
+				
+				if(mime.base == 'image') {
+					if(content)
+						result += '<img src="data:' + mime.base + '/' + mime.type + ';base64,' + content + '" />';
+					else
+						result += '<img src="' + url + '" />';
 				}
 				else {
-					_result = htmlEncode(url);
-					result += '<pre class="pre-scrollable">' + _result + '</pre>';
+					if(content) {
+						_result = htmlEncode(content);
+						result += '<pre class="pre-scrollable">' + _result + '</pre>';
+					}
+					else {
+						_result = htmlEncode(url);
+						result += '<pre class="pre-scrollable">' + _result + '</pre>';
+					}
 				}
+				
+				result += '</div>';
+				
 			}
-			
-			result += '</div>';
-			
 		}
 		return {
 			tabs: tabs,
