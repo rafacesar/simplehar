@@ -1,3 +1,4 @@
+/* simplehar: 0.12.0 */
 .container caption:empty {
 	display:none;
 }
@@ -217,6 +218,15 @@ tfoot th {
 .windowloaded {
 	display:block;
 	border-left:1px solid #d9534f;
+	height:24px;
+	width:1px;
+	position:absolute;
+	bottom:0px;
+	background-color:#000;
+}
+.renderstarted {
+	display:block;
+	border-left:1px solid #5BC0DE;
 	height:24px;
 	width:1px;
 	position:absolute;

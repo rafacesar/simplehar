@@ -130,7 +130,7 @@
 		}
 		
 		var $_timeline = $top.find('.timeline');
-		$top.find('td.size').add($_timeline.find('span.domloaded')).tooltip(tooltipOpt);
+		$top.find('td.size').add($_timeline.find('span.domloaded')).add($_timeline.find('span.renderstarted')).tooltip(tooltipOpt);
 		tooltipOpt.placement = 'left';
 		$top.find('td.status, td.type').add($_timeline.find('span.windowloaded')).tooltip(tooltipOpt);
 		
