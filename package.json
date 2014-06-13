@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/rafacesar/simplehar",
   "devDependencies": {
-    "grunt": "~0.4.4"
+    "mocha": "^1.20.1"
   },
   "dependencies": {
     "html-entities": "~1.0.10"
