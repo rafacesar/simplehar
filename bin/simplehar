@@ -1,57 +1,10 @@
 #!/usr/bin/env node
-'use strict';
+var result = require('./execSimplehar.js')(process.argv), simplehar;
 
-var fs = require('fs'),
-	path = require('path'),
-	argv = process.argv,
-	args = {},
-	i = 0, ilen,
-	lib = path.join(path.join(path.join(path.dirname(fs.realpathSync(__filename)), '..'), 'lib'), 'simplehar.js'),
-	simplehar = require(lib);
-
-
-if(argv.shift().indexOf('node') != -1)
-	argv.shift();
-
-ilen = argv.length;
-
-while(!args.har && i<ilen) {
-	if(argv[i].lastIndexOf('.har') + 4 == argv[i].length)
-		args.har = argv[i];
-	i++;
+if(typeof result === 'string')
+	console.log(result);
+else {
+	simplehar = require('../simplehar.js');
+	simplehar(result);
 }
 
-if(!args.har)
-	throw('Har not specified.');
-
-i=0;
-while(!args.html && i<ilen) {
-	if(argv[i].lastIndexOf('.html') + 5 == argv[i].length)
-		args.html = argv[i];
-	i++;
-}
-
-
-if(!args.html)
-	args.html = args.har.substr(0, args.har.lastIndexOf('.har')) + '.html';
-
-args.html = path.basename(args.html);
-
-i=0;
-while(!args.lng && i<ilen) {
-	if(!argv[i].indexOf('lng='))
-		args.lng = argv[i].split('=')[1];
-	i++;
-}
-
-args.lng = args.lng || process.env.LANG || false;
-
-
-i=0;
-while(!args.frame && i<ilen) {
-	if(argv[i].toLowerCase() === 'frame')
-		args.frame = true;
-	i++;
-}
-
-simplehar(args);
