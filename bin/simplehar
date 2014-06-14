@@ -1,10 +1,12 @@
 #!/usr/bin/env node
-var result = require('./execSimplehar.js')(process.argv), simplehar;
+var result = require('./execSimplehar.js')(process.argv),
+	path = require('path'),
+	simplehar;
 
 if(typeof result === 'string')
 	console.log(result);
 else {
-	simplehar = require('../simplehar.js');
+	simplehar = require(path.join(path.dirname(__filename), '..', 'lib', 'simplehar.js'));
 	simplehar(result);
 }
 
