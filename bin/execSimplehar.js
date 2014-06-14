@@ -8,7 +8,7 @@ var execBin = function(argv) {
 		i, ilen, simplehar;
 	
 	
-	
+	//Removing the parameters that are not used
 	if(argv.shift().indexOf('node') != -1)
 		argv.shift();
 	
@@ -16,6 +16,8 @@ var execBin = function(argv) {
 	ilen = argv.length;
 	
 	
+	
+	//Showing the version
 	i = 0;
 	while(i < ilen) {
 		
@@ -25,6 +27,10 @@ var execBin = function(argv) {
 		i++;
 	}
 	
+	
+	
+	
+	//Showing help message
 	i = 0;
 	while(i < ilen) {
 		
@@ -37,6 +43,8 @@ var execBin = function(argv) {
 	
 	
 	
+	
+	//Getting the path of the har file
 	i = 0;
 	while( !args.har && i < ilen) {
 		if(argv[i].lastIndexOf('.har') + 4 == argv[i].length)
@@ -51,6 +59,8 @@ var execBin = function(argv) {
 	
 	
 	
+	
+	//Getting the path of the html file
 	i = 0;
 	while( !args.html && i < ilen) {
 		if(argv[i].lastIndexOf('.html') + 5 == argv[i].length) {
@@ -64,16 +74,16 @@ var execBin = function(argv) {
 		i++;
 	}
 
-
 	if(!args.html)
 		args.html = path.basename(args.har, '.har') + htmlExt;
-	
 	
 	args.html = path.normalize(args.html);
 
 
 
 	
+	
+	//Getting the language
 	i = 0;
 	while( !args.lng && i < ilen) {
 		
@@ -88,6 +98,8 @@ var execBin = function(argv) {
 
 	
 	
+	
+	//Verifying frame option
 	i = 0;
 	while( !args.frame && i < ilen) {
 		
