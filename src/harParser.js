@@ -1,4 +1,4 @@
-module.exports = function(har, htmlEncode) {
+var harParser = module.exports = function(har, htmlEncode) {
 	'use strict';
 	
 	har = har.log;
@@ -6,21 +6,7 @@ module.exports = function(har, htmlEncode) {
 	// if(!htmlEncode)
 	// 	console.error('htmlEncode not found. The content tab will not be displayed');
 	
-	var strong = function(str,cname) {
-		if(cname)
-			cname = ' class="' + cname + '"';
-		else
-			cname = '';
-		return '<strong' + cname + '>' + str + '</strong>';
-	},
-	
-	em = function(str, cname) {
-		if(cname)
-			cname = ' class="' + cname + '"';
-		else
-			cname = '';
-		return '<em' + cname + '>' + str + '</em>';
-	},
+	var 
 	
 	pct = function(value, pct, symbol) {
 		if(!value)
@@ -182,19 +168,7 @@ module.exports = function(har, htmlEncode) {
 		}
 		return -1;
 	},
-	dataSizeFormatter = function(value, precision) {
-		var ext = [' Bytes', ' KB', ' MB', ' GB'],
-			i = 0;
-		
-		value = value >= 0 ? value : 0;
-		
-		while(value > 1024) {
-			value /= 1024;
-			i++;
-		}
-		
-		return precisionFormatter(value, precision || 2) + ext[i];
-	},
+	
 	
 	timeFormatter = function(time, precision) {
 		var ext = ['ms', 's', 'min'],
@@ -208,223 +182,19 @@ module.exports = function(har, htmlEncode) {
 			i++;
 		}
 		
-		return precisionFormatter(time, precision || 2) + ext[i];
-	},
-	precisionFormatter = function(number, precision) {
-		var matcher, fPoint;
-		precision = precision || 2;
-		
-		
-		number = number.toFixed(precision);
-		
-		if(precision === '0')
-			return number;
-		
-		fPoint = number.split('.')[1];
-		
-		matcher = fPoint.match(/0+/);
-		
-		if(matcher && matcher[0].length == fPoint.length) {
-			return number.split('.')[0];
-		}
-		else {
-			//Need to think on how to make this 'translatable'
-			//Not everyone use dot (.) as separator
-			return number;//.replace('.', ',');
-		}
-	},
-	urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i,
-	urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i,
-	
-	parseUrl = function(url, complete) {
-		
-		var urlMatch = url.match(urlRe),
-			urlFile;
-		
-		if(!urlMatch) {
-			if(!url.indexOf('data:')) {
-				urlFile = strong('Data:');
-				// url = url.split(';')[0];
-			}
-			else {
-				urlFile = url;
-			}
-		}
-		else {
-			if(!urlMatch[4]) {
-				urlFile = urlMatch[3];
-				
-				if(complete)
-					urlFile = urlMatch[1] + urlMatch[2] + urlFile;
-			}
-			else
-				urlFile = urlMatch[4];
-		}
-		
-		urlFile = urlFile.replace(/^\s*/g,'').replace(/\s*$/g,'');
-		
-		if(!url.indexOf('https'))
-			urlFile = '<strong class="text-success">' + urlFile + '</strong>';
-		
-		return {
-			params: urlMatch && urlMatch[5] || '',
-			file: urlFile,
-			//Should i use: decodeURIComponent here ??
-			complete:url
-		};
+		return harParser.precisionFormatter(time, precision || 2) + ext[i];
 	},
 	
-	parseMethod = function(method) {
-		if(method.toLowerCase() === 'get')
-			return '';
-		
-		return method && strong(method) || '';
-	},
 	
-	parseStatus = function(code, statusText) {
-		
-		var status = code;
-		
-		statusText = statusText || '';
-		
-		if(code >= 500)
-			status = strong(code, 'text-danger');
-		else if(code >= 400)
-			status = strong(code, 'text-warning');
-		else if(code < 100)
-			status = em(code, 'text-muted');
-		
-		
-		return {
-			code: code,
-			status: status,
-			complete: code + ' ' + statusText
-		};
-		
-	},
 	
-	parseSize = function(size, compressed, status) {
-		
-		var mainSize = compressed;
-		
-		if(compressed < 0)
-			mainSize = 0;
-		else if(compressed === 0)
-			mainSize = size;
-		
-		mainSize = dataSizeFormatter(mainSize);
-
-		if(status == 304)
-			mainSize = em(mainSize);
-		else if(status == 200 && (!compressed || compressed < 0))
-			mainSize = strong(mainSize);
-		
-		
-		return {
-			originalSize: size + ' Bytes',
-			originalCompressed: compressed + ' Bytes',
-			size: mainSize,
-			complete: size,
-			compressed: compressed
-		};
-	},
 	
-	parseMime = function(mimeType, url) {
-		
-		var inline = false,
-			mime;
-		
-		if(!mimeType && !url.indexOf('data:')) {
-			mimeType = url.match(urlDataRe);
-			
-			if(mimeType && mimeType[1])
-				mimeType = mimeType[1] + '; ' + (mimeType[2] && mimeType[2].substr(0,mimeType[2].length-1) || '');
-			else
-				mimeType = false;
-			
-			inline = true;
-		}
-		
-		
-		if(mimeType) {
-			mime = mimeType.split(';')[0].split('/');
-			
-			return {
-				complete: mimeType,
-				type: mime[1],
-				base: mime[0],
-				inline: inline
-			};
-		}
-		else {
-			return {
-				complete: '',
-				type: '',
-				base: '',
-				inline: inline
-			};
-		}
-	},
-	parseContent = function(content, url, mime) {
-		var tabs = '',
-			result = '',
-			_result = '';
-		
-		if(mime.base == 'image' || htmlEncode) {
-			if(content || !url.indexOf('data:')) {
-				tabs += '<li><a href="#content">[Content]</a></li>';
-				result += '<div class="content">';
-				
-				
-				if(mime.base == 'image') {
-					if(content)
-						result += '<img src="data:' + mime.base + '/' + mime.type + ';base64,' + content + '" />';
-					else
-						result += '<img src="' + url + '" />';
-				}
-				else {
-					if(content) {
-						_result = htmlEncode(content);
-						result += '<pre class="pre-scrollable">' + _result + '</pre>';
-					}
-					else {
-						_result = htmlEncode(url);
-						result += '<pre class="pre-scrollable">' + _result + '</pre>';
-					}
-				}
-				
-				result += '</div>';
-				
-			}
-		}
-		return {
-			tabs: tabs,
-			result: result,
-			_result: _result
-		};
-	},
 	
-	parseProgress = function(entry) {
-		var timings = entry.timings;
-		
-		return {
-			startedDateTime:(new Date(entry.startedDateTime)).getTime(),
-			time: entry.time,
-			blocked: timings.blocked,
-			dns: timings.dns,
-			connect: timings.connect,
-			send: timings.send,
-			wait: timings.wait,
-			receive: timings.receive,
-			ssl: timings.ssl,
-			total:	timings.blocked +
-					timings.dns +
-					timings.connect +
-					timings.send +
-					timings.wait +
-					timings.receive
-		};
-	},
+	
+	
+	
+	
+	
+	
 	
 	convertHar = function(entry, i) {
 		
@@ -432,13 +202,13 @@ module.exports = function(har, htmlEncode) {
 		var __request = entry.request,
 			__response = entry.response,
 			
-			method = parseMethod(__request.method),
-			url = parseUrl(__request.url, i > 1),
-			status = parseStatus(__response.status, __response.statusText),
-			size = parseSize(__response.content.size, __response.bodySize, status.code),
-			mime = parseMime(__response.content.mimeType || '', url.complete),
-			responseContent = parseContent(__response.content.text, url.complete, mime),
-			progress = parseProgress(entry),
+			method = harParser.parseMethod(__request.method),
+			url = harParser.parseUrl(__request.url, i > 1),
+			status = harParser.parseStatus(__response.status, __response.statusText),
+			size = harParser.parseSize(__response.content.size, __response.bodySize, status.code),
+			mime = harParser.parseMime(__response.content.mimeType || '', url.complete),
+			responseContent = harParser.parseContent(__response.content.text, url.complete, mime, htmlEncode),
+			progress = harParser.parseProgress(entry),
 			totalTime = progress.total,
 			infos = [
 				{tab:['headers'], decode:false, filters:['cookie']},
@@ -649,11 +419,252 @@ module.exports = function(har, htmlEncode) {
 	entries.title = page.title;
 	
 	entries.info = '<th>' + entries.length + ' [requests]</th>' + 
-						'<th colspan="3" class="text-right">' + dataSizeFormatter(totalSize) + 
-						' (' + dataSizeFormatter(totalCompressedSize) + ' [compressed])</th>' + 
+						'<th colspan="3" class="text-right">' + harParser.dataSizeFormatter(totalSize) + 
+						' (' + harParser.dataSizeFormatter(totalCompressedSize) + ' [compressed])</th>' + 
 						'<th class="text-center">' + (onContentLoad !== false?'(' + timeFormatter(onContentLoad) + ') ':'') + timeFormatter(onLoad) + '</th>';
 	
 	return entries;
 	
 	
+};
+harParser.parseMethod = function(method) {
+	if(method.toLowerCase() === 'get')
+		return '';
+	
+	return method && harParser.strong(method) || '';
+};
+
+harParser.urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i;
+harParser.urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i;
+
+harParser.parseUrl = function(url, complete) {
+	
+	var urlMatch = url.match(harParser.urlRe),
+		urlFile;
+	
+	if(!urlMatch) {
+		if(!url.indexOf('data:')) {
+			urlFile = harParser.strong('Data:');
+			// url = url.split(';')[0];
+		}
+		else {
+			urlFile = url;
+		}
+	}
+	else {
+		if(!urlMatch[4]) {
+			urlFile = urlMatch[3];
+			
+			if(complete)
+				urlFile = urlMatch[1] + urlMatch[2] + urlFile;
+		}
+		else
+			urlFile = urlMatch[4];
+	}
+	
+	urlFile = urlFile.replace(/^\s*/g,'').replace(/\s*$/g,'');
+	
+	if(!url.indexOf('https'))
+		urlFile = '<strong class="text-success">' + urlFile + '</strong>';
+	
+	return {
+		params: urlMatch && urlMatch[5] || '',
+		file: urlFile,
+		//Should i use: decodeURIComponent here ??
+		complete:url
+	};
+};
+
+harParser.parseStatus = function(code, statusText) {
+	
+	var status = code;
+	
+	statusText = statusText || '';
+	
+	if(code >= 500)
+		status = harParser.strong(code, 'text-danger');
+	else if(code >= 400)
+		status = harParser.strong(code, 'text-warning');
+	else if(code < 100)
+		status = harParser.em(code, 'text-muted');
+	
+	
+	return {
+		code: code,
+		status: status,
+		complete: code + ' ' + statusText
+	};
+	
+};
+
+harParser.parseSize = function(size, compressed, status) {
+	
+	var mainSize = compressed;
+	
+	if(compressed < 0)
+		mainSize = 0;
+	else if(compressed === 0)
+		mainSize = size;
+	
+	mainSize = harParser.dataSizeFormatter(mainSize);
+
+	if(status == 304)
+		mainSize = harParser.em(mainSize);
+	else if(status == 200 && (!compressed || compressed < 0))
+		mainSize = harParser.strong(mainSize);
+	
+	
+	return {
+		originalSize: size + ' Bytes',
+		originalCompressed: compressed + ' Bytes',
+		size: mainSize,
+		complete: size,
+		compressed: compressed
+	};
+};
+harParser.parseMime = function(mimeType, url) {
+	
+	var inline = false,
+		mime;
+	
+	if(!mimeType && !url.indexOf('data:')) {
+		mimeType = url.match(harParser.urlDataRe);
+		
+		if(mimeType && mimeType[1])
+			mimeType = mimeType[1] + '; ' + (mimeType[2] && mimeType[2].substr(0,mimeType[2].length-1) || '');
+		else
+			mimeType = false;
+		
+		inline = true;
+	}
+	
+	
+	if(mimeType) {
+		mime = mimeType.split(';')[0].split('/');
+		
+		return {
+			complete: mimeType,
+			type: mime[1],
+			base: mime[0],
+			inline: inline
+		};
+	}
+	else {
+		return {
+			complete: '',
+			type: '',
+			base: '',
+			inline: inline
+		};
+	}
+};
+harParser.parseContent = function(content, url, mime, htmlEncode) {
+	var tabs = '',
+		result = '',
+		_result = '';
+	
+	if(mime.base == 'image' || htmlEncode) {
+		if(content || !url.indexOf('data:')) {
+			tabs += '<li><a href="#content">[Content]</a></li>';
+			result += '<div class="content">';
+			
+			
+			if(mime.base == 'image') {
+				if(content)
+					result += '<img src="data:' + mime.base + '/' + mime.type + ';base64,' + content + '" />';
+				else
+					result += '<img src="' + url + '" />';
+			}
+			else {
+				if(content) {
+					_result = htmlEncode(content);
+					result += '<pre class="pre-scrollable">' + _result + '</pre>';
+				}
+				else {
+					_result = htmlEncode(url);
+					result += '<pre class="pre-scrollable">' + _result + '</pre>';
+				}
+			}
+			
+			result += '</div>';
+			
+		}
+	}
+	return {
+		tabs: tabs,
+		result: result,
+		_result: _result
+	};
+};
+
+harParser.parseProgress = function(entry) {
+	var timings = entry.timings;
+	
+	return {
+		startedDateTime:(new Date(entry.startedDateTime)).getTime(),
+		time: entry.time,
+		blocked: timings.blocked,
+		dns: timings.dns,
+		connect: timings.connect,
+		send: timings.send,
+		wait: timings.wait,
+		receive: timings.receive,
+		ssl: timings.ssl,
+		total:	timings.blocked +
+				timings.dns +
+				timings.connect +
+				timings.send +
+				timings.wait +
+				timings.receive
+	};
+};
+harParser.strong = function(str,cname) {
+	if(cname)
+		cname = ' class="' + cname + '"';
+	else
+		cname = '';
+	return '<strong' + cname + '>' + str + '</strong>';
+};
+harParser.em = function(str, cname) {
+	if(cname)
+		cname = ' class="' + cname + '"';
+	else
+		cname = '';
+	return '<em' + cname + '>' + str + '</em>';
+};
+harParser.dataSizeFormatter = function(value, precision) {
+	var ext = [' Bytes', ' KB', ' MB', ' GB'],
+		i = 0;
+	
+	value = value >= 0 ? value : 0;
+	
+	while(value > 1024) {
+		value /= 1024;
+		i++;
+	}
+	
+	return harParser.precisionFormatter(value, precision || 2) + ext[i];
+};
+harParser.precisionFormatter = function(number, precision) {
+	var matcher, fPoint;
+	precision = precision || 2;
+	
+	
+	number = number.toFixed(precision);
+	
+	if(precision === '0')
+		return number;
+	
+	fPoint = number.split('.')[1];
+	
+	matcher = fPoint.match(/0+/);
+	
+	if(matcher && matcher[0].length == fPoint.length) {
+		return number.split('.')[0];
+	}
+	else {
+		//Need to think on how to make this 'translatable'
+		//Not everyone use dot (.) as separator
+		return number;//.replace('.', ',');
+	}
 };
