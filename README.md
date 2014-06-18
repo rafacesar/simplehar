@@ -17,6 +17,47 @@ Or globally:
 node install -g simplehar
 ```
 
+### Using as a dependency
+```javascript
+var simplehar = require('simplehar'),
+	path = require('path'),
+	harFile = path.join('harFolder', 'myHarFile.har'),
+	htmlFile = path.join('htmlFolder', 'myHtmlFile.html');
+
+simplehar({
+	har:harFile,
+	html:htmlFile,
+	lng:false
+});
+
+
+//<style>...</style>...html...<script>...</script>
+var result = simplehar({
+	har:harFile,
+	html:htmlFile,
+	lng:false,
+	frame:true,
+	return:true
+});
+
+
+//{
+//	css:'...',
+//	js:'...',
+//	html:'...'
+//}
+var result = simplehar({
+	har:harFile,
+	html:htmlFile,
+	lng:false,
+	frame:true,
+	return:true,
+	frameContent:{
+		css:false,
+		js:false
+	}
+});
+```
 
 ### Using command line
 After installed you can simply run:
@@ -55,3 +96,5 @@ This options is good for embedding the html in another page. But the page must a
 Language used to translate (from src/translate.json) (e.g pt-BR)
 
 
+### frameContent (*Optional* - *`Used only as dependency`*)
+Object specifying if the html should have JS or CSS inline
