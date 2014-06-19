@@ -130,13 +130,13 @@ describe('Har Parser', function() {
 			complete: -10,
 			compressed: -20
 		});
-		// expect(harParser.parseSize(-10, -20)).to.eql({
-		// 	originalSize: '-10 Bytes',
-		// 	originalCompressed: '-20 Bytes',
-		// 	size: '<strong>0 Bytes</strong>',
-		// 	complete: -10,
-		// 	compressed: -20
-		// });
+		expect(harParser.parseSize(-10, -20)).to.eql({
+			originalSize: '-10 Bytes',
+			originalCompressed: '-20 Bytes',
+			size: '<strong>0 Bytes</strong>',
+			complete: -10,
+			compressed: -20
+		});
 	});
 	it('should format size', function() {
 		expect(harParser.dataSizeFormatter(1024)).to.be('1024 Bytes');
