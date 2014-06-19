@@ -1,6 +1,6 @@
 {
   "name": "simplehar",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "Har viewer made simple",
   "main": "./lib/simplehar.js",
   "scripts": {
