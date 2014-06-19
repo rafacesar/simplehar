@@ -633,12 +633,13 @@ harParser.em = function(str, cname) {
 	return '<em' + cname + '>' + str + '</em>';
 };
 harParser.dataSizeFormatter = function(value, precision) {
-	var ext = [' Bytes', ' KB', ' MB', ' GB'],
+	var ext = [' Bytes', ' KB', ' MB', ' GB', ' TB'],
+		_value = value,
 		i = 0;
 	
 	value = value >= 0 ? value : 0;
 	
-	while(value > 1024) {
+	while(value > 1024 && i < (ext.length - 1)) {
 		value /= 1024;
 		i++;
 	}

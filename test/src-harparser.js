@@ -116,13 +116,13 @@ describe('Har Parser', function() {
 			complete: 0,
 			compressed: 0
 		});
-		// expect(harParser.parseSize(0, 0)).to.eql({
-		// 	originalSize: '0 Bytes',
-		// 	originalCompressed: '0 Bytes',
-		// 	size: '<strong>0 Bytes</strong>',
-		// 	complete: 0,
-		// 	compressed: 0
-		// });
+		expect(harParser.parseSize(0, 0)).to.eql({
+			originalSize: '0 Bytes',
+			originalCompressed: '0 Bytes',
+			size: '<strong>0 Bytes</strong>',
+			complete: 0,
+			compressed: 0
+		});
 		expect(harParser.parseSize(-10, -20, 200)).to.eql({
 			originalSize: '-10 Bytes',
 			originalCompressed: '-20 Bytes',
@@ -148,7 +148,7 @@ describe('Har Parser', function() {
 		expect(harParser.dataSizeFormatter(123901293021)).to.be('115.39 GB');
 		expect(harParser.dataSizeFormatter(123901293021, 3)).to.be('115.392 GB');
 		
-		// expect(harParser.dataSizeFormatter(1239012930215376485764786)).to.be('???');
+		expect(harParser.dataSizeFormatter(1239012930215376485764786)).to.be('1126875695459.04 TB');
 	});
 	it('should parse URL', function() {
 		expect(harParser.parseUrl).withArgs().to.throwError();
