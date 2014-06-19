@@ -154,7 +154,7 @@ describe('Har Parser', function() {
 		expect(harParser.parseUrl).withArgs().to.throwError();
 		expect(harParser.parseUrl('http://example.com')).to.eql({
 			params:'',
-			file:'',
+			file:'/',
 			complete:'http://example.com'
 		});
 		expect(harParser.parseUrl('https://example.com/')).to.eql({
@@ -162,11 +162,11 @@ describe('Har Parser', function() {
 			file:'<strong class="text-success">/</strong>',
 			complete:'https://example.com/'
 		});
-		// expect(harParser.parseUrl('https://example.com')).to.eql({
-		// 	params:'',
-		// 	file:'<strong class="text-success">/</strong>',
-		// 	complete:'https://example.com'
-		// });
+		expect(harParser.parseUrl('https://example.com')).to.eql({
+			params:'',
+			file:'<strong class="text-success">/</strong>',
+			complete:'https://example.com'
+		});
 		expect(harParser.parseUrl('http://example.com/index.html')).to.eql({
 			params:'',
 			file:'index.html',
@@ -192,16 +192,16 @@ describe('Har Parser', function() {
 			file:'test.js',
 			complete:'ftp://example.com/test.js'
 		});
-		// expect(harParser.parseUrl('http://example.com/dir/?param=%C3%A1')).to.eql({
-		// 	params:'?param=á',
-		// 	file:'/dir/',
-		// 	complete:'http://example.com/dir/?param=á'
-		// });
-		// expect(harParser.parseUrl('http://example.com/dir/?param=%C3%A1', true)).to.eql({
-		// 	params:'?param=á',
-		// 	file:'http://example.com/dir/',
-		// 	complete:'http://example.com/dir/?param=á'
-		// });
+		expect(harParser.parseUrl('http://example.com/dir/?param=%C3%A1')).to.eql({
+			params:'?param=á',
+			file:'/dir/',
+			complete:'http://example.com/dir/?param=%C3%A1'
+		});
+		expect(harParser.parseUrl('http://example.com/dir/?param=%C3%A1', true)).to.eql({
+			params:'?param=á',
+			file:'http://example.com/dir/',
+			complete:'http://example.com/dir/?param=%C3%A1'
+		});
 		expect(harParser.parseUrl('http://example.com/dir/page.htm?param=value#hashstring')).to.eql({
 			params:'?param=value#hashstring',
 			file:'page.htm',

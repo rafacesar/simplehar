@@ -445,7 +445,6 @@ harParser.parseUrl = function(url, complete) {
 	if(!urlMatch) {
 		if(!url.indexOf('data:')) {
 			urlFile = harParser.strong('Data:');
-			// url = url.split(';')[0];
 		}
 		else {
 			urlFile = url;
@@ -457,6 +456,8 @@ harParser.parseUrl = function(url, complete) {
 			
 			if(complete)
 				urlFile = urlMatch[1] + urlMatch[2] + urlFile;
+			else if(!urlFile)
+				urlFile = '/';
 		}
 		else
 			urlFile = urlMatch[4];
