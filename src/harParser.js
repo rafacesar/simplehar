@@ -39,26 +39,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 		return dl;
 		
 	},
-	decode = function(str) {
-		var _str;
-		try {
-			_str = decodeURIComponent(str);
-		}
-		catch(e) {
-			try {
-				_str = decodeURI(str);
-			}
-			catch(ee) {
-				try {
-					_str = unescape(str);
-				}
-				catch(eee) {
-					_str = str;
-				}
-			}
-		}
-		return _str;
-	},
 	
 	decodeObj = function(arr, needDecode, filters) {
 		var newArr = [],
@@ -73,7 +53,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 					if(needDecode) {
 						j = 5;
 						while(j-- && ~value.indexOf('%') && value !== '')
-							value = decode(value);
+							value = harParser.decode(value);
 					}
 					newArr.push({name:name, value:value});
 				}
@@ -427,6 +407,26 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 };
+harParser.decode = function(str) {
+	var _str;
+	try {
+		_str = decodeURIComponent(str);
+	}
+	catch(e) {
+		try {
+			_str = decodeURI(str);
+		}
+		catch(ee) {
+			try {
+				_str = unescape(str);
+			}
+			catch(eee) {
+				_str = str;
+			}
+		}
+	}
+	return _str;
+};
 harParser.parseMethod = function(method) {
 	if(method.toLowerCase() === 'get')
 		return '';
@@ -468,9 +468,8 @@ harParser.parseUrl = function(url, complete) {
 		urlFile = '<strong class="text-success">' + urlFile + '</strong>';
 	
 	return {
-		params: urlMatch && urlMatch[5] || '',
+		params: harParser.decode(urlMatch && urlMatch[5] || ''),
 		file: urlFile,
-		//Should i use: decodeURIComponent here ??
 		complete:url
 	};
 };
