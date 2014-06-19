@@ -589,6 +589,17 @@ harParser.parseContent = function(content, url, mime, htmlEncode) {
 			result += '</div>';
 			
 		}
+		else {
+			tabs += '<li><a href="#content">[Content]</a></li>';
+			result += '<div class="content">';
+			if(mime.base == 'image') {
+				if(content)
+					result += '<img src="data:' + mime.base + '/' + mime.type + ';base64,' + content + '" />';
+				else
+					result += '<img src="' + url + '" />';
+			}
+			result += '</div>';
+		}
 	}
 	return {
 		tabs: tabs,

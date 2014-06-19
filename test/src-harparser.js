@@ -265,16 +265,16 @@ describe('Har Parser', function() {
 			result:'<div class="content"><pre class="pre-scrollable">&lt;strong&gt;tésté&lt;/strong&gt;</pre></div>',
 			_result:'&lt;strong&gt;tésté&lt;/strong&gt;'
 		});
-		// expect(harParser.parseContent('', 'http://example.com/gif.gif', {base:'image'}, htmlEntities)).to.eql({
-		// 	tabs:'<li><a href="#content">[Content]</a></li>',
-		// 	result:'<div class="content"><img src="http://example.com/gif.gif" /></div>',
-		// 	_result:''
-		// });
-		// expect(harParser.parseContent('', 'http://example.com/gif.gif', {base:'image'})).to.eql({
-		// 	tabs:'<li><a href="#content">[Content]</a></li>',
-		// 	result:'<div class="content"><img src="http://example.com/gif.gif" /></div>',
-		// 	_result:''
-		// });
+		expect(harParser.parseContent('', 'http://example.com/gif.gif', {base:'image'}, htmlEntities)).to.eql({
+			tabs:'<li><a href="#content">[Content]</a></li>',
+			result:'<div class="content"><img src="http://example.com/gif.gif" /></div>',
+			_result:''
+		});
+		expect(harParser.parseContent('', 'http://example.com/gif.gif', {base:'image'})).to.eql({
+			tabs:'<li><a href="#content">[Content]</a></li>',
+			result:'<div class="content"><img src="http://example.com/gif.gif" /></div>',
+			_result:''
+		});
 	});
 	it('should parse the timings', function() {
 		var fs = require('fs'),
