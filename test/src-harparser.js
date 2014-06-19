@@ -11,11 +11,11 @@ describe('Har Parser', function() {
 		expect(harParser.parseMethod('HEAD')).to.be('<strong>HEAD</strong>');
 	});
 	it('should parse the http status', function() {
-		// expect(harParser.parseStatus(0, '')).to.eql({
-		// 	code:0,
-		// 	complete:'0',
-		// 	status:'<em class="text-muted">0</em>'
-		// });
+		expect(harParser.parseStatus(0, '')).to.eql({
+			code:0,
+			complete:'0',
+			status:'<em class="text-muted">0</em>'
+		});
 		expect(harParser.parseStatus(200, 'OK')).to.eql({
 			code:200,
 			complete:'200 OK',

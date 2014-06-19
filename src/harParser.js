@@ -491,7 +491,7 @@ harParser.parseStatus = function(code, statusText) {
 	return {
 		code: code,
 		status: status,
-		complete: code + ' ' + statusText
+		complete: code + (statusText?(' ' + statusText):'')
 	};
 	
 };
