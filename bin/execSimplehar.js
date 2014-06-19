@@ -5,7 +5,8 @@ var execBin = function(argv) {
 		path = require('path'),
 		args = {},
 		htmlExt = '.html',
-		i, ilen, simplehar;
+		i, ilen, simplehar,
+		help;
 	
 	
 	//Removing the parameters that are not used
@@ -22,7 +23,7 @@ var execBin = function(argv) {
 	while(i < ilen) {
 		
 		if(argv[i] == '-v')
-			return require('../package.json').version;
+			return require(path.join('..','package.json')).version;
 		
 		i++;
 	}
@@ -35,7 +36,11 @@ var execBin = function(argv) {
 	while(i < ilen) {
 		
 		if(argv[i] == '--help') {
-			return '--help';
+			help = [
+				'',
+				'Usage: simplehar [harFile] [htmlFile] [frame] [lng]'
+			];
+			return help.join("\n  ");
 		}
 		
 		i++;

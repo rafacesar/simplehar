@@ -4,10 +4,10 @@ var expect = require('expect.js'),
 
 describe('Binary Parameter', function() {
 	it('should show the version', function() {
-		expect(execBin(['', '-v'])).to.be('0.14.0');
+		expect(execBin(['', '-v'])).to.be(require('../package.json').version);
 	});
 	it('should show the help message', function() {
-		expect(execBin(['', '--help'])).to.be('--help');
+		expect(execBin(['', '--help'])).to.be("\n  Usage: simplehar [harFile] [htmlFile] [frame] [lng]");
 	});
 	it('should throw an error if without or with empty parameters', function() {
 		expect(execBin).withArgs().to.throwException(function(error) {
