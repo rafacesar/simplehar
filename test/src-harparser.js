@@ -43,12 +43,12 @@ describe('Har Parser', function() {
 		});
 	});
 	it('should parse the mime type', function() {
-		// expect(harParser.parseMime('')).to.eql({
-		// 	base:'',
-		// 	complete:'',
-		// 	inline:false,
-		// 	type:''
-		// });
+		expect(harParser.parseMime('')).to.eql({
+			base:'',
+			complete:'',
+			inline:false,
+			type:''
+		});
 		expect(harParser.parseMime('', 'invalid url')).to.eql({
 			base:'',
 			complete:'',
@@ -73,12 +73,12 @@ describe('Har Parser', function() {
 			inline:false,
 			type:'css'
 		});
-		// expect(harParser.parseMime('', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')).to.eql({
-		// 	base:'image',
-		// 	complete:'image/gif',
-		// 	inline:true,
-		// 	type:'gif'
-		// });
+		expect(harParser.parseMime('', 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7')).to.eql({
+			base:'image',
+			complete:'image/gif',
+			inline:true,
+			type:'gif'
+		});
 	});
 	it('should parse the size', function() {
 		expect(harParser.parseSize(50, 20, 200)).to.eql({

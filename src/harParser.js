@@ -527,7 +527,7 @@ harParser.parseMime = function(mimeType, url) {
 	var inline = false,
 		mime;
 	
-	if(!mimeType && !url.indexOf('data:')) {
+	if(!mimeType && url && !url.indexOf('data:')) {
 		mimeType = url.match(harParser.urlDataRe);
 		
 		if(mimeType && mimeType[1])
@@ -543,7 +543,7 @@ harParser.parseMime = function(mimeType, url) {
 		mime = mimeType.split(';')[0].split('/');
 		
 		return {
-			complete: mimeType,
+			complete: mimeType.replace('; ', ''),
 			type: mime[1],
 			base: mime[0],
 			inline: inline
