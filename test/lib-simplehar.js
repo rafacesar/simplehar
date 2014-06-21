@@ -209,7 +209,19 @@ describe('Library', function() {
 		expect(harToHtml.fullHtml('', {title:'titleContent', info:'some information'})).to.be('{style}\n<table class="table table-condensed table-hover har-table">\n\t<caption>titleContent</caption>\n\t<thead>\n\t\t<tr>\n\t\t\t<th data-sort="url">[Url]</th>\n\t\t\t<th data-sort="int">[Status]</th>\n\t\t\t<th data-sort="string">[Type]</th>\n\t\t\t<th data-sort="int" class="text-right">[Size]</th>\n\t\t\t<th data-sort="int" class="timeline text-center">[Timeline]</th>\n\t\t</tr>\n\t</thead>\n\t<tbody></tbody>\n\t<tfoot>\n\t\t<tr>\n\t\t\tsome information\n\t\t</tr>\n\t</tfoot>\n</table>\n{script}');
 	});
 	
-	it('should merge strings and return assets with html', function() {
+	it('should translate the content', function() {
+		expect(harToHtml.translate('', '')).to.be('');
+		expect(harToHtml.translate('')).to.be('');
+		expect(harToHtml.translate).withArgs().to.throwError();
+		expect(harToHtml.translate('[Size]', '')).to.be('Size');
+		expect(harToHtml.translate('[Size]', 'en-US')).to.be('Size');
+		expect(harToHtml.translate('[Size]', 'pt-BR')).to.be('Tamanho');
+		expect(harToHtml.translate('[Size]|[Content]')).to.be('Size|Content');
+		expect(harToHtml.translate('[Size]|[Content]', '')).to.be('Size|Content');
+		expect(harToHtml.translate('[Size]|[Content]', 'en-US')).to.be('Size|Content');
+		expect(harToHtml.translate('[Size]|[Content]', 'pt-BR')).to.be('Tamanho|Conteúdo');
+		expect(harToHtml.translate('[Test]', '')).to.be('Test');
+		expect(harToHtml.translate('[Test]', 'pt-BR')).to.be('Test');
 	});
 	
 });
