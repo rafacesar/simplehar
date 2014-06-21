@@ -258,6 +258,52 @@ describe('Library', function() {
 			html:''
 		});
 	});
+
+	it('should copy the source files to simpleharSrc folder', function() {
+		harToHtml.copySrc('.');
+		
+		
+		expect(fs.existsSync(path.join('.', 'simpleharSrc'))).to.be.ok();
+		expect(fs.existsSync(path.join('.', 'simpleharSrc', 'script.js'))).to.be.ok();
+		expect(fs.existsSync(path.join('.', 'simpleharSrc', 'style.css'))).to.be.ok();
+		expect(fs.existsSync(path.join('.', 'simpleharSrc', 'stupidtable.js'))).to.be.ok();
+		
+		
+		
+		fs.unlinkSync(path.join('.', 'simpleharSrc', 'script.js'));
+		fs.unlinkSync(path.join('.', 'simpleharSrc', 'stupidtable.js'));
+		fs.unlinkSync(path.join('.', 'simpleharSrc', 'style.css'));
+		fs.rmdirSync(path.join('.', 'simpleharSrc'));
+		
+		expect(fs.existsSync(path.join('.', 'simpleharSrc'))).to.not.be.ok();
+		expect(fs.existsSync(path.join('.', 'simpleharSrc', 'script.js'))).to.not.be.ok();
+		expect(fs.existsSync(path.join('.', 'simpleharSrc', 'style.css'))).to.not.be.ok();
+		expect(fs.existsSync(path.join('.', 'simpleharSrc', 'stupidtable.js'))).to.not.be.ok();
+		
+		
+		harToHtml.copySrc('..');
+		
+		
+		expect(fs.existsSync(path.join('..', 'simpleharSrc'))).to.be.ok();
+		expect(fs.existsSync(path.join('..', 'simpleharSrc', 'script.js'))).to.be.ok();
+		expect(fs.existsSync(path.join('..', 'simpleharSrc', 'style.css'))).to.be.ok();
+		expect(fs.existsSync(path.join('..', 'simpleharSrc', 'stupidtable.js'))).to.be.ok();
+		
+		
+		
+		fs.unlinkSync(path.join('..', 'simpleharSrc', 'script.js'));
+		fs.unlinkSync(path.join('..', 'simpleharSrc', 'stupidtable.js'));
+		fs.unlinkSync(path.join('..', 'simpleharSrc', 'style.css'));
+		fs.rmdirSync(path.join('..', 'simpleharSrc'));
+		
+		expect(fs.existsSync(path.join('..', 'simpleharSrc'))).to.not.be.ok();
+		expect(fs.existsSync(path.join('..', 'simpleharSrc', 'script.js'))).to.not.be.ok();
+		expect(fs.existsSync(path.join('..', 'simpleharSrc', 'style.css'))).to.not.be.ok();
+		expect(fs.existsSync(path.join('..', 'simpleharSrc', 'stupidtable.js'))).to.not.be.ok();
+		
+	});
+
+
 	it('should prepare the final html page', function() {
 		expect(harToHtml.completePage).to.throwError();
 		expect(harToHtml.completePage('')).to.be('<!doctype html>\n<html lang="en" style="height:100%;">\n<head>\n\t<meta charset="UTF-8" />\n\t<title>SimpleHar</title>\n\t<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />\n\t<link rel="stylesheet" href="simpleharSrc/style.css" />\n</head>\n<body style="height:100%;">\n\t<div class="container">\n\t\t\n\t</div>\n\t<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>\n\t<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>\n\t\n\t<script src="simpleharSrc/stupidtable.js"></script>\n\t<script src="simpleharSrc/script.js"></script>\n</body>\n</html>');
