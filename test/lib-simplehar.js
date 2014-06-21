@@ -222,6 +222,42 @@ describe('Library', function() {
 		expect(harToHtml.translate('[Size]|[Content]', 'pt-BR')).to.be('Tamanho|Conteúdo');
 		expect(harToHtml.translate('[Test]', '')).to.be('Test');
 		expect(harToHtml.translate('[Test]', 'pt-BR')).to.be('Test');
+	it('should create html frame part', function() {
+		var css = fs.readFileSync(path.join(__filename, '..', '..', 'src', 'style.css')),
+			js = fs.readFileSync(path.join(__filename, '..', '..', 'src', 'script.js'));
+		
+		expect(harToHtml.makeFrame).to.throwError();
+		expect(harToHtml.makeFrame('')).to.be('');
+		expect(harToHtml.makeFrame('{style}')).to.be('<style>' + css.toString() + '</style>');
+		expect(harToHtml.makeFrame('{script}')).to.be('<script>' + js.toString() + '</script>');
+		expect(harToHtml.makeFrame('{script}test{style}')).to.be('<script>' + js.toString() + '</script>test<style>' + css.toString() + '</style>');
+		
+		expect(harToHtml.makeFrame('{script}test{style}', {})).to.eql({
+			css:css.toString(),
+			js:js.toString(),
+			html:'<script>' + js.toString() + '</script>test<style>' + css.toString() + '</style>'
+		});
+		expect(harToHtml.makeFrame('{script}test{style}', {css:false})).to.eql({
+			css:css.toString(),
+			js:js.toString(),
+			html:'<script>' + js.toString() + '</script>test'
+		});
+		expect(harToHtml.makeFrame('{script}test{style}', {js:false})).to.eql({
+			css:css.toString(),
+			js:js.toString(),
+			html:'test<style>' + css.toString() + '</style>'
+		});
+		expect(harToHtml.makeFrame('{script}test{style}', {js:false, css:false})).to.eql({
+			css:css.toString(),
+			js:js.toString(),
+			html:'test'
+		});
+		expect(harToHtml.makeFrame('', {js:false, css:false})).to.eql({
+			css:css.toString(),
+			js:js.toString(),
+			html:''
+		});
+	});
 	});
 	
 });
