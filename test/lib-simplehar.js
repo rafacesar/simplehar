@@ -5,8 +5,8 @@ var assert = require('assert'),
 	harToHtml = require('../lib/simplehar.js');
 
 describe('Library', function() {
-		
-		
+	
+	
 	
 	
 	it('should parse full har', function(done) {
@@ -340,7 +340,7 @@ describe('Library', function() {
 	it('should get encoder to html', function() {
 		expect(harToHtml.getEncoder()).to.be.a(Function);
 	});
-		
+	
 	it('should parse any template with lists', function() {
 		expect(harToHtml.templater([{a:1,b:'c',d:'test'}, {a:'testing',b:123,d:'another thing'}], '<strong>{a}</strong>{b}<em>{d}</em>')).to.be('<strong>1</strong>c<em>test</em><strong>testing</strong>123<em>another thing</em>');
 		expect(harToHtml.templater([{mime:'css'}], '<strong>{mime}</strong>')).to.be('<strong>css</strong>');
@@ -656,7 +656,7 @@ describe('Library', function() {
 			fileContent:'*{margin:0;}'
 		}, 'test').to.throwError();
 	});
-		
+	
 	it('should insert informations in the html', function(done) {
 		expect(harToHtml.fullHtml).to.throwError();
 		expect(harToHtml.fullHtml).withArgs('').to.throwError();
@@ -829,5 +829,5 @@ describe('Library', function() {
 		expect(harToHtml.completePage('testContent')).to.be('<!doctype html>\n<html lang="en" style="height:100%;">\n<head>\n\t<meta charset="UTF-8" />\n\t<title>SimpleHar</title>\n\t<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />\n\t<link rel="stylesheet" href="simpleharSrc/style.css" />\n</head>\n<body style="height:100%;">\n\t<div class="container">\n\t\ttestContent\n\t</div>\n\t<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>\n\t<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>\n\t\n\t<script src="simpleharSrc/stupidtable.js"></script>\n\t<script src="simpleharSrc/script.js"></script>\n</body>\n</html>');
 		expect(harToHtml.completePage('{script}testContent{style}')).to.be('<!doctype html>\n<html lang="en" style="height:100%;">\n<head>\n\t<meta charset="UTF-8" />\n\t<title>SimpleHar</title>\n\t<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />\n\t<link rel="stylesheet" href="simpleharSrc/style.css" />\n</head>\n<body style="height:100%;">\n\t<div class="container">\n\t\ttestContent\n\t</div>\n\t<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>\n\t<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>\n\t\n\t<script src="simpleharSrc/stupidtable.js"></script>\n\t<script src="simpleharSrc/script.js"></script>\n</body>\n</html>');
 	});
-	
+
 });
