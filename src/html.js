@@ -162,9 +162,9 @@ jQuery(function($) {
 		else if(translations === false || !translations[lng]) {
 			replacer = '$1';
 		}
-		else {
-			return setTimeout(function() {translateTemplate(elm);}, 500);
-		}
+		// else {
+		// 	return setTimeout(function() {translateTemplate(elm);}, 500);
+		// }
 		
 		return html.replace(/\[([^\]]+)\]/g, replacer);
 		
