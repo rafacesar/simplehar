@@ -482,12 +482,12 @@ harParser.decode = function(str) {
 			_str = decodeURI(str);
 		}
 		catch(ee) {
-			//try {
-			//		_str = unescape(str);
-			//}
-			//catch(eee) {
-			_str = str;
-			//}
+			try {
+				_str = unescape(str);
+			}
+			catch(eee) {
+				_str = str;
+			}
 		}
 	}
 	return _str;
