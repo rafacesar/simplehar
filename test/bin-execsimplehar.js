@@ -24,13 +24,15 @@ describe('Binary Parameter', function() {
 			lng:process.env.LANG || false
 		});
 	});
-	it('should return an object with different html path', function() {
+	it('should return an object with .html in the filename', function() {
 		expect(execBin(['', 'test.har', 'testing.html'])).to.eql({
 			har:'test.har',
 			html:'testing.html',
 			lng:process.env.LANG || false
 		});
 		expect(execBin(['', 'test.har', 'testing.htm'])).to.eql({
+	});
+	it('should return an object with .htm in the filename', function() {
 			har:'test.har',
 			html:'testing.htm',
 			lng:process.env.LANG || false
