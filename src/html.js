@@ -1,5 +1,6 @@
 window.module = {};
 (function(d,s) {
+	'use strict';
 	(s = d.createElement('script')).src = 'src/harParser.js';
 	s.id = 'harParser';
 	d.body.appendChild(s);
@@ -7,12 +8,13 @@ window.module = {};
 	s.id = 'unminify';
 	d.body.appendChild(s);
 })(document);
-$(function($) {
+jQuery(function($) {
+	'use strict';
 	$.getJSON('src/translate.json', function(data) {
 		window.translations = data || false;
 	});
 	$.get('src/template.html', function() {
-		$('.container').load('src/template.html table', function(html) {
+		$('.container').load('src/template.html table', function() {
 			var $table = $('table.har-table');
 			$table.find('caption').html('');
 			$table.html(translateTemplate($table.html()));
@@ -62,7 +64,7 @@ $(function($) {
 			return false;
 		};
 		
-		$('body').on('dragover', function(evt) {
+		$('body').on('dragover', function() {
 			var $drop = $('#drop');
 			if($drop.length) {
 				$drop.css('display', 'table');
@@ -104,13 +106,13 @@ $(function($) {
 			}
 			$drop.data('hide','false');
 			return false;
-		}).on('dragend', function(evt) {
+		}).on('dragend', function() {
 			return false;
-		}).on('dragleave', function(evt) {
+		}).on('dragleave', function() {
 			var $drop = $('#drop');
 			$drop.data('hide','true');
 			setTimeout(function() {
-				if($drop.data('hide') == 'true')
+				if($drop.data('hide') === 'true')
 					$drop.css('display', 'none');
 			}, 50);
 			return false;
@@ -152,12 +154,13 @@ $(function($) {
 			replacer;
 		if(translations && translations[lng]) {
 			translations = translations[lng];
-			replacer = function(complete, match) {
+			replacer = function() {
+				var match = arguments[1];
 				return (translations[match]) || match;
 			};
 		}
 		else if(translations === false || !translations[lng]) {
-			replacer = "$1";
+			replacer = '$1';
 		}
 		else {
 			return setTimeout(function() {translateTemplate(elm);}, 500);
@@ -196,7 +199,7 @@ $(function($) {
 	
 	var runHar = function(har) {
 		window.har = har;
-		var newHar = module.exports(window.har, function(content) {
+		var newHar = harParser(window.har, function(content) {
 			var elm = document.createElement('span');
 			elm.appendChild(document.createTextNode(content));
 			return elm.innerHTML;
@@ -209,7 +212,7 @@ $(function($) {
 				i = 0,
 				ilen = newHar.length,
 				table = $('table.har-table')[0],
-				prop, nHar = newHar[0], _html, res = {};
+				prop, nHar = newHar[0], _html;
 			
 			for(;i<ilen;i++) {
 				nHar = newHar[i];
@@ -220,7 +223,8 @@ $(function($) {
 				html += _html;
 			}
 			table.getElementsByTagName('tbody')[0].innerHTML = translateTemplate(html);
-			table.getElementsByTagName('tfoot')[0].getElementsByTagName('tr')[0].innerHTML = translateTemplate(newHar.info);
+			table.getElementsByTagName('tfoot')[0]
+				 .getElementsByTagName('tr')[0].innerHTML = translateTemplate(newHar.info);
 			table.getElementsByTagName('caption')[0].innerHTML = (newHar.title);
 			$('.loader').hide();
 			
@@ -233,14 +237,16 @@ $(function($) {
 				parseContent = function(id, type) {
 					return function() {
 						var $inside = $('#inside-' + id),
-							tabs = translateTemplate('<li><a href="#parsedcontent">[Parsed Content]</a></li>'),
-							result = '<div class="parsedcontent hidden" style="' + $inside.find('div').eq(0).attr('style') + '">';
+							tabs = translateTemplate('<li><a href="#parsedcontent">' + 
+													 '[Parsed Content]</a></li>'),
+							result = '<div class="parsedcontent hidden" style="' + 
+										$inside.find('div').eq(0).attr('style') + '">';
 						
 						
 						result += '<pre class="pre-scrollable">';
-						if(type.indexOf('css') != -1)
+						if(type.indexOf('css') !== -1)
 							result += unminify.css($inside.find('.content pre').html() || '');
-						else if(type.indexOf('javascript') != -1)
+						else if(type.indexOf('javascript') !== -1)
 							result += unminify.js($inside.find('.content pre').html() || '');
 						result += '</pre>';
 						result += '</div>';
@@ -252,7 +258,9 @@ $(function($) {
 			ilen = $parent.length;
 			
 			while(ilen--)
-				setTimeout(parseContent($parent.eq(ilen).attr('id').substr(4), $parseable.eq(ilen).text()), 100);
+				setTimeout(
+					parseContent($parent.eq(ilen).attr('id').substr(4), $parseable.eq(ilen).text()),
+				100);
 			
 			addInteraction($);
 			

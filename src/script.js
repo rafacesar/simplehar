@@ -2,7 +2,7 @@
 	'use strict';
 	var addInteraction = function() {
 		
-		if(typeof jQuery == 'undefined' || !jQuery('.inside').length)
+		if(typeof jQuery === 'undefined' || !jQuery('.inside').length)
 			return waiting();
 		
 		var $ = jQuery,
@@ -47,7 +47,7 @@
 			}
 		});
 		
-		$nav.on('click', 'a', function(evt) {
+		$nav.on('click', 'a', function() {
 			
 			
 			var $this = $(this),
@@ -66,7 +66,7 @@
 		});
 		
 		$top.find('.url > div > a').click(function(evt) {
-			if(evt.which == 2)
+			if(evt.which === 2)
 				evt.stopPropagation();
 			else {
 				$(this).parents('tr.top').click();
@@ -92,7 +92,7 @@
 			}
 			else {
 				
-				if($this.next() != $next)
+				if($this.next() !== $next)
 					$this.after($next);
 				
 				$this.addClass('opened');
@@ -130,9 +130,16 @@
 		}
 		
 		var $_timeline = $top.find('.timeline');
-		$top.find('td.size').add($_timeline.find('span.domloaded')).add($_timeline.find('span.renderstarted')).tooltip(tooltipOpt);
+		$top
+			.find('td.size')
+				.add($_timeline.find('span.domloaded'))
+				.add($_timeline.find('span.renderstarted'))
+				.tooltip(tooltipOpt);
 		tooltipOpt.placement = 'left';
-		$top.find('td.status, td.type').add($_timeline.find('span.windowloaded')).tooltip(tooltipOpt);
+		$top
+			.find('td.status, td.type')
+				.add($_timeline.find('span.windowloaded'))
+				.tooltip(tooltipOpt);
 		
 		if($timeline.length > 15) {
 			for(i=0, ilen=$timeline.length, half=ilen/2;i<ilen;i++)
@@ -185,7 +192,7 @@
 	
 
 	var waiting = function() {
-		if(typeof jQuery == 'undefined' || !jQuery('.inside').length)
+		if(typeof jQuery === 'undefined' || !jQuery('.inside').length)
 			return setTimeout(waiting, 500);
 		
 		jQuery(addInteraction);
