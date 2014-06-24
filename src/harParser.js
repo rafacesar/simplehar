@@ -16,7 +16,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	},
 	objToDl = function(arr, decode, filters) {
 		
-		if(decode && decode.length && typeof decode[0] == 'string') {
+		if(decode && decode.length && typeof decode[0] === 'string') {
 			filters = decode;
 			decode = false;
 		}
@@ -26,13 +26,14 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		var newArr = decodeObj(arr, decode, filters),
 			dl = '',
-			i, ilen, _arr, name;
+			i, ilen, _arr;
 		
 		if((ilen=newArr.length)) {
 			dl = '<dl class="dl-horizontal">';
 			for(i=0;i<ilen;i++) {
 				_arr = newArr[i];
-				dl += '<dt>' + _arr.name + '</dt><dd>' + _arr.value.split(';').join(';<br>') + '</dd>';
+				dl += '<dt>' + _arr.name + '</dt>';
+				dl += '<dd>' + _arr.value.split(';').join(';<br>') + '</dd>';
 			}
 			dl += '</dl>';	
 		}
@@ -48,11 +49,11 @@ var harParser = module.exports = function(har, htmlEncode) {
 			for(i=0, ilen=arr.length;i<ilen;i++) {
 				_arr = arr[i];
 				name = _arr.name;
-				if(!filters || lowerReverseIndexOf(name, filters) == -1) {
+				if(!filters || lowerReverseIndexOf(name, filters) === -1) {
 					value = _arr.value;
 					if(needDecode) {
 						j = 5;
-						while(j-- && ~value.indexOf('%') && value !== '')
+						while(j-- && value.indexOf('%') !== -1 && value !== '')
 							value = harParser.decode(value);
 					}
 					newArr.push({name:name, value:value});
@@ -75,7 +76,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 				containers:''
 			};
 		
-		if(decode && decode.length && typeof decode[0] == 'string') {
+		if(decode && decode.length && typeof decode[0] === 'string') {
 			filters = decode;
 			decode = false;
 		}
@@ -106,26 +107,40 @@ var harParser = module.exports = function(har, htmlEncode) {
 				
 				result.containers += '<div class="' + tab + '">';
 				
-				if(rq[tab])
-					result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>' + rq[tab];
+				if(rq[tab]) {
+					result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>';
+					result.containers += rq[tab];
+				}
 				
-				if(rp[tab])
-					result.containers += '<h3><small>[Response ' + tabCapitalized + ']</small></h3>' + rp[tab];
+				if(rp[tab]) {
+					result.containers += '<h3><small>[Response '+ tabCapitalized + ']</small></h3>';
+					result.containers += rp[tab];
+				}
 				
 				result.containers += '</div>';
 				
 				
 				if(decode) {
 					
-					result.tabs += '<li><a href="#parsed' + tab + '">[Parsed ' + tabCapitalized + ']</a></li>';
+					result.tabs += '<li><a href="#parsed' + tab + '">';
+						result.tabs += '[Parsed ' + tabCapitalized + ']';
+					result.tabs += '</a></li>';
 				
 					result.containers += '<div class="parsed' + tab + '">';
 					
-					if(rq['d'+tab])
-						result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>' + rq['d' + tab];
+					if(rq['d'+tab]) {
+						result.containers += '<h3><small>';
+						result.containers += '[Request ' + tabCapitalized + ']';
+						result.containers += '</small></h3>';
+						result.containers += rq['d' + tab];
+					}
 					
-					if(rp['d'+tab])
-						result.containers += '<h3><small>[Response ' + tabCapitalized + ']</small></h3>' + rp['d' + tab];
+					if(rp['d'+tab]) {
+						result.containers += '<h3><small>';
+						result.containers += '[Response ' + tabCapitalized + ']';
+						result.containers += '</small></h3>';
+						result.containers += rp['d' + tab];
+					}
 					
 					result.containers += '</div>';
 					
@@ -143,7 +158,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	lowerReverseIndexOf = function(pattern, arr) {
 		for(var i=0, ilen=arr.length;i<ilen;i++) {
-			if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) != -1)
+			if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) !== -1)
 				return i;
 		}
 		return -1;
@@ -187,7 +202,12 @@ var harParser = module.exports = function(har, htmlEncode) {
 			status = harParser.parseStatus(__response.status, __response.statusText),
 			size = harParser.parseSize(__response.content.size, __response.bodySize, status.code),
 			mime = harParser.parseMime(__response.content.mimeType || '', url.complete),
-			responseContent = harParser.parseContent(__response.content.text, url.complete, mime, htmlEncode),
+			responseContent = harParser.parseContent(
+				__response.content.text,
+				url.complete,
+				mime,
+				htmlEncode
+			),
 			progress = harParser.parseProgress(entry),
 			totalTime = progress.total,
 			infos = [
@@ -237,7 +257,10 @@ var harParser = module.exports = function(har, htmlEncode) {
 			totalTime:timeFormatter(totalTime),
 			rId:Math.floor((Math.random()*(new Date()).getTime())+1),
 			order: i+1,
-			bgstatus: (status.code >= 500?'danger':(status.code >= 400?'warning':(status.code >= 300?'redirect':'')))
+			bgstatus: (status.code >= 500?
+						'danger':(status.code >= 400?
+							'warning':(status.code >= 300?
+								'redirect':'')))
 		};
 		
 	},
@@ -245,7 +268,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	convertProgress = function(entries) {
 		
 		var startedDateTimeBefore = entries[0].progress.startedDateTime,
-			progressContent, startedDateTime, startPosition, startedTime,
+			progressContent, startedDateTime, startedTime,
 			blocked, dns, connect, send, wait, receive;
 		
 		
@@ -267,22 +290,48 @@ var harParser = module.exports = function(har, htmlEncode) {
 			
 			progressContent = '';
 			
-			if(blocked >= 0)
-				progressContent += '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> ' + timeFormatter(blocked, 3) + '</em></p>';
-			if(dns >= 0)
-				progressContent += '<p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> ~' + timeFormatter(dns, 3) + '</em></p>';
-			if(connect >= 0)
-				progressContent += '<p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> ~' + timeFormatter(connect, 3) + '</em></p>';
-			if(send >= 0)
-				progressContent += '<p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> ~' + timeFormatter(send, 3) + '</em></p>';
-			if(wait >= 0)
-				progressContent += '<p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> ~' + timeFormatter(wait, 3) + '</em></p>';
-			if(receive >= 0)
-				progressContent += '<p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> ~' + timeFormatter(receive, 3) + '</em></p>';
+			if(blocked >= 0) {
+				progressContent += '<p class=\'clearfix bg-warning\'>';
+				progressContent += '<strong>[Blocking]: </strong>';
+				progressContent += ' <em> ' + timeFormatter(blocked, 3) + '</em>';
+				progressContent += '</p>';
+			}
+			if(dns >= 0) {
+				progressContent += '<p class=\'clearfix bg-last\'>';
+				progressContent += '<strong>[DNS]: </strong>';
+				progressContent += ' <em> ~' + timeFormatter(dns, 3) + '</em>';
+				progressContent += '</p>';
+			}
+			if(connect >= 0) {
+				progressContent += '<p class=\'clearfix bg-info\'>';
+				progressContent += '<strong>[Connect]: </strong>';
+				progressContent += ' <em> ~' + timeFormatter(connect, 3) + '</em>';
+				progressContent += '</p>';
+			}
+			if(send >= 0) {
+				progressContent += '<p class=\'clearfix bg-primary\'>';
+				progressContent += '<strong>[Send]: </strong>';
+				progressContent += ' <em> ~' + timeFormatter(send, 3) + '</em>';
+				progressContent += '</p>';
+			}
+			if(wait >= 0) {
+				progressContent += '<p class=\'clearfix bg-danger\'>';
+				progressContent += '<strong>[Wait]: </strong>';
+				progressContent += ' <em> ~' + timeFormatter(wait, 3) + '</em>';
+				progressContent += '</p>';
+			}
+			if(receive >= 0) {
+				progressContent += '<p class=\'clearfix bg-success\'>';
+				progressContent += '<strong>[Receive]: </strong>';
+				progressContent += ' <em> ~' + timeFormatter(receive, 3) + '</em>';
+				progressContent += '</p>';
+			}
 			
 			
-			if(progressContent !== '' && startedTime >= 0)
-				entries[i].progressStart = '<strong>[Start Time]:</strong> <em>' + timeFormatter(startedTime, 3) + '</em>';
+			if(progressContent !== '' && startedTime >= 0) {
+				entries[i].progressStart = '<strong>[Start Time]:</strong>';
+				entries[i].progressStart += ' <em>' + timeFormatter(startedTime, 3) + '</em>';
+			}
 			else
 				entries[i].progressStart = '';
 			
@@ -331,7 +380,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	if(id && id !== '') {
 		for(i=0;i<ilen;i++) {
 			hEntry = harEntries[i];
-			if(hEntry.pageref && hEntry.pageref == id)
+			if(hEntry.pageref && hEntry.pageref === id)
 				entries.push(hEntry);
 		}
 	}
@@ -368,7 +417,10 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		hEntry = entries[i] = convertHar(entries[i], i);
 
-		lastTimeArray.push((hEntry.progress.total + hEntry.progress.startedDateTime) - entries[0].progress.startedDateTime);
+		lastTimeArray.push(
+			(hEntry.progress.total + hEntry.progress.startedDateTime) -
+			entries[0].progress.startedDateTime
+		);
 	}
 
 	
@@ -378,15 +430,23 @@ var harParser = module.exports = function(har, htmlEncode) {
 		onContentLoadText = pct(onContentLoad, lastTime);
 	
 	for(i=0;i<ilen;i++) {
-		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (' + timeFormatter(onLoad) + ')" style="left:' + pct(onLoad,lastTime) + '"></span>';
+		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" ';
+		entries[i].windowloaded += 'title="[Page Loaded] (' + timeFormatter(onLoad) + ')" ';
+		entries[i].windowloaded += 'style="left:' + pct(onLoad,lastTime) + '"></span>';
 		
-		if(onContentLoad)
-			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (' + timeFormatter(onContentLoad) + ')" style="left:' + onContentLoadText + '"></span>';
+		if(onContentLoad) {
+			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" ';
+			entries[i].domloaded += 'title="[DOMContentLoaded] ('+timeFormatter(onContentLoad)+')"';
+			entries[i].domloaded += ' style="left:' + onContentLoadText + '"></span>';
+		}
 		else
 			entries[i].domloaded = '';
 		
-		if(startRender)
-			entries[i].renderstarted = '<span class="renderstarted" data-toggle="tooltip" title="[Start Render] (' + timeFormatter(startRender) + ')" style="left:' + pct(startRender,lastTime) + '"></span>';
+		if(startRender) {
+			entries[i].renderstarted = '<span class="renderstarted" data-toggle="tooltip" ';
+			entries[i].renderstarted = 'title="[Start Render] ('+ timeFormatter(startRender) +')" ';
+			entries[i].renderstarted = 'style="left:' + pct(startRender,lastTime) + '"></span>';
+		}
 		else
 			entries[i].renderstarted = '';
 	}
@@ -399,15 +459,20 @@ var harParser = module.exports = function(har, htmlEncode) {
 	entries.title = page.title;
 	
 	entries.info = '<th>' + entries.length + ' [requests]</th>' + 
-						'<th colspan="3" class="text-right">' + harParser.dataSizeFormatter(totalSize) + 
-						' (' + harParser.dataSizeFormatter(totalCompressedSize) + ' [compressed])</th>' + 
-						'<th class="text-center">' + (onContentLoad !== false?'(' + timeFormatter(onContentLoad) + ') ':'') + timeFormatter(onLoad) + '</th>';
+						'<th colspan="3" class="text-right">' + 
+						harParser.dataSizeFormatter(totalSize) + 
+						' (' + harParser.dataSizeFormatter(totalCompressedSize) + 
+						' [compressed])</th>' + 
+						'<th class="text-center">' + 
+						(onContentLoad !== false?'(' + timeFormatter(onContentLoad) + ') ':'') + 
+						timeFormatter(onLoad) + '</th>';
 	
 	return entries;
 	
 	
 };
 harParser.decode = function(str) {
+	'use strict';
 	var _str;
 	try {
 		_str = decodeURIComponent(str);
@@ -417,17 +482,18 @@ harParser.decode = function(str) {
 			_str = decodeURI(str);
 		}
 		catch(ee) {
-			try {
-				_str = unescape(str);
-			}
-			catch(eee) {
-				_str = str;
-			}
+			//try {
+			//		_str = unescape(str);
+			//}
+			//catch(eee) {
+			_str = str;
+			//}
 		}
 	}
 	return _str;
 };
 harParser.parseMethod = function(method) {
+	'use strict';
 	if(method.toLowerCase() === 'get')
 		return '';
 	
@@ -438,7 +504,7 @@ harParser.urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i;
 harParser.urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i;
 
 harParser.parseUrl = function(url, complete) {
-	
+	'use strict';
 	var urlMatch = url.match(harParser.urlRe),
 		urlFile;
 	
@@ -476,7 +542,7 @@ harParser.parseUrl = function(url, complete) {
 };
 
 harParser.parseStatus = function(code, statusText) {
-	
+	'use strict';
 	var status = code;
 	
 	statusText = statusText || '';
@@ -498,7 +564,7 @@ harParser.parseStatus = function(code, statusText) {
 };
 
 harParser.parseSize = function(size, compressed, status) {
-	
+	'use strict';
 	var mainSize = compressed;
 	
 	if(compressed < 0)
@@ -508,9 +574,9 @@ harParser.parseSize = function(size, compressed, status) {
 	
 	mainSize = harParser.dataSizeFormatter(mainSize);
 
-	if(status == 304)
+	if(status === 304)
 		mainSize = harParser.em(mainSize);
-	else if((status == 200 || !status) && (!compressed || compressed < 0))
+	else if((status === 200 || !status) && (!compressed || compressed < 0))
 		mainSize = harParser.strong(mainSize);
 	
 	
@@ -523,15 +589,17 @@ harParser.parseSize = function(size, compressed, status) {
 	};
 };
 harParser.parseMime = function(mimeType, url) {
-	
+	'use strict';
 	var inline = false,
 		mime;
 	
 	if(!mimeType && url && !url.indexOf('data:')) {
 		mimeType = url.match(harParser.urlDataRe);
 		
-		if(mimeType && mimeType[1])
-			mimeType = mimeType[1] + '; ' + (mimeType[2] && mimeType[2].substr(0,mimeType[2].length-1) || '');
+		if(mimeType && mimeType[1]) {
+			mimeType = mimeType[1] + '; ';
+			mimeType += (mimeType[2] && mimeType[2].substr(0,mimeType[2].length-1) || '');
+		}
 		else
 			mimeType = false;
 		
@@ -559,19 +627,22 @@ harParser.parseMime = function(mimeType, url) {
 	}
 };
 harParser.parseContent = function(content, url, mime, htmlEncode) {
+	'use strict';
 	var tabs = '',
 		result = '',
 		_result = '';
 	
-	if(mime.base == 'image' || htmlEncode) {
+	if(mime.base === 'image' || htmlEncode) {
 		if(content || !url.indexOf('data:')) {
 			tabs += '<li><a href="#content">[Content]</a></li>';
 			result += '<div class="content">';
 			
 			
-			if(mime.base == 'image') {
-				if(content)
-					result += '<img src="data:' + mime.base + '/' + mime.type + ';base64,' + content + '" />';
+			if(mime.base === 'image') {
+				if(content) {
+					result += '<img src="data:' + mime.base + '/' + mime.type;
+					result += ';base64,' + content + '" />';
+				}
 				else
 					result += '<img src="' + url + '" />';
 			}
@@ -592,9 +663,11 @@ harParser.parseContent = function(content, url, mime, htmlEncode) {
 		else {
 			tabs += '<li><a href="#content">[Content]</a></li>';
 			result += '<div class="content">';
-			if(mime.base == 'image') {
-				if(content)
-					result += '<img src="data:' + mime.base + '/' + mime.type + ';base64,' + content + '" />';
+			if(mime.base === 'image') {
+				if(content) {
+					result += '<img src="data:' + mime.base + '/' + mime.type;
+					result += ';base64,' + content + '" />';
+				}
 				else
 					result += '<img src="' + url + '" />';
 			}
@@ -609,6 +682,7 @@ harParser.parseContent = function(content, url, mime, htmlEncode) {
 };
 
 harParser.parseProgress = function(entry) {
+	'use strict';
 	var timings = entry.timings;
 	
 	return {
@@ -630,6 +704,7 @@ harParser.parseProgress = function(entry) {
 	};
 };
 harParser.strong = function(str,cname) {
+	'use strict';
 	if(cname)
 		cname = ' class="' + cname + '"';
 	else
@@ -637,6 +712,7 @@ harParser.strong = function(str,cname) {
 	return '<strong' + cname + '>' + str + '</strong>';
 };
 harParser.em = function(str, cname) {
+	'use strict';
 	if(cname)
 		cname = ' class="' + cname + '"';
 	else
@@ -644,8 +720,8 @@ harParser.em = function(str, cname) {
 	return '<em' + cname + '>' + str + '</em>';
 };
 harParser.dataSizeFormatter = function(value, precision) {
+	'use strict';
 	var ext = [' Bytes', ' KB', ' MB', ' GB', ' TB'],
-		_value = value,
 		i = 0;
 	
 	value = value >= 0 ? value : 0;
@@ -658,6 +734,7 @@ harParser.dataSizeFormatter = function(value, precision) {
 	return harParser.precisionFormatter(value, precision || 2) + ext[i];
 };
 harParser.precisionFormatter = function(number, precision) {
+	'use strict';
 	var matcher, fPoint;
 	precision = precision || 2;
 	
@@ -671,7 +748,7 @@ harParser.precisionFormatter = function(number, precision) {
 	
 	matcher = fPoint.match(/0+/);
 	
-	if(matcher && matcher[0].length == fPoint.length) {
+	if(matcher && matcher[0].length === fPoint.length) {
 		return number.split('.')[0];
 	}
 	else {
