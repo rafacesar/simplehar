@@ -1,4 +1,4 @@
-var execBin = function(argv) {
+var processArgs = function(argv) {
 	'use strict';
 	
 	var fs = require('fs'),
@@ -120,4 +120,4 @@ var execBin = function(argv) {
 	return args;
 	
 };
-module.exports = execBin;
+module.exports = processArgs;
