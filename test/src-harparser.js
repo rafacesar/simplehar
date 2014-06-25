@@ -325,4 +325,32 @@ describe('Har Parser', function() {
 		expect(harParser.em('test')).to.be('<em>test</em>');
 		expect(harParser.em('test', 'testing')).to.be('<em class="testing">test</em>');
 	});
+	it('should return pct value', function() {
+		expect(harParser.pct()).to.be(0);
+		expect(harParser.pct('')).to.be(0);
+		expect(harParser.pct(35, 100)).to.be('35%');
+		expect(harParser.pct(35, 50)).to.be('70%');
+		expect(harParser.pct(35, .1)).to.be('35000%');
+		expect(harParser.pct(2, 100)).to.be('2%');
+		expect(harParser.pct(.1, 100)).to.be('0.1%');
+		expect(harParser.pct(58, 100)).to.be('58%');
+	});
+	it('should format time', function() {
+		expect(harParser.timeFormatter(600,2)).to.be('600ms');
+		expect(harParser.timeFormatter(6000,2)).to.be('6s');
+		expect(harParser.timeFormatter(321456,2)).to.be('5.36min');
+		expect(harParser.timeFormatter(725769.35737,3)).to.be('12.096min');
+		expect(harParser.timeFormatter(1000000000,2)).to.be('277.78h');
+		expect(harParser.timeFormatter(1000,2)).to.be('1s');
+		expect(harParser.timeFormatter(3211313132,5)).to.be('892.03143h');
+		expect(harParser.timeFormatter(725769.35,5)).to.be('12.09616min');
+	});
+	it('should find array item', function() {
+		expect(harParser.lowerReverseIndexOf('tesTe',['sa', 'se', 'ts', 'St'])).to.be(3);
+		expect(harParser.lowerReverseIndexOf('tesT',['ts', 'sst', 'tt', 'te'])).to.be(3);
+		expect(harParser.lowerReverseIndexOf('testing',['tn', 'test', 'ni', 'ig'])).to.be(1);
+		expect(harParser.lowerReverseIndexOf('tested',['ed', 'test', 'tes', 'ted'])).to.be(0);
+		expect(harParser.lowerReverseIndexOf('not test',['abc', 'tt', 'ni', 'ig'])).to.be(-1);
+		expect(harParser.lowerReverseIndexOf('tesTe',['sa', 'sT', 'st'])).to.be(1);
+	});
 });

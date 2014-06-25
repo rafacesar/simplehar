@@ -8,12 +8,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	var 
 	
-	pct = function(value, pct, symbol) {
-		if(!value)
-			return 0;
-		symbol = symbol || '%';
-		return ((value / pct) * 100) + symbol;
-	},
 	objToDl = function(arr, decode, filters) {
 		
 		if(decode && decode.length && typeof decode[0] === 'string') {
@@ -49,7 +43,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 			for(i=0, ilen=arr.length;i<ilen;i++) {
 				_arr = arr[i];
 				name = _arr.name;
-				if(!filters || lowerReverseIndexOf(name, filters) === -1) {
+				if(!filters || harParser.lowerReverseIndexOf(name, filters) === -1) {
 					value = _arr.value;
 					if(needDecode) {
 						j = 5;
@@ -156,29 +150,9 @@ var harParser = module.exports = function(har, htmlEncode) {
 		return result;
 	},
 	
-	lowerReverseIndexOf = function(pattern, arr) {
-		for(var i=0, ilen=arr.length;i<ilen;i++) {
-			if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) !== -1)
-				return i;
-		}
-		return -1;
-	},
 	
 	
-	timeFormatter = function(time, precision) {
-		var ext = ['ms', 's', 'min'],
-			div = [1000, 60, 60],
-			i = 0;
-		
-		time = time >= 0 ? time : 0;
-		
-		while(time > div[i]) {
-			time /= div[i];
-			i++;
-		}
-		
-		return harParser.precisionFormatter(time, precision || 2) + ext[i];
-	},
+	
 	
 	
 	
@@ -254,7 +228,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 			progress:progress,
 			domloaded:onContentLoadText,
 			windowloaded:onLoadText,
-			totalTime:timeFormatter(totalTime),
+			totalTime:harParser.timeFormatter(totalTime),
 			rId:Math.floor((Math.random()*(new Date()).getTime())+1),
 			order: i+1,
 			bgstatus: (status.code >= 500?
@@ -293,44 +267,44 @@ var harParser = module.exports = function(har, htmlEncode) {
 			if(blocked >= 0) {
 				progressContent += '<p class=\'clearfix bg-warning\'>';
 				progressContent += '<strong>[Blocking]: </strong>';
-				progressContent += ' <em> ' + timeFormatter(blocked, 3) + '</em>';
+				progressContent += ' <em> ' + harParser.timeFormatter(blocked, 3) + '</em>';
 				progressContent += '</p>';
 			}
 			if(dns >= 0) {
 				progressContent += '<p class=\'clearfix bg-last\'>';
 				progressContent += '<strong>[DNS]: </strong>';
-				progressContent += ' <em> ~' + timeFormatter(dns, 3) + '</em>';
+				progressContent += ' <em> ~' + harParser.timeFormatter(dns, 3) + '</em>';
 				progressContent += '</p>';
 			}
 			if(connect >= 0) {
 				progressContent += '<p class=\'clearfix bg-info\'>';
 				progressContent += '<strong>[Connect]: </strong>';
-				progressContent += ' <em> ~' + timeFormatter(connect, 3) + '</em>';
+				progressContent += ' <em> ~' + harParser.timeFormatter(connect, 3) + '</em>';
 				progressContent += '</p>';
 			}
 			if(send >= 0) {
 				progressContent += '<p class=\'clearfix bg-primary\'>';
 				progressContent += '<strong>[Send]: </strong>';
-				progressContent += ' <em> ~' + timeFormatter(send, 3) + '</em>';
+				progressContent += ' <em> ~' + harParser.timeFormatter(send, 3) + '</em>';
 				progressContent += '</p>';
 			}
 			if(wait >= 0) {
 				progressContent += '<p class=\'clearfix bg-danger\'>';
 				progressContent += '<strong>[Wait]: </strong>';
-				progressContent += ' <em> ~' + timeFormatter(wait, 3) + '</em>';
+				progressContent += ' <em> ~' + harParser.timeFormatter(wait, 3) + '</em>';
 				progressContent += '</p>';
 			}
 			if(receive >= 0) {
 				progressContent += '<p class=\'clearfix bg-success\'>';
 				progressContent += '<strong>[Receive]: </strong>';
-				progressContent += ' <em> ~' + timeFormatter(receive, 3) + '</em>';
+				progressContent += ' <em> ~' + harParser.timeFormatter(receive, 3) + '</em>';
 				progressContent += '</p>';
 			}
 			
 			
 			if(progressContent !== '' && startedTime >= 0) {
 				entries[i].progressStart = '<strong>[Start Time]:</strong>';
-				entries[i].progressStart += ' <em>' + timeFormatter(startedTime, 3) + '</em>';
+				entries[i].progressStart += ' <em>' + harParser.timeFormatter(startedTime, 3) + '</em>';
 			}
 			else
 				entries[i].progressStart = '';
@@ -338,13 +312,13 @@ var harParser = module.exports = function(har, htmlEncode) {
 			entries[i].progressContent = progressContent;
 			
 			
-			entries[i].startPosition = pct(startedTime, lastTime);
-			entries[i].blockedWidth = pct(blocked, lastTime);
-			entries[i].dnsWidth = pct(dns, lastTime);
-			entries[i].connectWidth = pct(connect, lastTime);
-			entries[i].sendWidth = pct(send, lastTime);
-			entries[i].waitWidth = pct(wait, lastTime);
-			entries[i].receiveWidth = pct(receive, lastTime);
+			entries[i].startPosition = harParser.pct(startedTime, lastTime);
+			entries[i].blockedWidth = harParser.pct(blocked, lastTime);
+			entries[i].dnsWidth = harParser.pct(dns, lastTime);
+			entries[i].connectWidth = harParser.pct(connect, lastTime);
+			entries[i].sendWidth = harParser.pct(send, lastTime);
+			entries[i].waitWidth = harParser.pct(wait, lastTime);
+			entries[i].receiveWidth = harParser.pct(receive, lastTime);
 			
 			
 		}
@@ -427,16 +401,16 @@ var harParser = module.exports = function(har, htmlEncode) {
 	lastTime = Math.max.apply(null, lastTimeArray);
 	
 	if(onContentLoad)
-		onContentLoadText = pct(onContentLoad, lastTime);
+		onContentLoadText = harParser.pct(onContentLoad, lastTime);
 	
 	for(i=0;i<ilen;i++) {
 		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" ';
-		entries[i].windowloaded += 'title="[Page Loaded] (' + timeFormatter(onLoad) + ')" ';
-		entries[i].windowloaded += 'style="left:' + pct(onLoad,lastTime) + '"></span>';
+		entries[i].windowloaded += 'title="[Page Loaded] (' + harParser.timeFormatter(onLoad) + ')" ';
+		entries[i].windowloaded += 'style="left:' + harParser.pct(onLoad,lastTime) + '"></span>';
 		
 		if(onContentLoad) {
 			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" ';
-			entries[i].domloaded += 'title="[DOMContentLoaded] ('+timeFormatter(onContentLoad)+')"';
+			entries[i].domloaded += 'title="[DOMContentLoaded] ('+harParser.timeFormatter(onContentLoad)+')"';
 			entries[i].domloaded += ' style="left:' + onContentLoadText + '"></span>';
 		}
 		else
@@ -444,8 +418,8 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		if(startRender) {
 			entries[i].renderstarted = '<span class="renderstarted" data-toggle="tooltip" ';
-			entries[i].renderstarted = 'title="[Start Render] ('+ timeFormatter(startRender) +')" ';
-			entries[i].renderstarted = 'style="left:' + pct(startRender,lastTime) + '"></span>';
+			entries[i].renderstarted = 'title="[Start Render] ('+ harParser.timeFormatter(startRender) +')" ';
+			entries[i].renderstarted = 'style="left:' + harParser.pct(startRender,lastTime) + '"></span>';
 		}
 		else
 			entries[i].renderstarted = '';
@@ -464,8 +438,8 @@ var harParser = module.exports = function(har, htmlEncode) {
 						' (' + harParser.dataSizeFormatter(totalCompressedSize) + 
 						' [compressed])</th>' + 
 						'<th class="text-center">' + 
-						(onContentLoad !== false?'(' + timeFormatter(onContentLoad) + ') ':'') + 
-						timeFormatter(onLoad) + '</th>';
+						(onContentLoad !== false?'(' + harParser.timeFormatter(onContentLoad) + ') ':'') + 
+						harParser.timeFormatter(onLoad) + '</th>';
 	
 	return entries;
 	
@@ -756,4 +730,32 @@ harParser.precisionFormatter = function(number, precision) {
 		//Not everyone use dot (.) as separator
 		return number;//.replace('.', ',');
 	}
+};
+harParser.pct = function(value, pct, symbol) {
+	if(!value)
+		return 0;
+	symbol = symbol || '%';
+	return ((value * 100) / pct) + symbol;
+};
+harParser.timeFormatter = function(time, precision) {
+	var ext = ['ms', 's', 'min', 'h'],
+		div = [1000, 60, 60, 60],
+		i = 0;
+	
+	time = time >= 0 ? time : 0;
+	
+	while(time >= div[i] && i < (ext.length - 1)) {
+		time /= div[i];
+		i++;
+	}
+	
+	return harParser.precisionFormatter(time, precision || 2) + ext[i];
+};
+
+harParser.lowerReverseIndexOf = function(pattern, arr) {
+	for(var i=0, ilen=arr.length;i<ilen;i++) {
+		if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) !== -1)
+			return i;
+	}
+	return -1;
 };
