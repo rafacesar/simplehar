@@ -8,55 +8,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	var 
 	
-	objToDl = function(arr, decode, filters) {
-		
-		if(decode && decode.length && typeof decode[0] === 'string') {
-			filters = decode;
-			decode = false;
-		}
-		
-		if(filters && !filters.length)
-			filters = false;
-		
-		var newArr = decodeObj(arr, decode, filters),
-			dl = '',
-			i, ilen, _arr;
-		
-		if((ilen=newArr.length)) {
-			dl = '<dl class="dl-horizontal">';
-			for(i=0;i<ilen;i++) {
-				_arr = newArr[i];
-				dl += '<dt>' + _arr.name + '</dt>';
-				dl += '<dd>' + _arr.value.split(';').join(';<br>') + '</dd>';
-			}
-			dl += '</dl>';	
-		}
-		return dl;
-		
-	},
 	
-	decodeObj = function(arr, needDecode, filters) {
-		var newArr = [],
-			name, value, i, ilen, j, _arr;
-		
-		if(arr && arr.length) {
-			for(i=0, ilen=arr.length;i<ilen;i++) {
-				_arr = arr[i];
-				name = _arr.name;
-				if(!filters || harParser.lowerReverseIndexOf(name, filters) === -1) {
-					value = _arr.value;
-					if(needDecode) {
-						j = 5;
-						while(j-- && value.indexOf('%') !== -1 && value !== '')
-							value = harParser.decode(value);
-					}
-					newArr.push({name:name, value:value});
-				}
-			}
-			return newArr;
-		}
-		return [];
-	},
 	
 	tabsAndContainers = function(tabs, request, response, decode, filters) {
 		
@@ -84,12 +36,12 @@ var harParser = module.exports = function(har, htmlEncode) {
 			tab = tabs[i];
 			
 			
-			rq[tab] = objToDl(request[tab], filters);
-			rp[tab] = objToDl(response[tab], filters);
+			rq[tab] = harParser.objToDl(request[tab], filters);
+			rp[tab] = harParser.objToDl(response[tab], filters);
 			
 			if((rq[tab] || rp[tab]) && decode) {
-				rq['d' + tab] = objToDl(request[tab], decode, filters);
-				rp['d' + tab] = objToDl(response[tab], decode, filters);
+				rq['d' + tab] = harParser.objToDl(request[tab], decode, filters);
+				rp['d' + tab] = harParser.objToDl(response[tab], decode, filters);
 			}
 			
 			
@@ -170,7 +122,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 			progress = harParser.parseProgress(entry),
 			totalTime = progress.total,
 			infos = [
-				{tab:['headers'], decode:false, filters:['cookie']},
+				{tab:['headers'], decode:false, filters:'cookie'},
 				{tab:['cookies', 'queryString'], decode:true, filters:false}
 			],
 			tabs = '',
@@ -178,7 +130,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 			j = 0,
 			jlen = infos.length,
 			info, _info;
-		
 		
 		// TABS INFO
 		for(;j<jlen;j++) {
@@ -289,7 +240,9 @@ var harParser = module.exports = function(har, htmlEncode) {
 			
 			if(progressContent !== '' && startedTime >= 0) {
 				entries[i].progressStart = '<strong>[Start Time]:</strong>';
-				entries[i].progressStart += ' <em>' + harParser.timeFormatter(startedTime, 3) + '</em>';
+				entries[i].progressStart += ' <em>';
+				entries[i].progressStart += harParser.timeFormatter(startedTime, 3);
+				entries[i].progressStart += '</em>';
 			}
 			else
 				entries[i].progressStart = '';
@@ -368,6 +321,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 	});
 	
+	
 	for(i=0,ilen=entries.length;i<ilen;i++) {
 		hEntry = entries[i];
 		
@@ -390,12 +344,13 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	for(i=0;i<ilen;i++) {
 		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" ';
-		entries[i].windowloaded += 'title="[Page Loaded] (' + harParser.timeFormatter(onLoad) + ')" ';
+		entries[i].windowloaded += 'title="[Page Loaded] ('+ harParser.timeFormatter(onLoad) +')" ';
 		entries[i].windowloaded += 'style="left:' + harParser.pct(onLoad,lastTime) + '"></span>';
 		
 		if(onContentLoad) {
 			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" ';
-			entries[i].domloaded += 'title="[DOMContentLoaded] ('+harParser.timeFormatter(onContentLoad)+')"';
+			entries[i].domloaded += 'title="[DOMContentLoaded] (';
+			entries[i].domloaded += harParser.timeFormatter(onContentLoad)+')"';
 			entries[i].domloaded += ' style="left:' + onContentLoadText + '"></span>';
 		}
 		else
@@ -403,8 +358,10 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		if(startRender) {
 			entries[i].renderstarted = '<span class="renderstarted" data-toggle="tooltip" ';
-			entries[i].renderstarted += 'title="[Start Render] ('+ harParser.timeFormatter(startRender) +')" ';
-			entries[i].renderstarted += 'style="left:' + harParser.pct(startRender,lastTime) + '"></span>';
+			entries[i].renderstarted += 'title="[Start Render] (';
+			entries[i].renderstarted += harParser.timeFormatter(startRender) +')" ';
+			entries[i].renderstarted += 'style="left:';
+			entries[i].renderstarted += harParser.pct(startRender,lastTime) + '"></span>';
 		}
 		else
 			entries[i].renderstarted = '';
@@ -423,8 +380,9 @@ var harParser = module.exports = function(har, htmlEncode) {
 						' (' + harParser.dataSizeFormatter(totalCompressedSize) + 
 						' [compressed])</th>' + 
 						'<th class="text-center">' + 
-						(onContentLoad !== false?'(' + harParser.timeFormatter(onContentLoad) + ') ':'') + 
-						harParser.timeFormatter(onLoad) + '</th>';
+						(onContentLoad !== false?
+							'(' + harParser.timeFormatter(onContentLoad) + ') ':'') + 
+							harParser.timeFormatter(onLoad) + '</th>';
 	
 	return entries;
 	
@@ -739,11 +697,83 @@ harParser.timeFormatter = function(time, precision) {
 	return harParser.precisionFormatter(time, precision || 2) + ext[i];
 };
 
-harParser.lowerReverseIndexOf = function(pattern, arr) {
+harParser.decoder = function(value) {
 	'use strict';
-	for(var i=0, ilen=arr.length;i<ilen;i++) {
-		if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) !== -1)
-			return i;
+	
+	var j = 5;
+	
+	while(j-- && value.indexOf('%') !== -1 && value !== '')
+		value = harParser.decode(value);
+	
+	return value;
+};
+harParser.decodeObj = function(arr, needDecode, filter) {
+	'use strict';
+	var newArr = [],
+		value, i, ilen, _arr;
+	
+	if(arr && arr.length) {
+		arr = harParser.filterObjList(arr, 'name', filter);
+		for(i=0, ilen=arr.length;i<ilen;i++) {
+			_arr = arr[i];
+			value = _arr.value;
+			if(needDecode)
+				value = harParser.decoder(value);
+			
+			newArr.push({name:_arr.name, value:value});
+		}
+		return newArr;
 	}
-	return -1;
+	return [];
+};
+
+harParser.filterObjList = function(objList, attr, filter) {
+	'use strict';
+	
+	var newObjList = [],
+		i = 0,
+		ilen,
+		obj;
+	
+	if(!filter)
+		return objList;
+	
+	for(ilen=objList.length;i<ilen;i++) {
+		obj = objList[i];
+		if(obj[attr].indexOf(filter) === -1)
+			newObjList.push(obj);
+	}
+	
+	return newObjList;
+};
+
+harParser.objToDl = function(arr, decode, filters) {
+	'use strict';
+	if(decode && decode.length && typeof decode[0] === 'string') {
+		filters = decode;
+		decode = false;
+	}
+	
+	if(filters && !filters.length)
+		filters = false;
+	
+	
+	
+	
+	
+	var newArr = harParser.decodeObj(arr, decode, filters),
+		dl = '',
+		i, ilen, _arr;
+	
+	if((ilen=newArr.length)) {
+		dl = '<dl class="dl-horizontal">';
+		for(i=0;i<ilen;i++) {
+			_arr = newArr[i];
+			dl += '<dt>' + _arr.name + '</dt>';
+			dl += '<dd>' + _arr.value.split(';').join(';<br>') + '</dd>';
+		}
+		dl += '</dl>';	
+	}
+	return dl;
+	
 };
