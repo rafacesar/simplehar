@@ -717,12 +717,14 @@ harParser.precisionFormatter = function(number, precision) {
 	}
 };
 harParser.pct = function(value, pct, symbol) {
+	'use strict';
 	if(!value)
 		return 0;
 	symbol = symbol || '%';
 	return ((value * 100) / pct) + symbol;
 };
 harParser.timeFormatter = function(time, precision) {
+	'use strict';
 	var ext = ['ms', 's', 'min', 'h'],
 		div = [1000, 60, 60, 60],
 		i = 0;
@@ -738,6 +740,7 @@ harParser.timeFormatter = function(time, precision) {
 };
 
 harParser.lowerReverseIndexOf = function(pattern, arr) {
+	'use strict';
 	for(var i=0, ilen=arr.length;i<ilen;i++) {
 		if(pattern.toLowerCase().indexOf(arr[i].toLowerCase()) !== -1)
 			return i;
