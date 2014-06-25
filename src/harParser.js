@@ -150,21 +150,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 		return result;
 	},
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	convertHar = function(entry, i) {
 		
 		
@@ -418,8 +403,8 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		if(startRender) {
 			entries[i].renderstarted = '<span class="renderstarted" data-toggle="tooltip" ';
-			entries[i].renderstarted = 'title="[Start Render] ('+ harParser.timeFormatter(startRender) +')" ';
-			entries[i].renderstarted = 'style="left:' + harParser.pct(startRender,lastTime) + '"></span>';
+			entries[i].renderstarted += 'title="[Start Render] ('+ harParser.timeFormatter(startRender) +')" ';
+			entries[i].renderstarted += 'style="left:' + harParser.pct(startRender,lastTime) + '"></span>';
 		}
 		else
 			entries[i].renderstarted = '';
