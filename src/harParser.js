@@ -10,98 +10,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 	
-	tabsAndContainers = function(tabs, request, response, decode, filters) {
-		
-		var i = 0,
-			ilen = tabs.length,
-			rq = {},
-			rp = {},
-			tab, tabCapitalized,
-			result = {
-				tabs:'',
-				containers:''
-			};
-		
-		if(decode && decode.length && typeof decode[0] === 'string') {
-			filters = decode;
-			decode = false;
-		}
-		
-		if(filters && !filters.length)
-			filters = false;
-		
-		
-		
-		for(;i<ilen;i++) {
-			tab = tabs[i];
-			
-			
-			rq[tab] = harParser.objToDl(request[tab], filters);
-			rp[tab] = harParser.objToDl(response[tab], filters);
-			
-			if((rq[tab] || rp[tab]) && decode) {
-				rq['d' + tab] = harParser.objToDl(request[tab], decode, filters);
-				rp['d' + tab] = harParser.objToDl(response[tab], decode, filters);
-			}
-			
-			
-			
-			if(rq[tab] || rp[tab]) {
-				tabCapitalized = tab.charAt(0).toUpperCase() + tab.substr(1);
-				
-				result.tabs += '<li><a href="#' + tab + '">[' + tabCapitalized + ']</a></li>';
-				
-				result.containers += '<div class="' + tab + '">';
-				
-				if(rq[tab]) {
-					result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>';
-					result.containers += rq[tab];
-				}
-				
-				if(rp[tab]) {
-					result.containers += '<h3><small>[Response '+ tabCapitalized + ']</small></h3>';
-					result.containers += rp[tab];
-				}
-				
-				result.containers += '</div>';
-				
-				
-				if(decode) {
-					
-					result.tabs += '<li><a href="#parsed' + tab + '">';
-						result.tabs += '[Parsed ' + tabCapitalized + ']';
-					result.tabs += '</a></li>';
-				
-					result.containers += '<div class="parsed' + tab + '">';
-					
-					if(rq['d'+tab]) {
-						result.containers += '<h3><small>';
-						result.containers += '[Request ' + tabCapitalized + ']';
-						result.containers += '</small></h3>';
-						result.containers += rq['d' + tab];
-					}
-					
-					if(rp['d'+tab]) {
-						result.containers += '<h3><small>';
-						result.containers += '[Response ' + tabCapitalized + ']';
-						result.containers += '</small></h3>';
-						result.containers += rp['d' + tab];
-					}
-					
-					result.containers += '</div>';
-					
-					
-				}
-				
-				
-				
-			}
-			
-			
-		}
-		return result;
-	},
-	
 	convertHar = function(entry, i) {
 		
 		
@@ -122,21 +30,22 @@ var harParser = module.exports = function(har, htmlEncode) {
 			progress = harParser.parseProgress(entry),
 			totalTime = progress.total,
 			infos = [
-				{tab:['headers'], decode:false, filters:'cookie'},
-				{tab:['cookies', 'queryString'], decode:true, filters:false}
+				{tab:'headers', decode:false, filters:'cookie'},
+				{tab:'cookies', decode:true, filters:false},
+				{tab:'queryString', decode:true, filters:false}
 			],
 			tabs = '',
 			containers = '',
 			j = 0,
 			jlen = infos.length,
-			info, _info;
+			info;
 		
 		// TABS INFO
 		for(;j<jlen;j++) {
 			info = infos[j];
-			_info = tabsAndContainers(info.tab, __request, __response, info.decode, info.filters);
-			tabs += _info.tabs;
-			containers += _info.containers;
+			info = harParser.tabAndContainer(info, __request, __response);
+			tabs += info.tabs;
+			containers += info.containers;
 		}
 		tabs += responseContent.tabs;
 		containers += responseContent.result;
@@ -747,33 +656,105 @@ harParser.filterObjList = function(objList, attr, filter) {
 	return newObjList;
 };
 
-harParser.objToDl = function(arr, decode, filters) {
+harParser.listObjToDl = function(listObj, decode, filter) {
 	'use strict';
-	if(decode && decode.length && typeof decode[0] === 'string') {
-		filters = decode;
-		decode = false;
+	listObj = harParser.decodeObj(listObj, decode, filter);
+	
+	var dl = '<dl class="dl-horizontal">',
+		i = 0,
+		ilen = listObj.length,
+		obj;
+	
+	if(!ilen)
+		return '';
+	
+	
+	
+	for(;i<ilen;i++) {
+		obj = listObj[i];
+		dl += '<dt>' + obj.name + '</dt>';
+		dl += '<dd>' + obj.value.replace(/;/g,';<br>') + '</dd>';
 	}
 	
-	if(filters && !filters.length)
-		filters = false;
+	return (dl + '</dl>');
+	
+};
+harParser.tabAndContainer = function(tabObj, request, response) {
+	'use strict';
+	
+	var tab = tabObj.tab,
+		rq = {},
+		rp = {},
+		filter = tabObj.filter,
+		decode = tabObj.decode,
+		tabCapitalized,
+		result = {
+			tabs:'',
+			containers:''
+		};
 	
 	
+		
+	rq[tab] = harParser.listObjToDl(request[tab], decode, filter);
+	rp[tab] = harParser.listObjToDl(response[tab], decode, filter);
 	
 	
-	
-	var newArr = harParser.decodeObj(arr, decode, filters),
-		dl = '',
-		i, ilen, _arr;
-	
-	if((ilen=newArr.length)) {
-		dl = '<dl class="dl-horizontal">';
-		for(i=0;i<ilen;i++) {
-			_arr = newArr[i];
-			dl += '<dt>' + _arr.name + '</dt>';
-			dl += '<dd>' + _arr.value.split(';').join(';<br>') + '</dd>';
+	if(rq[tab] || rp[tab]) {
+		if(decode) {
+			rq['d' + tab] = harParser.listObjToDl(request[tab], decode, filter);
+			rp['d' + tab] = harParser.listObjToDl(response[tab], decode, filter);
 		}
-		dl += '</dl>';	
+		
+		
+		tabCapitalized = tab.charAt(0).toUpperCase() + tab.substr(1);
+		
+		result.tabs += '<li><a href="#' + tab + '">[' + tabCapitalized + ']</a></li>';
+		
+		result.containers += '<div class="' + tab + '">';
+		
+		if(rq[tab]) {
+			result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>';
+			result.containers += rq[tab];
+		}
+		
+		if(rp[tab]) {
+			result.containers += '<h3><small>[Response '+ tabCapitalized + ']</small></h3>';
+			result.containers += rp[tab];
+		}
+		
+		result.containers += '</div>';
+		
+		
+		if(decode) {
+			
+			result.tabs += '<li><a href="#parsed' + tab + '">';
+			result.tabs += '[Parsed ' + tabCapitalized + ']';
+			result.tabs += '</a></li>';
+		
+			result.containers += '<div class="parsed' + tab + '">';
+			
+			if(rq['d'+tab]) {
+				result.containers += '<h3><small>';
+				result.containers += '[Request ' + tabCapitalized + ']';
+				result.containers += '</small></h3>';
+				result.containers += rq['d' + tab];
+			}
+			
+			if(rp['d'+tab]) {
+				result.containers += '<h3><small>';
+				result.containers += '[Response ' + tabCapitalized + ']';
+				result.containers += '</small></h3>';
+				result.containers += rp['d' + tab];
+			}
+			
+			result.containers += '</div>';
+			
+			
+		}
+		
+		
+		
 	}
-	return dl;
 	
+	return result;
 };
