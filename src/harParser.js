@@ -8,9 +8,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	var 
 	
-	
-	
-	
 	convertHar = function(entry, i) {
 		
 		
@@ -298,6 +295,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 };
+
 harParser.decode = function(str) {
 	'use strict';
 	var _str;
@@ -319,6 +317,7 @@ harParser.decode = function(str) {
 	}
 	return _str;
 };
+//Return request method with strong tag, or empty if GET
 harParser.parseMethod = function(method) {
 	'use strict';
 	if(method.toLowerCase() === 'get')
@@ -330,6 +329,7 @@ harParser.parseMethod = function(method) {
 harParser.urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i;
 harParser.urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i;
 
+//Parse url and return an object with necessary attributes
 harParser.parseUrl = function(url, complete) {
 	'use strict';
 	var urlMatch = url.match(harParser.urlRe),
@@ -367,7 +367,7 @@ harParser.parseUrl = function(url, complete) {
 		complete:url
 	};
 };
-
+//Parse status + statusText and return an object with necessary attributes
 harParser.parseStatus = function(code, statusText) {
 	'use strict';
 	var status = code;
@@ -389,7 +389,7 @@ harParser.parseStatus = function(code, statusText) {
 	};
 	
 };
-
+//Return object with original and compressed size formatted and without format
 harParser.parseSize = function(size, compressed, status) {
 	'use strict';
 	var mainSize = compressed;
@@ -415,6 +415,7 @@ harParser.parseSize = function(size, compressed, status) {
 		compressed: compressed
 	};
 };
+//Return object with separated mime type informations
 harParser.parseMime = function(mimeType, url) {
 	'use strict';
 	var inline = false,
@@ -453,6 +454,7 @@ harParser.parseMime = function(mimeType, url) {
 		};
 	}
 };
+//Parse and return content (html, css, images...)
 harParser.parseContent = function(content, url, mime, htmlEncode) {
 	'use strict';
 	var tabs = '',
@@ -507,7 +509,7 @@ harParser.parseContent = function(content, url, mime, htmlEncode) {
 		_result: _result
 	};
 };
-
+//Return object with progress informations
 harParser.parseProgress = function(entry) {
 	'use strict';
 	var timings = entry.timings;
@@ -530,6 +532,7 @@ harParser.parseProgress = function(entry) {
 				timings.receive
 	};
 };
+//Add tag strong and classname
 harParser.strong = function(str,cname) {
 	'use strict';
 	if(cname)
@@ -538,6 +541,7 @@ harParser.strong = function(str,cname) {
 		cname = '';
 	return '<strong' + cname + '>' + str + '</strong>';
 };
+//Add tag em and classname
 harParser.em = function(str, cname) {
 	'use strict';
 	if(cname)
@@ -546,6 +550,7 @@ harParser.em = function(str, cname) {
 		cname = '';
 	return '<em' + cname + '>' + str + '</em>';
 };
+//Format size to show
 harParser.dataSizeFormatter = function(value, precision) {
 	'use strict';
 	var ext = [' Bytes', ' KB', ' MB', ' GB', ' TB'],
@@ -560,6 +565,7 @@ harParser.dataSizeFormatter = function(value, precision) {
 	
 	return harParser.precisionFormatter(value, precision || 2) + ext[i];
 };
+//Format float point precision
 harParser.precisionFormatter = function(number, precision) {
 	'use strict';
 	var matcher, fPoint;
@@ -584,6 +590,7 @@ harParser.precisionFormatter = function(number, precision) {
 		return number;//.replace('.', ',');
 	}
 };
+//Calculate pct value
 harParser.pct = function(value, pct, symbol) {
 	'use strict';
 	if(!value)
@@ -591,6 +598,7 @@ harParser.pct = function(value, pct, symbol) {
 	symbol = symbol || '%';
 	return ((value * 100) / pct) + symbol;
 };
+//Format time based on miliseconds
 harParser.timeFormatter = function(time, precision) {
 	'use strict';
 	var ext = ['ms', 's', 'min', 'h'],
