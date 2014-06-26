@@ -10,97 +10,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 	
-	tabsAndContainers = function(tabs, request, response, decode, filters) {
-		
-		var i = 0,
-			ilen = tabs.length,
-			rq = {},
-			rp = {},
-			tab, tabCapitalized,
-			result = {
-				tabs:'',
-				containers:''
-			};
-		
-		if(decode && decode.length && typeof decode[0] === 'string') {
-			filters = decode;
-			decode = false;
-		}
-		
-		if(filters && !filters.length)
-			filters = false;
-		
-		
-		
-		for(;i<ilen;i++) {
-			tab = tabs[i];
-			
-			
-			rq[tab] = harParser.objToDl(request[tab], filters);
-			rp[tab] = harParser.objToDl(response[tab], filters);
-			
-			if((rq[tab] || rp[tab]) && decode) {
-				rq['d' + tab] = harParser.objToDl(request[tab], decode, filters);
-				rp['d' + tab] = harParser.objToDl(response[tab], decode, filters);
-			}
-			
-			
-			
-			if(rq[tab] || rp[tab]) {
-				tabCapitalized = tab.charAt(0).toUpperCase() + tab.substr(1);
-				
-				result.tabs += '<li><a href="#' + tab + '">[' + tabCapitalized + ']</a></li>';
-				
-				result.containers += '<div class="' + tab + '">';
-				
-				if(rq[tab]) {
-					result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>';
-					result.containers += rq[tab];
-				}
-				
-				if(rp[tab]) {
-					result.containers += '<h3><small>[Response '+ tabCapitalized + ']</small></h3>';
-					result.containers += rp[tab];
-				}
-				
-				result.containers += '</div>';
-				
-				
-				if(decode) {
-					
-					result.tabs += '<li><a href="#parsed' + tab + '">';
-						result.tabs += '[Parsed ' + tabCapitalized + ']';
-					result.tabs += '</a></li>';
-				
-					result.containers += '<div class="parsed' + tab + '">';
-					
-					if(rq['d'+tab]) {
-						result.containers += '<h3><small>';
-						result.containers += '[Request ' + tabCapitalized + ']';
-						result.containers += '</small></h3>';
-						result.containers += rq['d' + tab];
-					}
-					
-					if(rp['d'+tab]) {
-						result.containers += '<h3><small>';
-						result.containers += '[Response ' + tabCapitalized + ']';
-						result.containers += '</small></h3>';
-						result.containers += rp['d' + tab];
-					}
-					
-					result.containers += '</div>';
-					
-					
-				}
-				
-				
-				
-			}
-			
-			
-		}
-		return result;
-	},
 	
 	convertHar = function(entry, i) {
 		
@@ -122,8 +31,9 @@ var harParser = module.exports = function(har, htmlEncode) {
 			progress = harParser.parseProgress(entry),
 			totalTime = progress.total,
 			infos = [
-				{tab:['headers'], decode:false, filters:'cookie'},
-				{tab:['cookies', 'queryString'], decode:true, filters:false}
+				{tab:'headers', decode:false, filter:'cookie'},
+				{tab:'cookies', decode:true, filter:false},
+				{tab:'queryString', decode:true, filter:false}
 			],
 			tabs = '',
 			containers = '',
@@ -134,7 +44,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 		// TABS INFO
 		for(;j<jlen;j++) {
 			info = infos[j];
-			_info = tabsAndContainers(info.tab, __request, __response, info.decode, info.filters);
+			_info = harParser.tabContainer(info, __request, __response);
 			tabs += _info.tabs;
 			containers += _info.containers;
 		}
@@ -707,24 +617,25 @@ harParser.decoder = function(value) {
 	
 	return value;
 };
-harParser.decodeObj = function(arr, needDecode, filter) {
+harParser.decodeObj = function(objList) {
 	'use strict';
-	var newArr = [],
-		value, i, ilen, _arr;
+	var newObjList = [],
+		i = 0,
+		ilen, obj;
 	
-	if(arr && arr.length) {
-		arr = harParser.filterObjList(arr, 'name', filter);
-		for(i=0, ilen=arr.length;i<ilen;i++) {
-			_arr = arr[i];
-			value = _arr.value;
-			if(needDecode)
-				value = harParser.decoder(value);
-			
-			newArr.push({name:_arr.name, value:value});
-		}
-		return newArr;
+	if(!objList || !objList.length)
+		return objList;
+	
+	for(ilen=objList.length;i<ilen;i++) {
+		obj = objList[i];
+		newObjList.push({
+			name:obj.name,
+			value:harParser.decoder(obj.value)
+		});
 	}
-	return [];
+	
+	return newObjList;
+	
 };
 
 harParser.filterObjList = function(objList, attr, filter) {
@@ -747,33 +658,112 @@ harParser.filterObjList = function(objList, attr, filter) {
 	return newObjList;
 };
 
-harParser.objToDl = function(arr, decode, filters) {
+harParser.objToDl = function(objList) {
 	'use strict';
-	if(decode && decode.length && typeof decode[0] === 'string') {
-		filters = decode;
-		decode = false;
+	var dl = '<dl class="dl-horizontal">',
+		i = 0,
+		ilen = objList && objList.length,
+		obj;
+	
+	if(!ilen)
+		return '';
+	
+	for(;i<ilen;i++) {
+		obj = objList[i];
+		dl += '<dt>' + obj.name + '</dt>';
+		dl += '<dd>' + obj.value.replace(/;/g, ';<br>') + '</dd>';
 	}
 	
-	if(filters && !filters.length)
-		filters = false;
+	return (dl + '</dl>');
+	
+};
+
+harParser.tabContainer = function(header, request, response) {
+	'use strict';
+	var tab = header.tab,
+		decode = header.decode,
+		filter = header.filter,
+		rq = {},
+		rp = {},
+		rqTab = request[tab],
+		rpTab = response[tab],
+		result = {
+			tabs:'',
+			containers:''
+		},
+		tabCapitalized;
+	
+	
+	if(filter) {
+		rqTab = harParser.filterObjList(rqTab, 'name', filter);
+		rpTab = harParser.filterObjList(rpTab, 'name', filter);
+	}
+	
+	
+	rq[tab] = harParser.objToDl(rqTab);
+	rp[tab] = harParser.objToDl(rpTab);
 	
 	
 	
-	
-	
-	var newArr = harParser.decodeObj(arr, decode, filters),
-		dl = '',
-		i, ilen, _arr;
-	
-	if((ilen=newArr.length)) {
-		dl = '<dl class="dl-horizontal">';
-		for(i=0;i<ilen;i++) {
-			_arr = newArr[i];
-			dl += '<dt>' + _arr.name + '</dt>';
-			dl += '<dd>' + _arr.value.split(';').join(';<br>') + '</dd>';
+	if(rq[tab] || rp[tab]) {
+		
+		if(decode) {
+			rqTab = harParser.decodeObj(rqTab);
+			rpTab = harParser.decodeObj(rpTab);
+			rq['d' + tab] = harParser.objToDl(rqTab);
+			rp['d' + tab] = harParser.objToDl(rpTab);
 		}
-		dl += '</dl>';	
+		
+		tabCapitalized = tab.charAt(0).toUpperCase() + tab.substr(1);
+		
+		result.tabs += '<li><a href="#' + tab + '">[' + tabCapitalized + ']</a></li>';
+		
+		result.containers += '<div class="' + tab + '">';
+		
+		if(rq[tab]) {
+			result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>';
+			result.containers += rq[tab];
+		}
+		
+		if(rp[tab]) {
+			result.containers += '<h3><small>[Response '+ tabCapitalized + ']</small></h3>';
+			result.containers += rp[tab];
+		}
+		
+		result.containers += '</div>';
+		
+		
+		if(decode) {
+			
+			result.tabs += '<li><a href="#parsed' + tab + '">';
+			result.tabs += '[Parsed ' + tabCapitalized + ']';
+			result.tabs += '</a></li>';
+		
+			result.containers += '<div class="parsed' + tab + '">';
+			
+			if(rq['d'+tab]) {
+				result.containers += '<h3><small>';
+				result.containers += '[Request ' + tabCapitalized + ']';
+				result.containers += '</small></h3>';
+				result.containers += rq['d' + tab];
+			}
+			
+			if(rp['d'+tab]) {
+				result.containers += '<h3><small>';
+				result.containers += '[Response ' + tabCapitalized + ']';
+				result.containers += '</small></h3>';
+				result.containers += rp['d' + tab];
+			}
+			
+			result.containers += '</div>';
+			
+			
+		}
+		
+		
+		
 	}
-	return dl;
+	
+	return result;
 	
 };
