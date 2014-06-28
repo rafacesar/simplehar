@@ -713,12 +713,16 @@ harParser.tabAndContainer = function(tabObj, request, response) {
 		result.containers += '<div class="' + tab + '">';
 		
 		if(rq[tab]) {
-			result.containers += '<h3><small>[Request ' + tabCapitalized + ']</small></h3>';
+			result.containers += '<h3 class="headers-title">';
+			result.containers += '<small>[Request ' + tabCapitalized + ']</small>';
+			result.containers += '</h3>';
 			result.containers += rq[tab];
 		}
 		
 		if(rp[tab]) {
-			result.containers += '<h3><small>[Response '+ tabCapitalized + ']</small></h3>';
+			result.containers += '<h3 class="headers-title">';
+			result.containers += '<small>[Response '+ tabCapitalized + ']</small>';
+			result.containers += '</h3>';
 			result.containers += rp[tab];
 		}
 		
@@ -734,14 +738,14 @@ harParser.tabAndContainer = function(tabObj, request, response) {
 			result.containers += '<div class="parsed' + tab + '">';
 			
 			if(rq['d'+tab]) {
-				result.containers += '<h3><small>';
+				result.containers += '<h3 class="headers-title"><small>';
 				result.containers += '[Request ' + tabCapitalized + ']';
 				result.containers += '</small></h3>';
 				result.containers += rq['d' + tab];
 			}
 			
 			if(rp['d'+tab]) {
-				result.containers += '<h3><small>';
+				result.containers += '<h3 class="headers-title"><small>';
 				result.containers += '[Response ' + tabCapitalized + ']';
 				result.containers += '</small></h3>';
 				result.containers += rp['d' + tab];

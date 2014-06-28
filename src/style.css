@@ -9,14 +9,14 @@
 	color:#999;
 	background-color:#EEE;
 }
-tr.top {
+.simplehar-table .top {
 	font-size:12px;
 }
-.url {
+.simplehar-table .url {
 	width:300px;
 	white-space:nowrap;
 	position:relative;
-	padding:0 !important;
+	padding:0;
 }
 .url > div,
 .timeline > div {
@@ -64,10 +64,10 @@ tr.top {
 	top:0;
 	padding:3px 5px 3px 2px;
 }
-.container .url:hover a {
+.simplehar-table .url:hover a {
 	display:block;
 	position:absolute;
-	color:#428bca !important;
+	color:#428bca;
 	font-weight:normal;
 }
 
@@ -123,7 +123,7 @@ tr.top {
 .inside div dl {
 	padding-left:15px;
 }
-.inside div h3:first-child {
+.inside div .headers-title:first-child {
 	margin-top:0;
 }
 
@@ -157,6 +157,8 @@ tr.top {
 	background:transparent;
 	overflow:hidden;
 	text-indent:-5000px;
+	text-align:left;
+	direction:ltr;
 }
 
 .bg-secondary {
@@ -212,7 +214,7 @@ tfoot th {
 	height:24px;
 	width:1px;
 	position:absolute;
-	bottom:0px;
+	bottom:0;
 	background-color:#000;
 }
 .windowloaded {
@@ -221,7 +223,7 @@ tfoot th {
 	height:24px;
 	width:1px;
 	position:absolute;
-	bottom:0px;
+	bottom:0;
 	background-color:#000;
 }
 .renderstarted {
@@ -230,7 +232,7 @@ tfoot th {
 	height:24px;
 	width:1px;
 	position:absolute;
-	bottom:0px;
+	bottom:0;
 	background-color:#000;
 }
 
