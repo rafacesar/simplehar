@@ -28,7 +28,8 @@
     "grunt": "^0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-mocha-test": "^0.11.0",
-    "mocha": "^1.20.1"
+    "mocha": "^1.20.1",
+    "grunt-contrib-csslint": "^0.2.0"
   },
   "dependencies": {
     "html-entities": "~1.0.10"

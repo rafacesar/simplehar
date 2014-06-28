@@ -6,6 +6,14 @@ module.exports = function(grunt) {
 				src:['test/**/*.js']
 			}
 		},
+		csslint: {
+			test: {
+				options: {
+					'box-model':false
+				},
+				src:['src/*.css']
+			}
+		},
 		jshint: {
 			bin: {
 				options: {
@@ -58,7 +66,8 @@ module.exports = function(grunt) {
 	
 	grunt.loadNpmTasks('grunt-mocha-test');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
+	grunt.loadNpmTasks('grunt-contrib-csslint');
 	
-	grunt.registerTask('default', ['mochaTest', 'jshint']);
+	grunt.registerTask('default', ['mochaTest', 'jshint', 'csslint']);
 	
 };
