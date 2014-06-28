@@ -1,4 +1,18 @@
 module.exports = function(grunt) {
+	var jshintrc = grunt.file.readJSON('./.jshintrc'),
+		browserJshintrc = grunt.file.readJSON('./.jshintrc');
+	
+	browserJshintrc.browser = true;
+	browserJshintrc.globals = {
+		jQuery:true,
+		alert:true,
+		harParser:true,
+		unminify:true,
+		addInteraction:true
+	};
+	browserJshintrc.node = false;
+	browserJshintrc.camelcase = false;
+	
 	
 	grunt.initConfig({
 		mochaTest: {
@@ -16,47 +30,14 @@ module.exports = function(grunt) {
 		},
 		jshint: {
 			bin: {
-				options: {
-					jshintrc:true,
-				},
+				options: jshintrc,
 				files: {
 					src:['bin/*.js', 'lib/simplehar.js', 'src/harParser.js']
 				}
 			},
 			
 			online: {
-				options: {
-					browser:true,
-					globals: {
-						jQuery:true,
-						alert:true,
-						harParser:true,
-						unminify:true,
-						addInteraction:true
-					},
-					"node": true,
-					"esnext": false,
-					"bitwise": true,
-					"curly": false,
-					"freeze": true,
-					"eqeqeq": true,
-					"immed": true,
-					"indent": 4,
-					"maxparams": 4,
-					"newcap": true,
-					"noempty": true,
-					"nonbsp": true,
-					"noarg": true,
-					"quotmark": "single",
-					"latedef": true,
-					"undef": true,
-					"unused": "strict",
-					"strict": true,
-					"trailing": true,
-					"smarttabs": true,
-					"maxcomplexity": 20,
-					"maxlen": 100
-				},
+				options: browserJshintrc,
 				files: {
 					src: ['src/html.js', 'src/script.js']
 				}
