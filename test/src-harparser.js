@@ -346,14 +346,13 @@ describe('Har Parser', function() {
 		expect(harParser.timeFormatter(725769.35,5)).to.be('12.09616min');
 	});
 	it('should decode object list', function() {
-		expect(harParser.decodeObj([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}], false)).to.eql([{name:'test', value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}]);
-		expect(harParser.decodeObj([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}], true)).to.eql([{name:'test', value:'][áóçõü'}, {name:'testing',value:'][áóçõü'}]);
-		expect(harParser.decodeObj([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}], true, ['ing'])).to.eql([{name:'test', value:'][áóçõü'}]);
+		expect(harParser.decodeObj([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'test', value:'][áóçõü'}, {name:'testing',value:'][áóçõü'}]);
+		expect(harParser.decodeObj([{name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'testing',value:'][áóçõü'}]);
 	});
 	
 	it('should generate a DL list', function() {
-		expect(harParser.listObjToDl([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.be('<dl class="dl-horizontal"><dt>test</dt><dd>][áóçõü</dd><dt>testing</dt><dd>%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC</dd></dl>');
-		expect(harParser.listObjToDl([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}], true)).to.be('<dl class="dl-horizontal"><dt>test</dt><dd>][áóçõü</dd><dt>testing</dt><dd>][áóçõü</dd></dl>');
+		expect(harParser.objToDl([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.be('<dl class="dl-horizontal"><dt>test</dt><dd>][áóçõü</dd><dt>testing</dt><dd>%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC</dd></dl>');
+		expect(harParser.objToDl([{name:'test',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}, {name:'testing',value:'][áóçõü'}])).to.be('<dl class="dl-horizontal"><dt>test</dt><dd>%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC</dd><dt>testing</dt><dd>][áóçõü</dd></dl>');
 	});
 	
 });

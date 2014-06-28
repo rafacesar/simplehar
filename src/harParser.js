@@ -8,8 +8,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	var 
 	
-	
-	
 	convertHar = function(entry, i) {
 		
 		
@@ -30,9 +28,9 @@ var harParser = module.exports = function(har, htmlEncode) {
 			progress = harParser.parseProgress(entry),
 			totalTime = progress.total,
 			infos = [
-				{tab:'headers', decode:false, filters:'cookie'},
-				{tab:'cookies', decode:true, filters:false},
-				{tab:'queryString', decode:true, filters:false}
+				{tab:'headers', decode:false, filter:'cookie'},
+				{tab:'cookies', decode:true, filter:false},
+				{tab:'queryString', decode:true, filter:false}
 			],
 			tabs = '',
 			containers = '',
@@ -43,7 +41,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 		// TABS INFO
 		for(;j<jlen;j++) {
 			info = infos[j];
-			info = harParser.tabAndContainer(info, __request, __response);
+			info = harParser.tabContainer(info, __request, __response);
 			tabs += info.tabs;
 			containers += info.containers;
 		}
@@ -297,6 +295,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 };
+
 harParser.decode = function(str) {
 	'use strict';
 	var _str;
@@ -318,6 +317,7 @@ harParser.decode = function(str) {
 	}
 	return _str;
 };
+//Return request method with strong tag, or empty if GET
 harParser.parseMethod = function(method) {
 	'use strict';
 	if(method.toLowerCase() === 'get')
@@ -329,6 +329,7 @@ harParser.parseMethod = function(method) {
 harParser.urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i;
 harParser.urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i;
 
+//Parse url and return an object with necessary attributes
 harParser.parseUrl = function(url, complete) {
 	'use strict';
 	var urlMatch = url.match(harParser.urlRe),
@@ -366,7 +367,7 @@ harParser.parseUrl = function(url, complete) {
 		complete:url
 	};
 };
-
+//Parse status + statusText and return an object with necessary attributes
 harParser.parseStatus = function(code, statusText) {
 	'use strict';
 	var status = code;
@@ -388,7 +389,7 @@ harParser.parseStatus = function(code, statusText) {
 	};
 	
 };
-
+//Return object with original and compressed size formatted and without format
 harParser.parseSize = function(size, compressed, status) {
 	'use strict';
 	var mainSize = compressed;
@@ -414,6 +415,7 @@ harParser.parseSize = function(size, compressed, status) {
 		compressed: compressed
 	};
 };
+//Return object with separated mime type informations
 harParser.parseMime = function(mimeType, url) {
 	'use strict';
 	var inline = false,
@@ -452,6 +454,7 @@ harParser.parseMime = function(mimeType, url) {
 		};
 	}
 };
+//Parse and return content (html, css, images...)
 harParser.parseContent = function(content, url, mime, htmlEncode) {
 	'use strict';
 	var tabs = '',
@@ -506,7 +509,7 @@ harParser.parseContent = function(content, url, mime, htmlEncode) {
 		_result: _result
 	};
 };
-
+//Return object with progress informations
 harParser.parseProgress = function(entry) {
 	'use strict';
 	var timings = entry.timings;
@@ -529,6 +532,7 @@ harParser.parseProgress = function(entry) {
 				timings.receive
 	};
 };
+//Add tag strong and classname
 harParser.strong = function(str,cname) {
 	'use strict';
 	if(cname)
@@ -537,6 +541,7 @@ harParser.strong = function(str,cname) {
 		cname = '';
 	return '<strong' + cname + '>' + str + '</strong>';
 };
+//Add tag em and classname
 harParser.em = function(str, cname) {
 	'use strict';
 	if(cname)
@@ -545,6 +550,7 @@ harParser.em = function(str, cname) {
 		cname = '';
 	return '<em' + cname + '>' + str + '</em>';
 };
+//Format size to show
 harParser.dataSizeFormatter = function(value, precision) {
 	'use strict';
 	var ext = [' Bytes', ' KB', ' MB', ' GB', ' TB'],
@@ -559,6 +565,7 @@ harParser.dataSizeFormatter = function(value, precision) {
 	
 	return harParser.precisionFormatter(value, precision || 2) + ext[i];
 };
+//Format float point precision
 harParser.precisionFormatter = function(number, precision) {
 	'use strict';
 	var matcher, fPoint;
@@ -583,6 +590,7 @@ harParser.precisionFormatter = function(number, precision) {
 		return number;//.replace('.', ',');
 	}
 };
+//Calculate pct value
 harParser.pct = function(value, pct, symbol) {
 	'use strict';
 	if(!value)
@@ -590,6 +598,7 @@ harParser.pct = function(value, pct, symbol) {
 	symbol = symbol || '%';
 	return ((value * 100) / pct) + symbol;
 };
+//Format time based on miliseconds
 harParser.timeFormatter = function(time, precision) {
 	'use strict';
 	var ext = ['ms', 's', 'min', 'h'],
@@ -616,24 +625,25 @@ harParser.decoder = function(value) {
 	
 	return value;
 };
-harParser.decodeObj = function(arr, needDecode, filter) {
+harParser.decodeObj = function(objList) {
 	'use strict';
-	var newArr = [],
-		value, i, ilen, _arr;
+	var newObjList = [],
+		i = 0,
+		ilen, obj;
 	
-	if(arr && arr.length) {
-		arr = harParser.filterObjList(arr, 'name', filter);
-		for(i=0, ilen=arr.length;i<ilen;i++) {
-			_arr = arr[i];
-			value = _arr.value;
-			if(needDecode)
-				value = harParser.decoder(value);
-			
-			newArr.push({name:_arr.name, value:value});
-		}
-		return newArr;
+	if(!objList || !objList.length)
+		return objList;
+	
+	for(ilen=objList.length;i<ilen;i++) {
+		obj = objList[i];
+		newObjList.push({
+			name:obj.name,
+			value:harParser.decoder(obj.value)
+		});
 	}
-	return [];
+	
+	return newObjList;
+	
 };
 
 harParser.filterObjList = function(objList, attr, filter) {
@@ -656,53 +666,58 @@ harParser.filterObjList = function(objList, attr, filter) {
 	return newObjList;
 };
 
-harParser.listObjToDl = function(listObj, decode, filter) {
+
+harParser.objToDl = function(objList) {
 	'use strict';
-	listObj = harParser.decodeObj(listObj, decode, filter);
-	
 	var dl = '<dl class="dl-horizontal">',
 		i = 0,
-		ilen = listObj.length,
+		ilen = objList && objList.length,
 		obj;
 	
 	if(!ilen)
 		return '';
 	
-	
-	
 	for(;i<ilen;i++) {
-		obj = listObj[i];
+		obj = objList[i];
 		dl += '<dt>' + obj.name + '</dt>';
-		dl += '<dd>' + obj.value.replace(/;/g,';<br>') + '</dd>';
+		dl += '<dd>' + obj.value.replace(/;/g, ';<br>') + '</dd>';
 	}
 	
 	return (dl + '</dl>');
 	
 };
-harParser.tabAndContainer = function(tabObj, request, response) {
+
+harParser.tabContainer = function(header, request, response) {
 	'use strict';
-	
-	var tab = tabObj.tab,
+	var tab = header.tab,
+		decode = header.decode,
+		filter = header.filter,
 		rq = {},
 		rp = {},
-		filter = tabObj.filter,
-		decode = tabObj.decode,
-		tabCapitalized,
+		rqTab = request[tab],
+		rpTab = response[tab],
 		result = {
 			tabs:'',
 			containers:''
-		};
+		},
+		tabCapitalized;
 	
 	
-		
-	rq[tab] = harParser.listObjToDl(request[tab], decode, filter);
-	rp[tab] = harParser.listObjToDl(response[tab], decode, filter);
+	if(filter) {
+		rqTab = harParser.filterObjList(rqTab, 'name', filter);
+		rpTab = harParser.filterObjList(rpTab, 'name', filter);
+	}
+	
+	rq[tab] = harParser.objToDl(rqTab);
+	rp[tab] = harParser.objToDl(rpTab);
 	
 	
 	if(rq[tab] || rp[tab]) {
 		if(decode) {
-			rq['d' + tab] = harParser.listObjToDl(request[tab], decode, filter);
-			rp['d' + tab] = harParser.listObjToDl(response[tab], decode, filter);
+			rqTab = harParser.decodeObj(rqTab);
+			rpTab = harParser.decodeObj(rpTab);
+			rq['d' + tab] = harParser.objToDl(rqTab);
+			rp['d' + tab] = harParser.objToDl(rpTab);
 		}
 		
 		
