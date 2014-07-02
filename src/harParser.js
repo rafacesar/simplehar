@@ -86,7 +86,21 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		var startedDateTimeBefore = entries[0].progress.startedDateTime,
 			progressContent, startedDateTime, startedTime,
-			blocked, dns, connect, send, wait, receive;
+			blocked, dns, connect, send, wait, receive,
+			progressRow = function(bg, title, value) {
+				var result = '<p class=\'clearfix bg-' + bg + '\'>';
+				
+				result += tinyRow(title, value);
+				
+				result += '</p>';
+				
+				return result;
+			},
+			tinyRow = function(title, value) {
+				var result = '<strong>[' + title + ']: </strong> ';
+				result += '<em> ' + harParser.timeFormatter(value, 3) + '</em>';
+				return result;
+			};
 		
 		
 		for(var i=0, ilen=entries.length, entry;i<ilen;i++) {
@@ -107,50 +121,28 @@ var harParser = module.exports = function(har, htmlEncode) {
 			
 			progressContent = '';
 			
-			if(blocked >= 0) {
-				progressContent += '<p class=\'clearfix bg-warning\'>';
-				progressContent += '<strong>[Blocking]: </strong>';
-				progressContent += ' <em> ' + harParser.timeFormatter(blocked, 3) + '</em>';
-				progressContent += '</p>';
-			}
-			if(dns >= 0) {
-				progressContent += '<p class=\'clearfix bg-last\'>';
-				progressContent += '<strong>[DNS]: </strong>';
-				progressContent += ' <em> ~' + harParser.timeFormatter(dns, 3) + '</em>';
-				progressContent += '</p>';
-			}
-			if(connect >= 0) {
-				progressContent += '<p class=\'clearfix bg-info\'>';
-				progressContent += '<strong>[Connect]: </strong>';
-				progressContent += ' <em> ~' + harParser.timeFormatter(connect, 3) + '</em>';
-				progressContent += '</p>';
-			}
-			if(send >= 0) {
-				progressContent += '<p class=\'clearfix bg-primary\'>';
-				progressContent += '<strong>[Send]: </strong>';
-				progressContent += ' <em> ~' + harParser.timeFormatter(send, 3) + '</em>';
-				progressContent += '</p>';
-			}
-			if(wait >= 0) {
-				progressContent += '<p class=\'clearfix bg-danger\'>';
-				progressContent += '<strong>[Wait]: </strong>';
-				progressContent += ' <em> ~' + harParser.timeFormatter(wait, 3) + '</em>';
-				progressContent += '</p>';
-			}
-			if(receive >= 0) {
-				progressContent += '<p class=\'clearfix bg-success\'>';
-				progressContent += '<strong>[Receive]: </strong>';
-				progressContent += ' <em> ~' + harParser.timeFormatter(receive, 3) + '</em>';
-				progressContent += '</p>';
-			}
+			if(blocked >= 0)
+				progressContent += progressRow('warning', 'Blocking', blocked);
+			
+			if(dns >= 0)
+				progressContent += progressRow('last', 'DNS', dns);
+			
+			if(connect >= 0)
+				progressContent += progressRow('info', 'Connect', connect);
+			
+			if(send >= 0)
+				progressContent += progressRow('primary', 'Send', send);
+			
+			if(wait >= 0)
+				progressContent += progressRow('danger', 'Wait', wait);
+			
+			if(receive >= 0)
+				progressContent += progressRow('success', 'Receive', receive);
 			
 			
-			if(progressContent !== '' && startedTime >= 0) {
-				entries[i].progressStart = '<strong>[Start Time]:</strong>';
-				entries[i].progressStart += ' <em>';
-				entries[i].progressStart += harParser.timeFormatter(startedTime, 3);
-				entries[i].progressStart += '</em>';
-			}
+			
+			if(progressContent !== '' && startedTime >= 0)
+				entries[i].progressStart = tinyRow('Start Time', startedTime);
 			else
 				entries[i].progressStart = '';
 			
@@ -703,7 +695,13 @@ harParser.tabContainer = function(header, request, response) {
 			tabs:'',
 			containers:''
 		},
-		tabCapitalized;
+		tabCapitalized,
+		headersTitle = function(title, content) {
+			return '<h3 class="headers-title"><small>['+ title +']</small></h3>' + content;
+		},
+		liTab = function(tabId, title) {
+			return '<li><a href="#' + tabId + '">[' + title + ']</a></li>';
+		};
 	
 	
 	if(filter) {
@@ -726,48 +724,31 @@ harParser.tabContainer = function(header, request, response) {
 		
 		tabCapitalized = tab.charAt(0).toUpperCase() + tab.substr(1);
 		
-		result.tabs += '<li><a href="#' + tab + '">[' + tabCapitalized + ']</a></li>';
+		result.tabs += liTab(tab, tabCapitalized);
 		
 		result.containers += '<div class="' + tab + '">';
 		
-		if(rq[tab]) {
-			result.containers += '<h3 class="headers-title">';
-			result.containers += '<small>[Request ' + tabCapitalized + ']</small>';
-			result.containers += '</h3>';
-			result.containers += rq[tab];
-		}
+		if(rq[tab])
+			result.containers += headersTitle('Request ' + tabCapitalized, rq[tab]);
 		
-		if(rp[tab]) {
-			result.containers += '<h3 class="headers-title">';
-			result.containers += '<small>[Response '+ tabCapitalized + ']</small>';
-			result.containers += '</h3>';
-			result.containers += rp[tab];
-		}
+		if(rp[tab])
+			result.containers += headersTitle('Response ' + tabCapitalized, rp[tab]);
 		
 		result.containers += '</div>';
 		
 		
 		if(decode) {
 			
-			result.tabs += '<li><a href="#parsed' + tab + '">';
-			result.tabs += '[Parsed ' + tabCapitalized + ']';
-			result.tabs += '</a></li>';
+			result.tabs += liTab('parsed' + tab, 'Parsed ' + tabCapitalized);
 		
 			result.containers += '<div class="parsed' + tab + '">';
 			
-			if(rq['d'+tab]) {
-				result.containers += '<h3 class="headers-title"><small>';
-				result.containers += '[Request ' + tabCapitalized + ']';
-				result.containers += '</small></h3>';
-				result.containers += rq['d' + tab];
-			}
+			if(rq['d' + tab])
+				result.containers += headersTitle('Request ' + tabCapitalized, rq['d' + tab]);
 			
-			if(rp['d'+tab]) {
-				result.containers += '<h3 class="headers-title"><small>';
-				result.containers += '[Response ' + tabCapitalized + ']';
-				result.containers += '</small></h3>';
-				result.containers += rp['d' + tab];
-			}
+			if(rp['d' + tab])
+				result.containers += headersTitle('Response ' + tabCapitalized, rp['d' + tab]);
+			
 			
 			result.containers += '</div>';
 			
