@@ -695,7 +695,8 @@ harParser.objToDl = function(objList) {
 	return (dl + '</dl>');
 	
 };
-
+//Generate an object with the tabs/titles and the content based in
+//the request and response objects
 harParser.tabContainer = function(header, request, response) {
 	'use strict';
 	var tab = header.tab,
