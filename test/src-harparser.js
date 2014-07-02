@@ -349,6 +349,12 @@ describe('Har Parser', function() {
 	it('should decode a text', function() {
 		expect(harParser.decode('%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC')).to.be('][áóçõü');
 	});
+	it('should decode a multiple encoded text', function() {
+		expect(harParser.decoder('%2525255B')).to.be('[');
+		expect(harParser.decoder('%25252525255B')).to.be('[');
+		expect(harParser.decoder('%252525255B%5B')).to.be('[[');
+		
+	});
 	it('should decode object list', function() {
 		expect(harParser.decodeObj([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'test', value:'][áóçõü'}, {name:'testing',value:'][áóçõü'}]);
 		expect(harParser.decodeObj([{name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'testing',value:'][áóçõü'}]);

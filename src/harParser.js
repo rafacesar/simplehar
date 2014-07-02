@@ -614,16 +614,18 @@ harParser.timeFormatter = function(time, precision) {
 	
 	return harParser.precisionFormatter(time, precision || 2) + ext[i];
 };
-
-harParser.decoder = function(value) {
+//Decode multiple encoded text
+harParser.decoder = function(text) {
 	'use strict';
 	
-	var j = 5;
+	var oldtext;
 	
-	while(j-- && value.indexOf('%') !== -1 && value !== '')
-		value = harParser.decode(value);
+	do {
+		oldtext = text;
+		text = harParser.decode(text);
+	}while(text !== oldtext);
 	
-	return value;
+	return text;
 };
 harParser.decodeObj = function(objList) {
 	'use strict';
