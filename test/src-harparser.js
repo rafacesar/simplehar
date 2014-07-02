@@ -345,6 +345,10 @@ describe('Har Parser', function() {
 		expect(harParser.timeFormatter(3211313132,5)).to.be('892.03143h');
 		expect(harParser.timeFormatter(725769.35,5)).to.be('12.09616min');
 	});
+	
+	it('should decode a text', function() {
+		expect(harParser.decode('%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC')).to.be('][áóçõü');
+	});
 	it('should decode object list', function() {
 		expect(harParser.decodeObj([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'test', value:'][áóçõü'}, {name:'testing',value:'][áóçõü'}]);
 		expect(harParser.decodeObj([{name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'testing',value:'][áóçõü'}]);

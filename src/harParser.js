@@ -295,7 +295,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 };
-
+//Decode url texts
 harParser.decode = function(str) {
 	'use strict';
 	var _str;
