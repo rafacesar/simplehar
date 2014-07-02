@@ -664,9 +664,11 @@ harParser.filterObjList = function(objList, attr, filter) {
 	if(!filter)
 		return objList;
 	
+	filter = filter.toLowerCase();
+	
 	for(ilen=objList.length;i<ilen;i++) {
 		obj = objList[i];
-		if(!obj.hasOwnProperty(attr) || obj[attr].indexOf(filter) === -1)
+		if(!obj.hasOwnProperty(attr) || obj[attr].toLowerCase().indexOf(filter) === -1)
 			newObjList.push(obj);
 	}
 	

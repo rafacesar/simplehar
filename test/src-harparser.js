@@ -357,7 +357,7 @@ describe('Har Parser', function() {
 	});
 	
 	it('should filter a list of objects attributes', function() {
-		expect(harParser.filterObjList([{some:'object'}, { attr:'test', value:'anything'}, {attr:'anothertest', value:'other thing'}, {attr:'my', value:'test'}, {attr:'testing', value:'again'}, {attr:'something', value:'some value'}], 'attr', 'test')).to.eql([{some:'object'}, {attr:'my', value:'test'}, {attr:'something', value:'some value'}]);
+		expect(harParser.filterObjList([{some:'object'}, { attr:'Test', value:'anything'}, {attr:'anothertest', value:'other thing'}, {attr:'my', value:'test'}, {attr:'testing', value:'again'}, {attr:'something', value:'some value'}], 'attr', 'test')).to.eql([{some:'object'}, {attr:'my', value:'test'}, {attr:'something', value:'some value'}]);
 		expect(harParser.filterObjList([{anotherattrname:'test', value:'anything'}, {anotherattrname:'anothertest', value:'other thing'}, {anotherattrname:'my', value:'test'}, {anotherattrname:'testing', value:'again'}, {anotherattrname:'something', value:'some value'}], 'anotherattrname', 'test')).to.eql([{anotherattrname:'my', value:'test'}, {anotherattrname:'something', value:'some value'}]);
 	});
 	
