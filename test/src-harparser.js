@@ -355,6 +355,12 @@ describe('Har Parser', function() {
 		expect(harParser.decoder('%252525255B%5B')).to.be('[[');
 		
 	});
+	
+	it('should filter a list of objects attributes', function() {
+		expect(harParser.filterObjList([{some:'object'}, { attr:'test', value:'anything'}, {attr:'anothertest', value:'other thing'}, {attr:'my', value:'test'}, {attr:'testing', value:'again'}, {attr:'something', value:'some value'}], 'attr', 'test')).to.eql([{some:'object'}, {attr:'my', value:'test'}, {attr:'something', value:'some value'}]);
+		expect(harParser.filterObjList([{anotherattrname:'test', value:'anything'}, {anotherattrname:'anothertest', value:'other thing'}, {anotherattrname:'my', value:'test'}, {anotherattrname:'testing', value:'again'}, {anotherattrname:'something', value:'some value'}], 'anotherattrname', 'test')).to.eql([{anotherattrname:'my', value:'test'}, {anotherattrname:'something', value:'some value'}]);
+	});
+	
 	it('should decode object list', function() {
 		expect(harParser.decodeObj([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'test', value:'][áóçõü'}, {name:'testing',value:'][áóçõü'}]);
 		expect(harParser.decodeObj([{name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'testing',value:'][áóçõü'}]);

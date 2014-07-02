@@ -281,14 +281,14 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	entries.title = page.title;
 	
-	entries.info = '<th>' + entries.length + ' [requests]</th>' + 
-						'<th colspan="3" class="text-right">' + 
-						harParser.dataSizeFormatter(totalSize) + 
-						' (' + harParser.dataSizeFormatter(totalCompressedSize) + 
-						' [compressed])</th>' + 
-						'<th class="text-center">' + 
+	entries.info = '<th>' + entries.length + ' [requests]</th>' +
+						'<th colspan="3" class="text-right">' +
+						harParser.dataSizeFormatter(totalSize) +
+						' (' + harParser.dataSizeFormatter(totalCompressedSize) +
+						' [compressed])</th>' +
+						'<th class="text-center">' +
 						(onContentLoad !== false?
-							'(' + harParser.timeFormatter(onContentLoad) + ') ':'') + 
+							'(' + harParser.timeFormatter(onContentLoad) + ') ':'') +
 							harParser.timeFormatter(onLoad) + '</th>';
 	
 	return entries;
@@ -648,7 +648,7 @@ harParser.decodeObj = function(objList) {
 	return newObjList;
 	
 };
-
+//Filter an attribute value in an object list
 harParser.filterObjList = function(objList, attr, filter) {
 	'use strict';
 	
@@ -662,7 +662,7 @@ harParser.filterObjList = function(objList, attr, filter) {
 	
 	for(ilen=objList.length;i<ilen;i++) {
 		obj = objList[i];
-		if(obj[attr].indexOf(filter) === -1)
+		if(!obj.hasOwnProperty(attr) || obj[attr].indexOf(filter) === -1)
 			newObjList.push(obj);
 	}
 	
