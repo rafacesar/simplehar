@@ -24,6 +24,6 @@
 	"strict": true,
 	"trailing": true,
 	"smarttabs": true,
-	"maxcomplexity": 20,
+	"maxcomplexity": 14,
 	"maxlen": 100
 }

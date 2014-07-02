@@ -6,7 +6,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	// if(!htmlEncode)
 	// 	console.error('htmlEncode not found. The content tab will not be displayed');
 	
-	var 
+	var
 	
 	convertHar = function(entry, i) {
 		
