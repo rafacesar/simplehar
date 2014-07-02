@@ -162,6 +162,14 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		return entries;
 		
+	},
+	verticalRowMarker = function(cname, title, value, left) {
+		var result = '<span class="' + cname + '" data-toggle="tooltip" ';
+		
+		result += 'title="[' + title + '] (' + harParser.timeFormatter(value) +')" ';
+		result += 'style="left:' + left + '"></span>';
+		
+		return result;
 	};
 	
 	
@@ -242,25 +250,29 @@ var harParser = module.exports = function(har, htmlEncode) {
 		onContentLoadText = harParser.pct(onContentLoad, lastTime);
 	
 	for(i=0;i<ilen;i++) {
-		entries[i].windowloaded = '<span class="windowloaded" data-toggle="tooltip" ';
-		entries[i].windowloaded += 'title="[Page Loaded] ('+ harParser.timeFormatter(onLoad) +')" ';
-		entries[i].windowloaded += 'style="left:' + harParser.pct(onLoad,lastTime) + '"></span>';
+		entries[i].windowloaded = verticalRowMarker(
+										'windowloaded',
+										'Page Loaded',
+										onLoad,
+										harParser.pct(onLoad,lastTime));
+		
 		
 		if(onContentLoad) {
-			entries[i].domloaded = '<span class="domloaded" data-toggle="tooltip" ';
-			entries[i].domloaded += 'title="[DOMContentLoaded] (';
-			entries[i].domloaded += harParser.timeFormatter(onContentLoad)+')"';
-			entries[i].domloaded += ' style="left:' + onContentLoadText + '"></span>';
+			entries[i].domloaded = verticalRowMarker(
+											'domloaded',
+											'DOMContentLoaded',
+											onContentLoad,
+											onContentLoadText);
 		}
 		else
 			entries[i].domloaded = '';
 		
 		if(startRender) {
-			entries[i].renderstarted = '<span class="renderstarted" data-toggle="tooltip" ';
-			entries[i].renderstarted += 'title="[Start Render] (';
-			entries[i].renderstarted += harParser.timeFormatter(startRender) +')" ';
-			entries[i].renderstarted += 'style="left:';
-			entries[i].renderstarted += harParser.pct(startRender,lastTime) + '"></span>';
+			entries[i].renderstarted = verticalRowMarker(
+												'renderstarted',
+												'Start Render',
+												startRender,
+												harParser.pct(startRender,lastTime));
 		}
 		else
 			entries[i].renderstarted = '';
