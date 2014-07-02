@@ -627,6 +627,7 @@ harParser.decoder = function(text) {
 	
 	return text;
 };
+//Decode a list of objects
 harParser.decodeObj = function(objList) {
 	'use strict';
 	var newObjList = [],
@@ -668,7 +669,7 @@ harParser.filterObjList = function(objList, attr, filter) {
 	return newObjList;
 };
 
-
+//Generate a DL list based in an object list
 harParser.objToDl = function(objList) {
 	'use strict';
 	var dl = '<dl class="dl-horizontal">',
