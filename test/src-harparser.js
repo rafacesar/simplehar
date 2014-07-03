@@ -380,4 +380,41 @@ describe('Har Parser', function() {
 		expect(harParser.tabContainer({tab:'tabname', decode:true}, {tabname:[{name:'some name', value:'v%C3%A1l%C3%BC%C3%A8'}]}, {tabname:[{name:'another test', value:'my value;with %C3%A0n%C3%93therth%C3%AD%C3%B1g;here'}]})).to.eql({ tabs: '<li><a href="#tabname">[Tabname]</a></li><li><a href="#parsedtabname">[Parsed Tabname]</a></li>',containers: '<div class="tabname"><h3 class="headers-title"><small>[Request Tabname]</small></h3><dl class="dl-horizontal"><dt>some name</dt><dd>v%C3%A1l%C3%BC%C3%A8</dd></dl><h3 class="headers-title"><small>[Response Tabname]</small></h3><dl class="dl-horizontal"><dt>another test</dt><dd>my value;<br>with %C3%A0n%C3%93therth%C3%AD%C3%B1g;<br>here</dd></dl></div><div class="parsedtabname"><h3 class="headers-title"><small>[Request Tabname]</small></h3><dl class="dl-horizontal"><dt>some name</dt><dd>válüè</dd></dl><h3 class="headers-title"><small>[Response Tabname]</small></h3><dl class="dl-horizontal"><dt>another test</dt><dd>my value;<br>with ànÓtherthíñg;<br>here</dd></dl></div>'});
 	});
 	
+	it('should return the object list with progress parsed informations', function() {
+		expect(harParser.convertProgress).to.throwError();
+		expect(harParser.convertProgress([{progress:{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0}}, {progress:{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0}}], 50)).to.eql([ { progress: 
+     { startedDateTime: 0,
+       blocked: 0,
+       dns: 0,
+       connect: 0,
+       send: 0,
+       wait: 0,
+       receive: 0 },
+    progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
+    progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>',
+    startPosition: 0,
+    blockedWidth: 0,
+    dnsWidth: 0,
+    connectWidth: 0,
+    sendWidth: 0,
+    waitWidth: 0,
+    receiveWidth: 0 },
+  { progress: 
+     { startedDateTime: 0,
+       blocked: 0,
+       dns: 0,
+       connect: 0,
+       send: 0,
+       wait: 0,
+       receive: 0 },
+    progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
+    progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>',
+    startPosition: 0,
+    blockedWidth: 0,
+    dnsWidth: 0,
+    connectWidth: 0,
+    sendWidth: 0,
+    waitWidth: 0,
+    receiveWidth: 0 } ]);
+	});
 });

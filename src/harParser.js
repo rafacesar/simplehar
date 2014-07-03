@@ -82,87 +82,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 	},
 	
-	convertProgress = function(entries) {
-		
-		var startedDateTimeBefore = entries[0].progress.startedDateTime,
-			progressContent, startedDateTime, startedTime,
-			blocked, dns, connect, send, wait, receive,
-			progressRow = function(bg, title, value) {
-				var result = '<p class=\'clearfix bg-' + bg + '\'>';
-				
-				result += tinyRow(title, value);
-				
-				result += '</p>';
-				
-				return result;
-			},
-			tinyRow = function(title, value) {
-				var result = '<strong>[' + title + ']: </strong> ';
-				result += '<em> ' + harParser.timeFormatter(value, 3) + '</em>';
-				return result;
-			};
-		
-		
-		for(var i=0, ilen=entries.length, entry;i<ilen;i++) {
-			
-			entry = entries[i];
-			
-			startedDateTime = entry.progress.startedDateTime;
-			startedTime = startedDateTime - startedDateTimeBefore;
-			
-			
-			blocked = entry.progress.blocked;
-			dns = entry.progress.dns;
-			connect = entry.progress.connect;
-			send = entry.progress.send;
-			wait = entry.progress.wait;
-			receive = entry.progress.receive;
-			
-			
-			progressContent = '';
-			
-			if(blocked >= 0)
-				progressContent += progressRow('warning', 'Blocking', blocked);
-			
-			if(dns >= 0)
-				progressContent += progressRow('last', 'DNS', dns);
-			
-			if(connect >= 0)
-				progressContent += progressRow('info', 'Connect', connect);
-			
-			if(send >= 0)
-				progressContent += progressRow('primary', 'Send', send);
-			
-			if(wait >= 0)
-				progressContent += progressRow('danger', 'Wait', wait);
-			
-			if(receive >= 0)
-				progressContent += progressRow('success', 'Receive', receive);
-			
-			
-			
-			if(progressContent !== '' && startedTime >= 0)
-				entries[i].progressStart = tinyRow('Start Time', startedTime);
-			else
-				entries[i].progressStart = '';
-			
-			entries[i].progressContent = progressContent;
-			
-			
-			entries[i].startPosition = harParser.pct(startedTime, lastTime);
-			entries[i].blockedWidth = harParser.pct(blocked, lastTime);
-			entries[i].dnsWidth = harParser.pct(dns, lastTime);
-			entries[i].connectWidth = harParser.pct(connect, lastTime);
-			entries[i].sendWidth = harParser.pct(send, lastTime);
-			entries[i].waitWidth = harParser.pct(wait, lastTime);
-			entries[i].receiveWidth = harParser.pct(receive, lastTime);
-			
-			
-		}
-		
-		return entries;
-		
-	},
 	verticalRowMarker = function(cname, title, value, left) {
 		var result = '<span class="' + cname + '" data-toggle="tooltip" ';
 		
@@ -281,7 +200,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 	
-	entries = convertProgress(entries);
+	entries = harParser.convertProgress(entries, lastTime);
 	
 	entries.title = page.title;
 	
@@ -775,4 +694,86 @@ harParser.tabContainer = function(header, request, response) {
 	}
 	
 	return result;
+};harParser.convertProgress = function(entries, lastTime) {
+	'use strict';
+	
+	var firstTime = entries[0].progress.startedDateTime,
+		i = 0,
+		ilen = entries.length,
+		progressContent, startedTime,
+		blocked, dns, connect, send, wait, receive, progress,
+		progressRow = function(bg, title, value) {
+			var result = '<p class=\'clearfix bg-' + bg + '\'>';
+			
+			result += tinyRow(title, value);
+			
+			result += '</p>';
+			
+			return result;
+		},
+		tinyRow = function(title, value) {
+			var result = '<strong>[' + title + ']: </strong> ';
+			result += '<em> ' + harParser.timeFormatter(value, 3) + '</em>';
+			return result;
+		};
+	
+	
+	for(;i<ilen;i++) {
+		
+		progress = entries[i].progress;
+		
+		
+		blocked = progress.blocked;
+		dns = progress.dns;
+		connect = progress.connect;
+		send = progress.send;
+		wait = progress.wait;
+		receive = progress.receive;
+		
+		
+		progressContent = '';
+		
+		if(blocked >= 0)
+			progressContent += progressRow('warning', 'Blocking', blocked);
+		
+		if(dns >= 0)
+			progressContent += progressRow('last', 'DNS', dns);
+		
+		if(connect >= 0)
+			progressContent += progressRow('info', 'Connect', connect);
+		
+		if(send >= 0)
+			progressContent += progressRow('primary', 'Send', send);
+		
+		if(wait >= 0)
+			progressContent += progressRow('danger', 'Wait', wait);
+		
+		if(receive >= 0)
+			progressContent += progressRow('success', 'Receive', receive);
+		
+		
+		
+		startedTime = progress.startedDateTime - firstTime;
+		
+		if(progressContent !== '' && startedTime >= 0)
+			entries[i].progressStart = tinyRow('Start Time', startedTime);
+		else
+			entries[i].progressStart = '';
+		
+		entries[i].progressContent = progressContent;
+		
+		
+		entries[i].startPosition = harParser.pct(startedTime, lastTime);
+		entries[i].blockedWidth = harParser.pct(blocked, lastTime);
+		entries[i].dnsWidth = harParser.pct(dns, lastTime);
+		entries[i].connectWidth = harParser.pct(connect, lastTime);
+		entries[i].sendWidth = harParser.pct(send, lastTime);
+		entries[i].waitWidth = harParser.pct(wait, lastTime);
+		entries[i].receiveWidth = harParser.pct(receive, lastTime);
+		
+		
+	}
+	
+	return entries;
+	
 };
