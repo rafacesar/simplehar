@@ -694,7 +694,8 @@ harParser.tabContainer = function(header, request, response) {
 	}
 	
 	return result;
-};harParser.convertProgress = function(entries, lastTime) {
+};
+harParser.convertProgress = function(entries, lastTime) {
 	'use strict';
 	
 	var firstTime = entries[0].progress.startedDateTime,
