@@ -8,80 +8,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	var
 	
-	convertHar = function(entry, i) {
-		
-		
-		var __request = entry.request,
-			__response = entry.response,
-			
-			method = harParser.parseMethod(__request.method),
-			url = harParser.parseUrl(__request.url, i > 1),
-			status = harParser.parseStatus(__response.status, __response.statusText),
-			size = harParser.parseSize(__response.content.size, __response.bodySize, status.code),
-			mime = harParser.parseMime(__response.content.mimeType || '', url.complete),
-			responseContent = harParser.parseContent(
-				__response.content.text,
-				url.complete,
-				mime,
-				htmlEncode
-			),
-			progress = harParser.parseProgress(entry),
-			totalTime = progress.total,
-			infos = [
-				{tab:'headers', decode:false, filter:'cookie'},
-				{tab:'cookies', decode:true, filter:false},
-				{tab:'queryString', decode:true, filter:false}
-			],
-			tabs = '',
-			containers = '',
-			j = 0,
-			jlen = infos.length,
-			info;
-		
-		// TABS INFO
-		for(;j<jlen;j++) {
-			info = infos[j];
-			info = harParser.tabContainer(info, __request, __response);
-			tabs += info.tabs;
-			containers += info.containers;
-		}
-		tabs += responseContent.tabs;
-		containers += responseContent.result;
-		
-		
-		
-		return {
-			sign: sign,
-			toggleSign: toggleSign,
-			method: method,
-			fullUrl: url.complete,
-			fileName: url.file,
-			params: url.params,
-			status: status.status,
-			fullStatus: status.complete,
-			mime: mime.type,
-			fullMimeType: mime.complete,
-			mimeType: mime.base + '/' + mime.type,
-			size: size.originalCompressed,
-			fullSize: size.originalSize,
-			sizeToShow: size.size,
-			tabs: tabs,
-			tabContainers: containers,
-			fileContent: responseContent._result,
-			progress:progress,
-			domloaded:onContentLoadText,
-			windowloaded:onLoadText,
-			totalTime:harParser.timeFormatter(totalTime),
-			rId:Math.floor((Math.random()*(new Date()).getTime())+1),
-			order: i+1,
-			bgstatus: (status.code >= 500?
-						'danger':(status.code >= 400?
-							'warning':(status.code >= 300?
-								'redirect':'')))
-		};
-		
-	},
-	
 	verticalRowMarker = function(cname, title, value, left) {
 		var result = '<span class="' + cname + '" data-toggle="tooltip" ';
 		
@@ -89,46 +15,9 @@ var harParser = module.exports = function(har, htmlEncode) {
 		result += 'style="left:' + left + '"></span>';
 		
 		return result;
-	};
+	},
 	
-	
-	
-	
-	var page = har.pages[0],
-		harEntries = har.entries,
-		entries = [],
-		id = page.id,
-		sign = 'glyphicon-chevron-down',
-		toggleSign = 'glyphicon-chevron-up',
-		onContentLoad = page.pageTimings.onContentLoad || false,
-		startRender = page.pageTimings._startRender || false,
-		onLoad = page.pageTimings.onLoad,
-		lastTime = onLoad,
-		onContentLoadText = '',
-		onLoadText,
-		totalSize = 0,
-		totalCompressedSize = 0,
-		lastTimeArray = [onLoad],
-		ilen = harEntries.length,
-		i, hEntry;
-	
-	
-	
-	
-	if(id && id !== '') {
-		for(i=0;i<ilen;i++) {
-			hEntry = harEntries[i];
-			if(hEntry.pageref && hEntry.pageref === id)
-				entries.push(hEntry);
-		}
-	}
-	else {
-		for(i=0;i<ilen;i++)
-			entries.push(harEntries[i]);
-	}
-	
-	
-	entries.sort(function(a, b) {
+	sortEntries = function(a, b) {
 		a = a.startedDateTime;
 		b = b.startedDateTime;
 		
@@ -145,20 +34,94 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		return a - b;
 		
-	});
+	},
+	
+	filterEntryByPage = function(entries, id) {
+		var newEntries, i, ilen, entry;
+		if(id && id !== '') {
+			newEntries = [];
+			for(i=0, ilen=entries.length;i<ilen;i++) {
+				entry = entries[i];
+				if(entry.pageref && entry.pageref === id)
+					newEntries.push(entry);
+			}
+			return newEntries;
+		}
+		return entries;
+	},
+	
+	verticalMarkers = function(entries, params) {
+		var i = 0,
+			ilen = entries.length;
+		
+		for(;i<ilen;i++) {
+			entries[i].windowloaded = verticalRowMarker(
+												'windowloaded',
+												'Page Loaded',
+												params.onLoad,
+												harParser.pct(params.onLoad,params.lastTime));
+			
+			
+			if(onContentLoad) {
+				entries[i].domloaded = verticalRowMarker(
+												'domloaded',
+												'DOMContentLoaded',
+												params.load,
+												params.loadText);
+			}
+			else
+				entries[i].domloaded = '';
+			
+			if(startRender) {
+				entries[i].renderstarted = verticalRowMarker(
+												'renderstarted',
+												'Start Render',
+												params.startRender,
+												harParser.pct(params.startRender,params.lastTime));
+			}
+			else
+				entries[i].renderstarted = '';
+		}
+		
+		return entries;
+	},
 	
 	
-	for(i=0,ilen=entries.length;i<ilen;i++) {
+	page = har.pages[0],
+	harEntries = har.entries,
+	id = page.id,
+	entries = filterEntryByPage(harEntries, id),
+	pageTimings = page.pageTimings,
+	onContentLoad = pageTimings.onContentLoad || false,
+	startRender = pageTimings._startRender || false,
+	onLoad = pageTimings.onLoad,
+	onContentLoadText = '',
+	totalSize = 0,
+	totalCompressedSize = 0,
+	lastTimeArray = [onLoad],
+	i = 0,
+	// firstTime,
+	lastTime,
+	hResponse, hProgress, ilen, hEntry;
+	
+	
+	entries.sort(sortEntries);
+	
+	// firstTime = entries.length && entries[0].progress.startedDateTime;
+	
+	for(ilen=entries.length;i<ilen;i++) {
 		hEntry = entries[i];
+		hResponse = hEntry.response;
 		
-		totalSize += hEntry.response.content.size;
-		totalCompressedSize += hEntry.response.bodySize;
 		
-		hEntry = entries[i] = convertHar(entries[i], i);
-
+		totalSize += hResponse.content.size;
+		totalCompressedSize += hResponse.bodySize;
+		
+		hEntry = entries[i] = harParser.convertHar(entries[i], i, htmlEncode);
+		hProgress = hEntry.progress;
+		
 		lastTimeArray.push(
-			(hEntry.progress.total + hEntry.progress.startedDateTime) -
-			entries[0].progress.startedDateTime
+			(hProgress.total + hProgress.startedDateTime) - entries[0].progress.startedDateTime
 		);
 	}
 
@@ -168,34 +131,15 @@ var harParser = module.exports = function(har, htmlEncode) {
 	if(onContentLoad)
 		onContentLoadText = harParser.pct(onContentLoad, lastTime);
 	
-	for(i=0;i<ilen;i++) {
-		entries[i].windowloaded = verticalRowMarker(
-										'windowloaded',
-										'Page Loaded',
-										onLoad,
-										harParser.pct(onLoad,lastTime));
-		
-		
-		if(onContentLoad) {
-			entries[i].domloaded = verticalRowMarker(
-											'domloaded',
-											'DOMContentLoaded',
-											onContentLoad,
-											onContentLoadText);
-		}
-		else
-			entries[i].domloaded = '';
-		
-		if(startRender) {
-			entries[i].renderstarted = verticalRowMarker(
-												'renderstarted',
-												'Start Render',
-												startRender,
-												harParser.pct(startRender,lastTime));
-		}
-		else
-			entries[i].renderstarted = '';
-	}
+	entries = verticalMarkers(entries, {
+		onLoad:onLoad,
+		lastTime:lastTime,
+		load:onContentLoad,
+		loadText:onContentLoadText,
+		start:startRender
+	});
+	
+	
 	
 	
 	
@@ -204,15 +148,15 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	entries.title = page.title;
 	
-	entries.info = '<th>' + entries.length + ' [requests]</th>' +
-						'<th colspan="3" class="text-right">' +
-						harParser.dataSizeFormatter(totalSize) +
-						' (' + harParser.dataSizeFormatter(totalCompressedSize) +
-						' [compressed])</th>' +
-						'<th class="text-center">' +
-						(onContentLoad !== false?
-							'(' + harParser.timeFormatter(onContentLoad) + ') ':'') +
-							harParser.timeFormatter(onLoad) + '</th>';
+	entries.info = '<th>' + entries.length + ' [requests]</th>';
+	entries.info += '<th colspan="3" class="text-right">';
+	entries.info += harParser.dataSizeFormatter(totalSize);
+	entries.info += ' (' + harParser.dataSizeFormatter(totalCompressedSize);
+	entries.info += ' [compressed])</th>';
+	entries.info += '<th class="text-center">';
+	if(onContentLoad !== false)
+		entries.info += '(' + harParser.timeFormatter(onContentLoad) + ') ';
+	entries.info += harParser.timeFormatter(onLoad) + '</th>';
 	
 	return entries;
 	
@@ -775,5 +719,76 @@ harParser.tabContainer = function(header, request, response) {
 	}
 	
 	return entries;
+	
+};
+harParser.convertHar = function(entry, i, htmlEncode) {
+	'use strict';
+	
+	var __request = entry.request,
+		__response = entry.response,
+		
+		method = harParser.parseMethod(__request.method),
+		url = harParser.parseUrl(__request.url, i > 1),
+		status = harParser.parseStatus(__response.status, __response.statusText),
+		size = harParser.parseSize(__response.content.size, __response.bodySize, status.code),
+		mime = harParser.parseMime(__response.content.mimeType || '', url.complete),
+		responseContent = harParser.parseContent(
+			__response.content.text,
+			url.complete,
+			mime,
+			htmlEncode
+		),
+		progress = harParser.parseProgress(entry),
+		totalTime = progress.total,
+		infos = [
+			{tab:'headers', decode:false, filter:'cookie'},
+			{tab:'cookies', decode:true, filter:false},
+			{tab:'queryString', decode:true, filter:false}
+		],
+		tabs = '',
+		containers = '',
+		j = 0,
+		jlen = infos.length,
+		info;
+	
+	// TABS INFO
+	for(;j<jlen;j++) {
+		info = infos[j];
+		info = harParser.tabContainer(info, __request, __response);
+		tabs += info.tabs;
+		containers += info.containers;
+	}
+	tabs += responseContent.tabs;
+	containers += responseContent.result;
+	
+	
+	
+	return {
+		sign: 'glyphicon-chevron-down',
+		toggleSign: 'glyphicon-chevron-up',
+		method: method,
+		fullUrl: url.complete,
+		fileName: url.file,
+		params: url.params,
+		status: status.status,
+		fullStatus: status.complete,
+		mime: mime.type,
+		fullMimeType: mime.complete,
+		mimeType: mime.base + '/' + mime.type,
+		size: size.originalCompressed,
+		fullSize: size.originalSize,
+		sizeToShow: size.size,
+		tabs: tabs,
+		tabContainers: containers,
+		fileContent: responseContent._result,
+		progress:progress,
+		totalTime:harParser.timeFormatter(totalTime),
+		rId:Math.floor((Math.random()*(new Date()).getTime())+1),
+		order: i+1,
+		bgstatus: (status.code >= 500?
+					'danger':(status.code >= 400?
+						'warning':(status.code >= 300?
+							'redirect':'')))
+	};
 	
 };
