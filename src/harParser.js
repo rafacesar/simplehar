@@ -52,35 +52,50 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	verticalMarkers = function(entries, params) {
 		var i = 0,
-			ilen = entries.length;
+			j = 0,
+			ilen = entries.length,
+			args = [
+				{
+					cname:'windowloaded',
+					title:'Page Loaded',
+					value:'onLoad',
+					param1:'onLoad',
+					param2:'lastTime',
+					left:false,
+					verify:true
+				},
+				{
+					cname:'domloaded',
+					title:'DOMContentLoaded',
+					value:'load',
+					left:'loadText',
+					verify:params.load
+				},
+				{
+					cname:'renderstarted',
+					title:'Start Render',
+					value:'startRender',
+					param1:'startRender',
+					param2:'lastTime',
+					left:false,
+					verify:params.startRender
+				}
+			],
+			jlen = args.length;
 		
 		for(;i<ilen;i++) {
-			entries[i].windowloaded = verticalRowMarker(
-												'windowloaded',
-												'Page Loaded',
-												params.onLoad,
-												harParser.pct(params.onLoad,params.lastTime));
-			
-			
-			if(onContentLoad) {
-				entries[i].domloaded = verticalRowMarker(
-												'domloaded',
-												'DOMContentLoaded',
-												params.load,
-												params.loadText);
+			for(;j<jlen;j++) {
+				if(args[j].verify)
+					entries[i][args[j].cname] = verticalRowMarker(
+						args[j].cname,
+						args[j].title,
+						params[args[j].value],
+						params[args[j].left] ||
+							harParser.pct(params[args[j].param1],params[args[j].param2])
+					);
+				else
+					entries[i][args[j].cname] = '';
 			}
-			else
-				entries[i].domloaded = '';
-			
-			if(startRender) {
-				entries[i].renderstarted = verticalRowMarker(
-												'renderstarted',
-												'Start Render',
-												params.startRender,
-												harParser.pct(params.startRender,params.lastTime));
-			}
-			else
-				entries[i].renderstarted = '';
 		}
 		
 		return entries;
