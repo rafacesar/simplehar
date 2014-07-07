@@ -639,6 +639,7 @@ harParser.tabContainer = function(header, request, response) {
 	
 	return result;
 };
+// Convert progress data to an object with converted data and HTML to tooltip
 harParser.convertProgress = function(entries, lastTime) {
 	'use strict';
 	
