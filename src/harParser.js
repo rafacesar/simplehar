@@ -100,6 +100,16 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		return entries;
 	},
+	prepareInfo = function(requests, size, load) {
+		var info = '<th>' + requests + ' [requests]</th>';
+		info+= '<th colspan="3" class="text-right">';
+		info+= size.total + ' (' + size.compressed + ' [compressed])</th>';
+		info+= '<th class="text-center">';
+		info+= load.content?'('+load.content+') ':'';
+		info+= load.on + '</th>';
+		
+		return info;
+	},
 	
 	
 	page = har.pages[0],
@@ -163,15 +173,20 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	entries.title = page.title;
 	
-	entries.info = '<th>' + entries.length + ' [requests]</th>';
-	entries.info += '<th colspan="3" class="text-right">';
-	entries.info += harParser.dataSizeFormatter(totalSize);
-	entries.info += ' (' + harParser.dataSizeFormatter(totalCompressedSize);
-	entries.info += ' [compressed])</th>';
-	entries.info += '<th class="text-center">';
 	if(onContentLoad !== false)
-		entries.info += '(' + harParser.timeFormatter(onContentLoad) + ') ';
-	entries.info += harParser.timeFormatter(onLoad) + '</th>';
+		onContentLoad = harParser.timeFormatter(onContentLoad);
+	
+	entries.info = prepareInfo(
+		entries.length,
+		{
+			total:harParser.dataSizeFormatter(totalSize),
+			compressed:harParser.dataSizeFormatter(totalCompressedSize)
+		},
+		{
+			content:onContentLoad,
+			on:harParser.timeFormatter(onLoad)
+		}
+	);
 	
 	return entries;
 	
