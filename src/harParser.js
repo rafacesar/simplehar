@@ -113,28 +113,22 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 	page = har.pages[0],
-	harEntries = har.entries,
-	id = page.id,
-	entries = filterEntryByPage(harEntries, id),
+	entries = filterEntryByPage(har.entries, page.id),
 	pageTimings = page.pageTimings,
 	onContentLoad = pageTimings.onContentLoad || false,
-	startRender = pageTimings._startRender || false,
 	onLoad = pageTimings.onLoad,
-	onContentLoadText = '',
 	totalSize = 0,
 	totalCompressedSize = 0,
 	lastTimeArray = [onLoad],
 	i = 0,
-	// firstTime,
+	ilen = entries.length,
 	lastTime,
-	hResponse, hProgress, ilen, hEntry;
+	hResponse, hProgress, hEntry;
 	
 	
 	entries.sort(sortEntries);
 	
-	// firstTime = entries.length && entries[0].progress.startedDateTime;
-	
-	for(ilen=entries.length;i<ilen;i++) {
+	for(;i<ilen;i++) {
 		hEntry = entries[i];
 		hResponse = hEntry.response;
 		
@@ -153,15 +147,13 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	lastTime = Math.max.apply(null, lastTimeArray);
 	
-	if(onContentLoad)
-		onContentLoadText = harParser.pct(onContentLoad, lastTime);
 	
 	entries = verticalMarkers(entries, {
 		onLoad:onLoad,
 		lastTime:lastTime,
 		load:onContentLoad,
-		loadText:onContentLoadText,
-		start:startRender
+		loadText:onContentLoad?harParser.pct(onContentLoad, lastTime):'',
+		start:pageTimings._startRender || false
 	});
 	
 	
