@@ -74,11 +74,11 @@ var harParser = module.exports = function(har, htmlEncode) {
 				{
 					cname:'renderstarted',
 					title:'Start Render',
-					value:'startRender',
-					param1:'startRender',
+					value:'start',
+					param1:'start',
 					param2:'lastTime',
 					left:false,
-					verify:params.startRender
+					verify:params.start
 				}
 			],
 			jlen = args.length;
@@ -155,8 +155,6 @@ var harParser = module.exports = function(har, htmlEncode) {
 		loadText:onContentLoad?harParser.pct(onContentLoad, lastTime):'',
 		start:pageTimings._startRender || false
 	});
-	
-	
 	
 	
 	
