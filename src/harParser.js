@@ -786,8 +786,6 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 	
 	
 	return {
-		sign: 'glyphicon-chevron-down',
-		toggleSign: 'glyphicon-chevron-up',
 		method: method,
 		fullUrl: url.complete,
 		fileName: url.file,
