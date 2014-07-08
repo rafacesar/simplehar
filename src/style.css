@@ -38,6 +38,21 @@
 	color:#888;
 }
 
+.har-table {
+	counter-reset:request;
+}
+.har-table .url div > strong:before {
+	counter-increment:request;
+	content:counter(request) ". ";
+	position:absolute;
+	display:block;
+	left:-28px;
+	top:3px;
+	width:25px;
+	text-align:right;
+	text-indent:0;
+}
+
 .url strong strong {
 	font-weight:bold;
 	display:inline;
@@ -81,16 +96,6 @@
 	white-space:nowrap;
 	text-overflow:ellipsis;
 	width:70px;
-}
-
-.order {
-	position:absolute;
-	left:-28px;
-	top:3px;
-	display:block;
-	width:25px;
-	text-align:right;
-	text-indent:0;
 }
 
 .bg-redirect {
