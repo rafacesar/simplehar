@@ -210,7 +210,7 @@ harParser.parseMethod = function(method) {
 	if(method.toLowerCase() === 'get')
 		return '';
 	
-	return method && harParser.strong(method) || '';
+	return method && harParser.strong(method + ' ') || '';
 };
 
 harParser.urlRe = /([^:]+:\/+)([^\/]*)(\/?(?:\/?([^\/\?\#]*))*)(.*)/i;
