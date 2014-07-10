@@ -801,12 +801,7 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 		tabContainers: containers,
 		fileContent: responseContent._result,
 		progress:progress,
-		totalTime:harParser.timeFormatter(totalTime),
-		rId:Math.floor((Math.random()*(new Date()).getTime())+1),
-		bgstatus: (status.code >= 500?
-					'danger':(status.code >= 400?
-						'warning':(status.code >= 300?
-							'redirect':'')))
+		totalTime:harParser.timeFormatter(totalTime)
 	};
 	
 };
