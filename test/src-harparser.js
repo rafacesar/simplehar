@@ -6,9 +6,9 @@ describe('Har Parser', function() {
 	it('should parse the method', function() {
 		expect(harParser.parseMethod('get')).to.be('');
 		expect(harParser.parseMethod('GET')).to.be('');
-		expect(harParser.parseMethod('post')).to.be('<strong>post</strong>');
-		expect(harParser.parseMethod('POST')).to.be('<strong>POST</strong>');
-		expect(harParser.parseMethod('HEAD')).to.be('<strong>HEAD</strong>');
+		expect(harParser.parseMethod('post')).to.be('<strong>post </strong>');
+		expect(harParser.parseMethod('POST')).to.be('<strong>POST </strong>');
+		expect(harParser.parseMethod('HEAD')).to.be('<strong>HEAD </strong>');
 	});
 	it('should parse the http status', function() {
 		expect(harParser.parseStatus(0, '')).to.eql({

@@ -246,7 +246,7 @@ harParser.parseUrl = function(url, complete) {
 	urlFile = urlFile.replace(/^\s*/g,'').replace(/\s*$/g,'');
 	
 	if(!url.indexOf('https'))
-		urlFile = '<strong class="text-success">' + urlFile + '</strong>';
+		urlFile = harParser.strong(urlFile, 'text-success');
 	
 	return {
 		params: harParser.decode(urlMatch && urlMatch[5] || ''),
