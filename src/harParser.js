@@ -84,7 +84,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 			jlen = args.length;
 		
 		for(;i<ilen;i++) {
-			for(;j<jlen;j++) {
+			for(j=0;j<jlen;j++) {
 				if(args[j].verify)
 					entries[i][args[j].cname] = verticalRowMarker(
 						args[j].cname,
