@@ -122,8 +122,8 @@ var harParser = module.exports = function(har, htmlEncode) {
 	lastTimeArray = [onLoad],
 	i = 0,
 	ilen = entries.length,
-	lastTime,
-	hResponse, hProgress, hEntry;
+	progress = [],
+	prop, lastTime, hResponse, hProgress, hEntry;
 	
 	
 	entries.sort(sortEntries);
@@ -136,17 +136,28 @@ var harParser = module.exports = function(har, htmlEncode) {
 		totalSize += hResponse.content.size;
 		totalCompressedSize += hResponse.bodySize;
 		
-		hEntry = entries[i] = harParser.convertHar(entries[i], i, htmlEncode);
-		hProgress = hEntry.progress;
+		hProgress = harParser.parseProgress(hEntry);
+		progress.push(hProgress);
+		
+		
+		hEntry = entries[i] = harParser.convertHar(hEntry, i, htmlEncode);
 		
 		lastTimeArray.push(
-			(hProgress.total + hProgress.startedDateTime) - entries[0].progress.startedDateTime
+			(hProgress.total + hProgress.startedDateTime) - progress[0].startedDateTime
 		);
 	}
 
 	
 	lastTime = Math.max.apply(null, lastTimeArray);
 	
+	progress = harParser.convertProgress(progress, lastTime);
+	
+	for(i=0;i<ilen;i++) {
+		hProgress = progress[i];
+		for(prop in hProgress) {
+			entries[i][prop] = hProgress[prop];
+		}
+	}
 	
 	entries = verticalMarkers(entries, {
 		onLoad:onLoad,
@@ -159,7 +170,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 	
 	
 	
-	entries = harParser.convertProgress(entries, lastTime);
+	
 	
 	entries.title = page.title;
 	
@@ -660,14 +671,15 @@ harParser.tabContainer = function(header, request, response) {
 	return result;
 };
 // Convert progress data to an object with converted data and HTML to tooltip
-harParser.convertProgress = function(entries, lastTime) {
+harParser.convertProgress = function(progress, lastTime) {
 	'use strict';
 	
-	var firstTime = entries[0].progress.startedDateTime,
+	var firstTime = progress[0].startedDateTime,
 		i = 0,
-		ilen = entries.length,
-		progressContent, startedTime,
-		blocked, dns, connect, send, wait, receive, progress,
+		ilen = progress.length,
+		result = [],
+		progressContent, startedTime, r,
+		blocked, dns, connect, send, wait, receive, p,
 		progressRow = function(bg, title, value) {
 			var result = '<p class=\'clearfix bg-' + bg + '\'>';
 			
@@ -686,15 +698,17 @@ harParser.convertProgress = function(entries, lastTime) {
 	
 	for(;i<ilen;i++) {
 		
-		progress = entries[i].progress;
+		r = {};
+		
+		p = progress[i];
 		
 		
-		blocked = progress.blocked;
-		dns = progress.dns;
-		connect = progress.connect;
-		send = progress.send;
-		wait = progress.wait;
-		receive = progress.receive;
+		blocked = p.blocked;
+		dns = p.dns;
+		connect = p.connect;
+		send = p.send;
+		wait = p.wait;
+		receive = p.receive;
 		
 		
 		progressContent = '';
@@ -719,28 +733,30 @@ harParser.convertProgress = function(entries, lastTime) {
 		
 		
 		
-		startedTime = progress.startedDateTime - firstTime;
+		startedTime = p.startedDateTime - firstTime;
 		
 		if(progressContent !== '' && startedTime >= 0)
-			entries[i].progressStart = tinyRow('Start Time', startedTime);
+			r.progressStart = tinyRow('Start Time', startedTime);
 		else
-			entries[i].progressStart = '';
+			r.progressStart = '';
 		
-		entries[i].progressContent = progressContent;
-		
-		
-		entries[i].startPosition = harParser.pct(startedTime, lastTime);
-		entries[i].blockedWidth = harParser.pct(blocked, lastTime);
-		entries[i].dnsWidth = harParser.pct(dns, lastTime);
-		entries[i].connectWidth = harParser.pct(connect, lastTime);
-		entries[i].sendWidth = harParser.pct(send, lastTime);
-		entries[i].waitWidth = harParser.pct(wait, lastTime);
-		entries[i].receiveWidth = harParser.pct(receive, lastTime);
+		r.progressContent = progressContent;
 		
 		
+		r.startPosition = harParser.pct(startedTime, lastTime);
+		r.blockedWidth = harParser.pct(blocked, lastTime);
+		r.dnsWidth = harParser.pct(dns, lastTime);
+		r.connectWidth = harParser.pct(connect, lastTime);
+		r.sendWidth = harParser.pct(send, lastTime);
+		r.waitWidth = harParser.pct(wait, lastTime);
+		r.receiveWidth = harParser.pct(receive, lastTime);
+		
+		r.totalTime = harParser.timeFormatter(p.total);
+		
+		result.push(r);
 	}
 	
-	return entries;
+	return result;
 	
 };
 harParser.convertHar = function(entry, i, htmlEncode) {
@@ -760,8 +776,6 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 			mime,
 			htmlEncode
 		),
-		progress = harParser.parseProgress(entry),
-		totalTime = progress.total,
 		infos = [
 			{tab:'headers', decode:false, filter:'cookie'},
 			{tab:'cookies', decode:true, filter:false},
@@ -799,9 +813,7 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 		sizeToShow: size.size,
 		tabs: tabs,
 		tabContainers: containers,
-		fileContent: responseContent._result,
-		progress:progress,
-		totalTime:harParser.timeFormatter(totalTime)
+		fileContent: responseContent._result
 	};
 	
 };
