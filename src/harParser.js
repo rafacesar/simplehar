@@ -759,6 +759,7 @@ harParser.convertProgress = function(progress, lastTime) {
 	return result;
 	
 };
+// Convert a request into another object
 harParser.convertHar = function(entry, i, htmlEncode) {
 	'use strict';
 	
