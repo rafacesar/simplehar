@@ -121,7 +121,6 @@
 					_left += __left;
 			}
 			
-			console.log(_left);
 			
 			if(_left > 80) {
 				if(_space > 10) {
@@ -130,11 +129,9 @@
 					
 					_marginLeft += $_totalTime.width() + 5;
 					$_totalTime.css('marginLeft', _marginLeft * -1);
-					console.log('teste');
 				}
 				else {
 					_left = 0;
-					console.log('testa');
 					$_totalTime.css('font-weight', 'bold');
 				}
 			}
