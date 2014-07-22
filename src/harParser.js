@@ -807,7 +807,7 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 		params: url.params,
 		status: status.status,
 		fullStatus: status.complete,
-		mime: mime.type,
+		mime: (mime.type === 'plain' || !mime.type) && mime.base?mime.base:mime.type,
 		fullMimeType: mime.complete,
 		size: size.originalCompressed,
 		fullSize: size.originalSize,
