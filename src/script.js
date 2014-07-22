@@ -103,7 +103,7 @@
 			return false;
 		});
 		
-		var $_top, $_bars, $_totalTime, _left, _marginLeft, j, jlen;
+		var $_top, $_bars, $_totalTime, _left, __left, _marginLeft, _space, j, jlen;
 		ilen = $top.length;
 		while(ilen--) {
 			$_top = $top.eq(ilen);
@@ -111,18 +111,32 @@
 			$_totalTime = $_top.find('span.totalTime');
 			_left = 0;
 			_marginLeft = 0;
+			_space = $_bars.siblings('.progress-bar-space').width();
 			
 			j = jlen = $_bars.length;
 			
-			while(j--)
-				_left += parseFloat($_bars.eq(j).attr('style').replace('width:', ''));
+			while(j--) {
+				__left = parseFloat($_bars.eq(j).attr('style').replace('width:', ''));
+				if(__left > 0)
+					_left += __left;
+			}
+			
+			console.log(_left);
 			
 			if(_left > 80) {
-				for(j=1;j<jlen;j++)
-					_marginLeft += parseFloat($_bars.eq(j).width());
-				
-				_marginLeft += $_totalTime.width() + 5;
-				$_totalTime.css('marginLeft', _marginLeft * -1);
+				if(_space > 10) {
+					for(j=1;j<jlen;j++)
+						_marginLeft += parseFloat($_bars.eq(j).width());
+					
+					_marginLeft += $_totalTime.width() + 5;
+					$_totalTime.css('marginLeft', _marginLeft * -1);
+					console.log('teste');
+				}
+				else {
+					_left = 0;
+					console.log('testa');
+					$_totalTime.css('font-weight', 'bold');
+				}
 			}
 			
 			$_totalTime.css('left', (_left + 0.5) + '%');
