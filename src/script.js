@@ -6,7 +6,7 @@
 			return waiting();
 		
 		var $ = jQuery,
-			$table = $('.har-table'),
+			$table = $('.sh-table'),
 			$inside = $table.find('.inside'),
 			$nav = $inside.find('.nav'),
 			$top = $table.find('.top'),
@@ -190,14 +190,14 @@
 			});
 			$table.bind('beforetablesort', function() {
 				$('tr.top.opened').click();
-				$('.loader').show();
+				$('.sh-loader').show();
 			});
 			$table.bind('aftertablesort', function() {
-				$('.loader').hide();
+				$('.sh-loader').hide();
 			});
 		}
 		
-		$('.loader').hide();
+		$('.sh-loader').hide();
 		
 	};
 	
@@ -210,7 +210,7 @@
 	};
 	if(!document.getElementById('harParser')) {
 		var div = document.createElement('div');
-		div.className = 'loader';
+		div.className = 'sh-loader';
 		document.body.appendChild(div);
 		waiting();
 	}

@@ -1,156 +1,16 @@
-window.module = {};
-(function(d,s) {
+(function(w, d, $) {
 	'use strict';
-	(s = d.createElement('script')).src = 'src/harParser.js';
-	s.id = 'harParser';
-	d.body.appendChild(s);
-	(s = d.createElement('script')).src = 'lib/unminify.js';
-	s.id = 'unminify';
-	d.body.appendChild(s);
-})(document);
-jQuery(function($) {
-	'use strict';
-	$.getJSON('src/translate.json', function(data) {
-		window.translations = data || false;
-	});
-	$.get('src/template.html', function() {
-		$('.container').load('src/template.html table', function() {
-			var $table = $('table.har-table');
-			$table.find('caption').html('');
-			$table.html(translateTemplate($table.html()));
-		});
-		
-		var drop = function(evt) {
-			evt.stopPropagation();
-			evt.preventDefault();
-			
-			window.scrollTo(0,0);
-			
-			var files = evt.originalEvent.dataTransfer.files;
-			
-			$('#drop').css('display', 'none');
-			
-			if(files.length) {
-				
-				if($('.loader').length)
-					$('.loader').show();
-				else
-					$(document.createElement('div')).addClass('loader').appendTo(document.body);
-			
-			
-				var file = files[0],
-					reader = new FileReader();
-				
-				reader.onload = function (evt) {
-					var har;
-					try {
-						har = JSON.parse(evt.target.result);
-					}
-					catch(e) {
-						alert('Invalid JSON');
-						$('.loader').hide();
-						return;
-					}
-					$('tbody, tfoot tr, caption').html('');
-					$('.tooltip, .popover').remove();
-					
-					
-					runHar(har);
-					
-				};
-				reader.readAsText(file);
-			}
-			
-			return false;
-		};
-		
-		$('body').on('dragover', function() {
-			var $drop = $('#drop');
-			if($drop.length) {
-				$drop.css('display', 'table');
-			}
-			else {
-				$(document.createElement('div'))
-				.attr('id', 'drop')
-				.css({
-					width:'100%',
-					height:'100%',
-					position:'fixed',
-					left:0,
-					top:0,
-					border:'7px dashed #666',
-					display:'table',
-					textAlign:'center',
-					backgroundColor:'rgba(0,0,0,.3)'
-				})
-				.append(
-					$(document.createElement('span'))
-					.text('Drop Here! :)')
-					.css({
-						color: '#EEE',
-						display:'table-cell',
-						'text-shadow': '2px 2px 5px #066',
-						fontSize:'50px',
-						verticalAlign:'middle'
-					})
-				)
-				.on('drop', function(evt) {
-					var $loader = $('.loader');
-					if($loader.length && $loader.is(':visible'))
-						return;
-					
-					return drop(evt);
-					
-				})
-				.appendTo(document.body);
-			}
-			$drop.data('hide','false');
-			return false;
-		}).on('dragend', function() {
-			return false;
-		}).on('dragleave', function() {
-			var $drop = $('#drop');
-			$drop.data('hide','true');
-			setTimeout(function() {
-				if($drop.data('hide') === 'true')
-					$drop.css('display', 'none');
-			}, 50);
-			return false;
-		}).on('drop', drop);
-		
-		
-		
-		
-	}).fail(function() {
-		$(document.createElement('p')).css({
-			width:'100%',
-			height:'100%',
-			position:'absolute',
-			left:0,
-			top:0,
-			textAlign:'center',
-			verticalAlign:'middle',
-			display:'table',
-			backgroundColor:'rgba(0,255,255,0.5)'
-		})
-		.append(
-			$(document.createElement('span'))
-			.text('Local Ajax is not supported :(')
-			.css({
-				display:'table-cell',
-				'text-shadow': '2px 2px 5px #333',
-				fontSize:'50px',
-				verticalAlign:'middle',
-				color:'rgb(0,200,200)',
-				fontWeight:'bold'
-			})
-		).appendTo(document.body);
-		$('body').html($('body').html().replace('{content}', ''));
-	});
-	
-	var translateTemplate = function(html) {
-		var translations = window.translations,
-			lng = navigator.language,
+	w.module = {};
+	$.create = function(e) {return $(d.createElement(e));};
+	var appendScript = function(path) {
+		return $.create('script').attr({
+			src: path,
+			id: path.split('/')[1].split('.')[0]
+		}).appendTo(d.body);
+	},
+	translateTemplate = function(html) {
+		var translations = w.translations,
+			lng = w.navigator.language,
 			replacer;
 		if(translations && translations[lng]) {
 			translations = translations[lng];
@@ -162,15 +22,11 @@ jQuery(function($) {
 		else if(translations === false || !translations[lng]) {
 			replacer = '$1';
 		}
-		// else {
-		// 	return setTimeout(function() {translateTemplate(elm);}, 500);
-		// }
 		
 		return html.replace(/\[([^\]]+)\]/g, replacer);
 		
-	};
-	
-	var replaceAll = function(_s, _f, _r, _c){ 
+	},
+	replaceAll = function(_s, _f, _r, _c) {
 
 		var o = _s.toString(),
 			r = '',
@@ -195,23 +51,44 @@ jQuery(function($) {
 
 		// Return New String
 		return r;
-	};
-	
-	var runHar = function(har) {
-		window.har = har;
-		var newHar = harParser(window.har, function(content) {
-			var elm = document.createElement('span');
-			elm.appendChild(document.createTextNode(content));
+	},
+	localAccessWarning = function() {
+		$.create('p')
+		.addClass('sh-localaccesswarning')
+		.append(
+			$.create('span')
+			.text('Local Ajax is not supported :(')
+		).appendTo(d.body);
+		$('body').html($('body').html().replace('{content}', ''));
+	},
+	runHar = function(har) {
+		w.har = har;
+		var newHar = harParser(w.har, function(content) {
+			var elm = d.createElement('span');
+			elm.appendChild(d.createTextNode(content));
 			return elm.innerHTML;
 		});
 		
+		for(var i=0, ilen=newHar.length, status;i<ilen;i++) {
+			newHar[i].order = i + 1;
+			newHar[i].rId = Math.floor((Math.random()*(new Date()).getTime())+1);
+			status = newHar[i].status;
+			if(!status || status < 300)
+				newHar[i].bgstatus = '';
+			else if(status >= 500)
+				newHar[i].bgstatus = 'danger';
+			else if(status >= 400)
+				newHar[i].bgstatus = 'warning';
+			else if(status >= 300)
+				newHar[i].bgstatus = 'redirect';
+		}
 		
 		
 		$.get('src/requestTemplate.html', function(template) {
 			var html =  '',
 				i = 0,
 				ilen = newHar.length,
-				table = $('table.har-table')[0],
+				$table = $('table.sh-table').eq(0),
 				prop, nHar = newHar[0], _html;
 			
 			for(;i<ilen;i++) {
@@ -222,24 +99,23 @@ jQuery(function($) {
 				}
 				html += _html;
 			}
-			table.getElementsByTagName('tbody')[0].innerHTML = translateTemplate(html);
-			table.getElementsByTagName('tfoot')[0]
-				 .getElementsByTagName('tr')[0].innerHTML = translateTemplate(newHar.info);
-			table.getElementsByTagName('caption')[0].innerHTML = (newHar.title);
-			$('.loader').hide();
+			$table.find('tbody').html(translateTemplate(html));
+			$table.find('tfoot tr').html(translateTemplate(newHar.info));
+			$table.find('caption').html(newHar.title);
+			$('.sh-loader').hide();
 			
 			
-			var $parseable = $(table).find('tr.top').find('td.type:contains(css)').add(
-					$(table).find('tr.top').find('td.type:contains(javascript)')
+			var $parseable = $table.find('tr.top').find('td.type:contains(css)').add(
+					$table.find('tr.top').find('td.type:contains(javascript)')
 				),
 				$parent = $parseable.parent(),
 				
 				parseContent = function(id, type) {
 					return function() {
 						var $inside = $('#inside-' + id),
-							tabs = translateTemplate('<li><a href="#parsedcontent">' + 
+							tabs = translateTemplate('<li><a href="#parsedcontent">' +
 													 '[Parsed Content]</a></li>'),
-							result = '<div class="parsedcontent hidden" style="' + 
+							result = '<div class="parsedcontent hidden" style="' +
 										$inside.find('div').eq(0).attr('style') + '">';
 						
 						
@@ -266,6 +142,114 @@ jQuery(function($) {
 			
 		});
 		
+	},
+	drop = function(evt) {
+		evt.stopPropagation();
+		evt.preventDefault();
+		
+		w.scrollTo(0,0);
+		
+		var files = evt.originalEvent.dataTransfer.files,
+			$drop = $('#drop'),
+			$loader = $('.sh-loader'),
+			file, reader;
+		
+		$drop
+			.css('display', 'none')
+			.data('hide', 'true');
+		
+		if(files.length) {
+			
+			if($loader.length)
+				$loader.show();
+			else
+				$loader = $.create('div').addClass('sh-loader').appendTo(d.body);
+		
+		
+			file = files[0];
+			
+			reader = new FileReader();
+			
+			reader.onload = function (evt) {
+				var har;
+				try {
+					har = JSON.parse(evt.target.result);
+				}
+				catch(e) {
+					w.alert(translateTemplate('[Invalid JSON]'));
+					$('.sh-loader').hide();
+					return;
+				}
+				$('.sh-table').find('tbody, tfoot tr, caption').html('');
+				$('.sh-table').find('.tooltip, .popover').remove();
+				
+				
+				runHar(har);
+				
+			};
+			reader.readAsText(file);
+		}
+		
+		return false;
+	},
+	dragover = function() {
+		var $drop = $('#drop');
+		if($drop.length) {
+			$drop.css('display', 'table');
+		}
+		else {
+			$.create('div')
+			.attr('id', 'drop')
+			.addClass('sh-dropfile')
+			.append($.create('span').text(translateTemplate('[Drop Here! :)]')))
+			.on('drop', function(evt) {
+				var $loader = $('.sh-loader');
+				if($loader.length && $loader.is(':visible'))
+					return;
+				
+				return drop(evt);
+				
+			})
+			.appendTo(d.body);
+		}
+		
+		$drop.data('hide','false');
+		return false;
+	},
+	dragleave = function() {
+		var $drop = $('#drop');
+		$drop.data('hide','true');
+		
+		setTimeout(function() {
+			if($drop.data('hide') === 'true')
+				$drop.css('display', 'none');
+		}, 50);
+		
+		return false;
 	};
+	appendScript('src/harParser.js');
+	appendScript('lib/unminify.js');
 	
-});
+	$.getJSON('src/translate.json', function(data) {
+		w.translations = data || false;
+	});
+	
+	$.get('src/template.html', function() {
+		$('.container').load('src/template.html table', function() {
+			var $table = $('table.sh-table');
+			$table.find('caption').html('');
+			$table.html(translateTemplate($table.html()));
+		});
+		
+		
+		
+		$('body')
+			.on('dragover', dragover)
+			.on('dragend', function() {return false;})
+			.on('dragleave', dragleave)
+			.on('drop', drop);
+			
+	})
+	.fail(localAccessWarning);
+	
+})(window, document, jQuery);
