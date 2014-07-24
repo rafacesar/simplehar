@@ -11,7 +11,6 @@ module.exports = function(grunt) {
 		addInteraction:true
 	};
 	browserJshintrc.node = false;
-	browserJshintrc.camelcase = false;
 	
 	
 	grunt.initConfig({
