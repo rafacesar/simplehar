@@ -1,172 +1,208 @@
-(function() {
+(function(w, d) {
 	'use strict';
-	var addInteraction = function() {
+	var addInteraction = function($) {
 		
-		if(typeof jQuery === 'undefined' || !jQuery('.inside').length)
+		if(typeof $ === 'undefined' || !$('.inside').length)
 			return waiting();
 		
-		var $ = jQuery,
-			$table = $('.sh-table'),
+		var $table = $('.sh-table'),
+			$tableParent = $table.parent(),
 			$inside = $table.find('.inside'),
 			$nav = $inside.find('.nav'),
 			$top = $table.find('.top'),
 			$timeline = $top.find('.timeline'),
 			$div = $inside.find('div'),
-			tooltipOpt = {
-				placement:'right',
-				trigger: 'hover',
-				html:true,
-				container:$table.parent()
-			},
-			tableWidth, i, ilen, half;
+			$dt = $inside.find('dt'),
+			tableWidth;
 		
-		$div.hide();
-		tableWidth = $table.width();
-		$div.show();
+		tableWidth = getTableWidth($table, $div);
 		
-		
-		var $dt = $inside.find('dt'), $_dt, _dtLength;
-		
-		ilen = $dt.length;
-		while(ilen--) {
-			$_dt = $dt[ilen];
-			_dtLength = $_dt.textContent.length;
-			if(_dtLength > 18) {
-				//if($_dt.clientWidth > 160)
-				$_dt.title = $_dt.textContent;
-			}
-		}
+		addTitles($dt);
 		
 		
 		$inside.addClass('hidden');
 		
-		$div.css('width', tableWidth - 10).end().each(function() {
-			var $div = $(this).find('div');
-			for(var i=1,ilen=$div.length;i<ilen;i++) {
-				$div.eq(i).addClass('hidden');
-			}
-		});
-		
-		$nav.on('click', 'a', function() {
-			
-			
-			var $this = $(this),
-				$inside = $this.parents('.inside'),
-				$div = $inside.find('div');
-			
-			$inside.find('.active').removeClass('active');
-			$this.parent().addClass('active');
-			
-			
-			$div.addClass('hidden');
-			$div.filter('.' + $this.attr('href').substr(1)).removeClass('hidden');
-			
-			
-			return false;
-		});
-		
-		$top.find('.url > div > a').click(function(evt) {
-			if(evt.which === 2)
-				evt.stopPropagation();
-			else {
-				$(this).parents('tr.top').click();
-				return false;
-			}
-		});
+		//Hiding content from tabs, but first
+		$div.css('width', tableWidth - 10).addClass('hidden').end()
+			.find('div:first').removeClass('hidden');
 		
 		$nav.find('li:first-child').addClass('active');
 		
-		$top.click(function() {
-			var $this = $(this),
-				$i = $this.find('i'),
-				classname = $i.get(0).className,
-				toggleClass = $i.data('toggle-sign'),
-				$next = $('#inside-' + $this.attr('id').substr(4));
-			
-			
-			
-			
-			if($this.hasClass('opened')) {
-				$this.removeClass('opened');
-				$next.addClass('hidden');
-			}
-			else {
-				
-				if($this.next() !== $next)
-					$this.after($next);
-				
-				$this.addClass('opened');
-				$next.removeClass('hidden');
-			}
-			$i.get(0).className = toggleClass;
-			$i.data('toggle-sign', classname);
-			return false;
-		});
+		//Tabs clicks listener
+		$nav.on('click', 'a', tabsListener);
 		
-		var $_top, $_bars, $_totalTime, _left, __left, _marginLeft, _space, j, jlen;
-		ilen = $top.length;
-		while(ilen--) {
-			$_top = $top.eq(ilen);
-			$_bars = $_top.find('div.progress-bar');
-			$_totalTime = $_top.find('span.totalTime');
-			_left = 0;
-			_marginLeft = 0;
-			_space = $_bars.siblings('.progress-bar-space').width();
-			
-			j = jlen = $_bars.length;
-			
-			while(j--) {
-				__left = parseFloat($_bars.eq(j).attr('style').replace('width:', ''));
-				if(__left > 0)
-					_left += __left;
-			}
-			
-			
-			if(_left > 80) {
-				if(_space > 10) {
-					for(j=1;j<jlen;j++)
-						_marginLeft += parseFloat($_bars.eq(j).width());
-					
-					_marginLeft += $_totalTime.width() + 5;
-					$_totalTime.css('marginLeft', _marginLeft * -1);
-				}
-				else {
-					_left = 0;
-					$_totalTime.css('font-weight', 'bold');
-				}
-			}
-			
-			$_totalTime.css('left', (_left + 0.5) + '%');
-			
+		//Middle click to open url
+		$top.find('td.url').find('div > a').click(middleClickListener);
+		
+		
+		//Toggle request click
+		$top.click(requestClickListener);
+		
+		totalStartTime($top);
+		
+		applyTooltip($top, $timeline, $tableParent);
+		
+		applyPopover($timeline, $tableParent);
+		
+		
+		
+		stupidtable($table);
+		
+		
+		
+		$('.sh-loader').hide();
+		
+	},
+	waiting = function() {
+		if(typeof jQuery === 'undefined' || !jQuery('.inside').length)
+			return setTimeout(waiting, 500);
+		$ = jQuery;
+		jQuery(addInteraction);
+	},
+	getTableWidth = function($table, $div) {
+		$div.hide();
+		var width = $table.width();
+		$div.show();
+		
+		return width;
+	},
+	//Adding title attribute to large descriptions
+	addTitles = function($dt) {
+		var i = 0,
+			ilen = $dt.length,
+			_$dt, text;
+		
+		for(;i<ilen;i++) {
+			_$dt = $dt.eq(i);
+			text = _$dt.text();
+			if(text.length > 18)
+				_$dt.attr('title', text);
 		}
+	},
+	applyTooltip = function($top, $timeline, $container) {
+		var tooltipOpt = {
+			placement:'right',
+			trigger: 'hover',
+			html:true,
+			container:$container
+		};
 		
-		var $_timeline = $top.find('.timeline');
-		$top
-			.find('td.size')
-				.add($_timeline.find('span.domloaded'))
-				.add($_timeline.find('span.renderstarted'))
-				.tooltip(tooltipOpt);
+		$top.find('td.size')
+			.add($timeline.find('span.domloaded, span.renderstarted'))
+			.tooltip(tooltipOpt);
+		
 		tooltipOpt.placement = 'left';
-		$top
-			.find('td.status, td.type')
-				.add($_timeline.find('span.windowloaded'))
-				.tooltip(tooltipOpt);
+		$top.find('td.status, td.type')
+			.add($timeline.find('span.windowloaded'))
+			.tooltip(tooltipOpt);
+	},
+	applyPopover = function($timeline, $container) {
+		var i = 0,
+			ilen = $timeline.length;
 		
-		if($timeline.length > 15) {
-			for(i=0, ilen=$timeline.length, half=ilen/2;i<ilen;i++)
-				$timeline.eq(i).data('placement', i<half?'bottom':'top');
+		if(ilen > 15) {
+			for(ilen=Math.floor($timeline.length/2);i<ilen;i++)
+				$timeline.eq(i).data('placement', 'bottom');
+			
+			for(ilen=$timeline.length;i<ilen;i++)
+				$timeline.eq(i).data('placement', 'top');
 		}
 		else {
-			for(i=0, ilen=$timeline.length;i<ilen;i++)
+			for(;i<ilen;i++)
 				$timeline.eq(i).data('placement', 'bottom');
 		}
 		
 		$timeline.popover({
 			html:true,
 			trigger:'hover',
-			container:$table.parent()
+			container:$container
 		});
+	},
+	tabsListener = function() {
+		var $this = $(this),
+			$inside = $this.parents('tr.inside'),
+			$div = $inside.find('div');
 		
+		$inside.find('.active').removeClass('active');
+		$this.parent().addClass('active');
+		
+		
+		$div
+			.addClass('hidden')
+			.filter('.' + $this.attr('href').substr(1))
+			.removeClass('hidden');
+		
+		
+		return false;
+	},
+	middleClickListener = function(evt) {
+		if(evt.which === 2)
+			evt.stopPropagation();
+		else {
+			$(this).parents('tr.top').click();
+			return false;
+		}
+	},
+	requestClickListener = function() {
+		var $this = $(this),
+			$i = $this.find('i'),
+			classname = $i.get(0).className,
+			toggleClass = $i.data('toggle-sign'),
+			$next = $('#inside-' + $this.attr('id').substr(4));
+		
+		
+		
+		
+		if($this.hasClass('opened')) {
+			$this.removeClass('opened');
+			$next.addClass('hidden');
+		}
+		else {
+			
+			if($this.next() !== $next)
+				$this.after($next);
+			
+			$this.addClass('opened');
+			$next.removeClass('hidden');
+		}
+		$i.get(0).className = toggleClass;
+		$i.data('toggle-sign', classname);
+		return false;
+	},
+	totalStartTime = function($row) {
+		var i = 0,
+			ilen = $row.length,
+			spacePct, widthPct,
+			$top, $bars, $startTime, $space,
+			getWidth = function() {
+				return parseFloat($(this).attr('style').replace('width:', ''));
+			},
+			sum = function(v1, v2) {
+				return v1 + v2;
+			};
+		
+		for(;i<ilen;i++) {
+			$top = $row.eq(i);
+			$bars = $top.find('div.progress-bar');
+			$startTime = $top.find('span.totalTime');
+			
+			$space = $top.find('div.progress-bar-space');
+			spacePct = parseFloat($space.attr('style').replace('width:', ''));
+			
+			widthPct = $bars.map(getWidth).toArray().reduce(sum);
+			
+			
+			if(spacePct > 80 || (widthPct > 80 && spacePct > 20))
+				$startTime.css('right', (100.5 - spacePct) + '%');
+			else if(widthPct > 80)
+				$startTime.css({left:'.5%', fontWeight:'bold'});
+			else
+				$startTime.css('left', (widthPct + 0.5) + '%');
+			
+		}
+		
+	},
+	stupidtable = function($table) {
 		if($table.stupidtable) {
 			$table.stupidtable({
 				url:function(a, b) {
@@ -196,23 +232,12 @@
 				$('.sh-loader').hide();
 			});
 		}
-		
-		$('.sh-loader').hide();
-		
-	};
-	
-
-	var waiting = function() {
-		if(typeof jQuery === 'undefined' || !jQuery('.inside').length)
-			return setTimeout(waiting, 500);
-		
-		jQuery(addInteraction);
-	};
-	if(!document.getElementById('harParser')) {
-		var div = document.createElement('div');
+	}, $;
+	if(!d.getElementById('harParser')) {
+		var div = d.createElement('div');
 		div.className = 'sh-loader';
-		document.body.appendChild(div);
+		d.body.appendChild(div);
 		waiting();
 	}
-	window.addInteraction = addInteraction;
-})();
+	w.addInteraction = addInteraction;
+})(window, document);
