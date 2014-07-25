@@ -56,7 +56,7 @@
 	waiting = function() {
 		if(typeof jQuery === 'undefined' || !jQuery('.inside').length)
 			return setTimeout(waiting, 500);
-		$ = jQuery;
+
 		jQuery(addInteraction);
 	},
 	getTableWidth = function($table, $div) {
@@ -119,7 +119,7 @@
 		});
 	},
 	tabsListener = function() {
-		var $this = $(this),
+		var $this = jQuery(this),
 			$inside = $this.parents('tr.inside'),
 			$div = $inside.find('div');
 		
@@ -139,16 +139,16 @@
 		if(evt.which === 2)
 			evt.stopPropagation();
 		else {
-			$(this).parents('tr.top').click();
+			jQuery(this).parents('tr.top').click();
 			return false;
 		}
 	},
 	requestClickListener = function() {
-		var $this = $(this),
+		var $this = jQuery(this),
 			$i = $this.find('i'),
 			classname = $i.get(0).className,
 			toggleClass = $i.data('toggle-sign'),
-			$next = $('#inside-' + $this.attr('id').substr(4));
+			$next = jQuery('#inside-' + $this.attr('id').substr(4));
 		
 		
 		
@@ -175,7 +175,7 @@
 			spacePct, widthPct,
 			$top, $bars, $startTime, $space,
 			getWidth = function() {
-				return parseFloat($(this).attr('style').replace('width:', ''));
+				return parseFloat(jQuery(this).attr('style').replace('width:', ''));
 			},
 			sum = function(v1, v2) {
 				return v1 + v2;
@@ -195,7 +195,7 @@
 			if(spacePct > 80 || (widthPct > 80 && spacePct > 20))
 				$startTime.css('right', (100.5 - spacePct) + '%');
 			else if(widthPct > 80)
-				$startTime.css({left:'.5%', fontWeight:'bold'});
+				$startTime.css({left:'5px', fontWeight:'bold'});
 			else
 				$startTime.css('left', (widthPct + 0.5) + '%');
 			
@@ -225,14 +225,14 @@
 				}
 			});
 			$table.bind('beforetablesort', function() {
-				$('tr.top.opened').click();
-				$('.sh-loader').show();
+				jQuery('tr.top.opened').click();
+				jQuery('.sh-loader').show();
 			});
 			$table.bind('aftertablesort', function() {
-				$('.sh-loader').hide();
+				jQuery('.sh-loader').hide();
 			});
 		}
-	}, $;
+	};
 	if(!d.getElementById('harParser')) {
 		var div = d.createElement('div');
 		div.className = 'sh-loader';
