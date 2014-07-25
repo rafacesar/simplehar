@@ -382,65 +382,75 @@ describe('Har Parser', function() {
 	
 	it('should return the object list with progress parsed informations', function() {
 		expect(harParser.convertProgress).to.throwError();
-		expect(harParser.convertProgress([{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0}, {startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0}], 50)).to.eql([ { progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0 }, { progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0 } ]);
+		expect(harParser.convertProgress([
+			{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0, ssl:0},
+			{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0, ssl:0}
+		], 50)).to.eql([
+			{ progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 0ms</em></p>', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0, sslWidth: 0 },
+			{ progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 0ms</em></p>', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0, sslWidth: 0 }
+		]);
 		expect(harParser.convertProgress([
 			{
-				startedDateTime:1, blocked:2, dns:3, connect:4, send:5, wait:6, receive:7, total:15
+				startedDateTime:1, blocked:2, dns:3, connect:4, send:5, wait:6, receive:7, total:15, ssl:47
 			},
 			{
-				startedDateTime:8, blocked:9, dns:10, connect:11, send:12, wait:13, receive:14, total:0
+				startedDateTime:8, blocked:9, dns:10, connect:11, send:12, wait:13, receive:14, total:0, ssl:52
 			},
 			{
-				startedDateTime:13, blocked:12, dns:11, connect:10, send:9, wait:8, receive:7
+				startedDateTime:13, blocked:12, dns:11, connect:10, send:9, wait:8, receive:7, ssl:18
 			},
 			{
-				startedDateTime:6, blocked:5, dns:4, connect:3, send:2, wait:1, receive:0
+				startedDateTime:6, blocked:5, dns:4, connect:3, send:2, wait:1, receive:0, ssl:21
 			}
 		], 178.9)).to.eql([
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
-				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 6ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 7ms</em></p>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 6ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 7ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 47ms</em></p>',
 				startPosition: 0,
 				blockedWidth: "1.1179429849077698%",
 				dnsWidth: "1.6769144773616544%",
 				connectWidth: "2.2358859698155396%",
 				sendWidth: "2.794857462269424%",
+				sslWidth: "26.271660145332586%",
 				waitWidth: "3.353828954723309%",
 				totalTime: '15ms',
 				receiveWidth: "3.9128004471771938%"
 			},
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 7ms</em>',
-				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 9ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 10ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 11ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 12ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 13ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 14ms</em></p>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 9ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 10ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 11ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 12ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 13ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 14ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 52ms</em></p>',
 				startPosition: "3.9128004471771938%",
 				blockedWidth: "5.0307434320849636%",
 				dnsWidth: "5.589714924538848%",
 				connectWidth: "6.148686416992733%",
 				sendWidth: "6.707657909446618%",
+				sslWidth: "29.066517607602012%",
 				waitWidth: "7.266629401900503%",
 				totalTime: '0ms',
 				receiveWidth: "7.8256008943543875%"
 			},
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 12ms</em>',
-				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 12ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 11ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 10ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 9ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 8ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 7ms</em></p>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 12ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 11ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 10ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 9ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 8ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 7ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 18ms</em></p>',
 				startPosition: "6.707657909446618%",
 				blockedWidth: "6.707657909446618%",
 				dnsWidth: "6.148686416992733%",
 				connectWidth: "5.589714924538848%",
 				sendWidth: "5.0307434320849636%",
+				sslWidth: "10.061486864169927%",
 				waitWidth: "4.471771939631079%",
 				totalTime: '0ms',
 				receiveWidth: "3.9128004471771938%"
 			},
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 5ms</em>',
-				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 1ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 1ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 21ms</em></p>',
 				startPosition: "2.794857462269424%",
 				blockedWidth: "2.794857462269424%",
 				dnsWidth: "2.2358859698155396%",
 				connectWidth: "1.6769144773616544%",
 				sendWidth: "1.1179429849077698%",
+				sslWidth: "11.738401341531581%",
 				totalTime: '0ms',
 				waitWidth: "0.5589714924538849%",
 				receiveWidth: 0
@@ -861,12 +871,13 @@ describe('Har Parser', function() {
 					progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 1ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 119ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>',
 					startPosition: 0,
 					blockedWidth: '0.8064510859455214%',
-					dnsWidth: '-0.8064511415244168%',
-					connectWidth: '-0.8064511415244168%',
+					dnsWidth: '0',
+					connectWidth: '0',
 					sendWidth: 0,
+					sslWidth: 0,
 					waitWidth: '95.96768598711243%',
 					receiveWidth: '0.00009989179840567282%',
-					totalTime: '118ms',
+					totalTime: '120ms',
 					windowloaded: '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (124ms)" style="left:100%"></span>',
 					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (125ms)" style="left:100.80639269055209%"></span>',
 					renderstarted: '<span class="renderstarted" data-toggle="tooltip" title="[Start Render] (121ms)" style="left:97.58068858185382%"></span>'
