@@ -410,24 +410,41 @@ harParser.parseContent = function(content, url, mime, htmlEncode) {
 //Return object with progress informations
 harParser.parseProgress = function(entry) {
 	'use strict';
-	var timings = entry.timings;
+	var timings = entry.timings,
+		blocked = timings.blocked,
+		dns = timings.dns,
+		connect = timings.connect,
+		send = timings.send,
+		wait = timings.wait,
+		receive = timings.receive,
+		ssl = timings.ssl,
+		_blocked = blocked >= 0?blocked:0,
+		_dns = dns >= 0?dns:0,
+		_connect = connect >= 0?connect:0,
+		_send = send >= 0?send:0,
+		_wait = wait >= 0?wait:0,
+		_receive = receive >= 0?receive:0,
+		_ssl = ssl >= 0?ssl:0;
+	
+	
 	
 	return {
 		startedDateTime:(new Date(entry.startedDateTime)).getTime(),
 		time: entry.time,
-		blocked: timings.blocked,
-		dns: timings.dns,
-		connect: timings.connect,
-		send: timings.send,
-		wait: timings.wait,
-		receive: timings.receive,
-		ssl: timings.ssl,
-		total:	timings.blocked +
-				timings.dns +
-				timings.connect +
-				timings.send +
-				timings.wait +
-				timings.receive
+		blocked: blocked,
+		dns: dns,
+		connect: connect,
+		send: send,
+		wait: wait,
+		receive: receive,
+		ssl: ssl,
+		total:	_blocked +
+				_dns +
+				_connect +
+				_send +
+				_wait +
+				_receive +
+				_ssl
 	};
 };
 //Add tag strong and classname
@@ -679,7 +696,16 @@ harParser.convertProgress = function(progress, lastTime) {
 		ilen = progress.length,
 		result = [],
 		progressContent, startedTime, r,
-		blocked, dns, connect, send, wait, receive, p,
+		steps = [
+			{classname:'warning',title:'Blocking',step:'blocked'},
+			{classname:'last',title:'DNS',step:'dns'},
+			{classname:'info',title:'Connect',step:'connect'},
+			{classname:'primary',title:'Send',step:'send'},
+			{classname:'danger',title:'Wait',step:'wait'},
+			{classname:'success',title:'Receive',step:'receive'},
+			{classname:'last',title:'SSL',step:'ssl'}
+		],
+		step, j, jlen = steps.length, p,
 		progressRow = function(bg, title, value) {
 			var result = '<p class=\'clearfix bg-' + bg + '\'>';
 			
@@ -702,38 +728,22 @@ harParser.convertProgress = function(progress, lastTime) {
 		
 		p = progress[i];
 		
-		
-		blocked = p.blocked;
-		dns = p.dns;
-		connect = p.connect;
-		send = p.send;
-		wait = p.wait;
-		receive = p.receive;
-		
+		startedTime = p.startedDateTime - firstTime;
 		
 		progressContent = '';
 		
-		if(blocked >= 0)
-			progressContent += progressRow('warning', 'Blocking', blocked);
+		for(j=0;j<jlen;j++) {
+			step = steps[j];
+			
+			if(p[step.step] >= 0) {
+				progressContent += progressRow(step.classname, step.title, p[step.step]);
+				r[step.step + 'Width'] = harParser.pct(p[step.step], lastTime);
+			}
+			else
+				r[step.step + 'Width'] = '0';
+			
+		}
 		
-		if(dns >= 0)
-			progressContent += progressRow('last', 'DNS', dns);
-		
-		if(connect >= 0)
-			progressContent += progressRow('info', 'Connect', connect);
-		
-		if(send >= 0)
-			progressContent += progressRow('primary', 'Send', send);
-		
-		if(wait >= 0)
-			progressContent += progressRow('danger', 'Wait', wait);
-		
-		if(receive >= 0)
-			progressContent += progressRow('success', 'Receive', receive);
-		
-		
-		
-		startedTime = p.startedDateTime - firstTime;
 		
 		if(progressContent !== '' && startedTime >= 0)
 			r.progressStart = tinyRow('Start Time', startedTime);
@@ -744,12 +754,7 @@ harParser.convertProgress = function(progress, lastTime) {
 		
 		
 		r.startPosition = harParser.pct(startedTime, lastTime);
-		r.blockedWidth = harParser.pct(blocked, lastTime);
-		r.dnsWidth = harParser.pct(dns, lastTime);
-		r.connectWidth = harParser.pct(connect, lastTime);
-		r.sendWidth = harParser.pct(send, lastTime);
-		r.waitWidth = harParser.pct(wait, lastTime);
-		r.receiveWidth = harParser.pct(receive, lastTime);
+		
 		
 		r.totalTime = harParser.timeFormatter(p.total);
 		
