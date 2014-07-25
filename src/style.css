@@ -1,32 +1,30 @@
 /* simplehar: 0.15.1 */
-.container caption:empty {
-	display:none;
-}
-.container caption {
+.sh-container caption:empty {display:none}
+
+.sh-container caption {
 	font-size:20px;
 	font-family:"Trebuchet MS", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	text-align:center;
 	color:#999;
 	background-color:#EEE;
 }
-.sh-table .top {
-	font-size:12px;
-}
+
+.sh-table .top {font-size:12px}
+
 .sh-table .url {
 	width:300px;
 	white-space:nowrap;
 	position:relative;
 	padding:0;
 }
-.url > div,
-.timeline > div {
-	position:relative;
-}
-.table-condensed>tbody>tr>td,
-.url > div {
-	padding:3px 5px;
-}
-.url strong {
+
+.sh-table .url > div,
+.sh-table .timeline > div {position:relative}
+
+.sh-table > tbody > tr > td,
+.sh-table .url > div {padding:3px 5px}
+
+.sh-table .url strong {
 	display:block;
 	overflow:hidden;
 	width:350px;
@@ -34,13 +32,11 @@
 	text-overflow:ellipsis;
 	font-weight:normal;
 }
-.url strong em {
-	color:#888;
-}
 
-.sh-table {
-	counter-reset:request;
-}
+.sh-table .url strong em {color:#888}
+
+.sh-table {counter-reset:request}
+
 .sh-table .url div > strong:before {
 	counter-increment:request;
 	content:counter(request) ". ";
@@ -53,22 +49,20 @@
 	text-indent:0;
 }
 
-.url strong strong {
+.sh-table .url strong strong {
 	font-weight:bold;
 	display:inline;
 }
-.container {
-	position:relative;
-}
+.sh-container {position:relative}
 
-.container .url i {
+.sh-container .url i {
 	position:absolute;
 	left:3px;
 	font-size:10px;
 	top:6px;
 }
 
-.container .url a {
+.sh-container .url a {
 	display:none;
 	white-space:nowrap;
 	cursor:pointer;
@@ -86,79 +80,72 @@
 	font-weight:normal;
 }
 
-.container .status {
+.sh-container .status {
 	white-space:nowrap;
 	text-overflow:ellipsis;
 	width:55px;
 	text-align:center;
 }
-.container .type {
+.sh-container .type {
 	white-space:nowrap;
 	text-overflow:ellipsis;
 	width:70px;
 }
 
-.bg-redirect {
-	background-color:#F0F0F0;
-}
+.sh-table .bg-redirect {background-color:#F0F0F0}
 
-.container .size {
+.sh-container .size {
 	text-align:right;
 	width:95px;
 }
-.container .size em {
-	color:#999;
-}
-.container .size strong {
+.sh-container .size em {color:#999}
+
+.sh-container .size strong {
 	text-decoration:underline;
 	font-weight:normal;
 }
-.container .timeline {
+.sh-container .timeline {
 	width:600px;
 	position:relative;
 	padding:0;
 }
 
-.inside div {
+.sh-table .inside div {
 	background-color:#fff;
 	padding:20px 10px 5px;
 	border:1px solid #ddd;
 	border-top:0;
 }
-.inside div dl {
-	padding-left:15px;
-}
-.inside div .headers-title:first-child {
-	margin-top:0;
-}
+.sh-table .inside div dl {padding-left:15px}
 
-.inside dd {
+.sh-table .inside div .headers-title:first-child {margin-top:0}
+
+.sh-table .inside dd {
 	word-wrap: break-word;
 	word-break:break-all;
 	min-height:20px;
 }
 
-.inside .content pre,
-.inside .content {
+.sh-table .inside .content pre,
+.sh-table .inside .content {
 	width:100%;
 	display:block;
 	word-wrap: break-word;
 	word-break:break-all;
 }
-.inside .content {overflow:hidden}
 
-.progress {
+.sh-table .inside .content {overflow:hidden}
+
+.sh-table .progress {
 	margin-bottom:0;
 	height:23px;
 }
 
-.progress-bar-secondary {
-  background-color:#B45CB8;
-}
-.progress-bar-last {
-	background-color:#B7B7B7;
-}
-.progress-bar-space {
+.sh-table .progress-bar-secondary {background-color:#B45CB8}
+
+.sh-table .progress-bar-last {background-color:#B7B7B7}
+
+.sh-table .progress-bar-space {
 	background:transparent;
 	overflow:hidden;
 	text-indent:-5000px;
@@ -166,54 +153,41 @@
 	direction:ltr;
 }
 
-.bg-secondary {
+.sh-table .bg-secondary {
 	background-color:#B45CB8;
 	color:#FFF;
 }
-.bg-last {
-	background-color:#B7B7B7;
-}
-.popover {
-	max-width:300px;
-}
-.popover p {
+.sh-table .bg-last {background-color:#B7B7B7}
+
+.sh-table .popover {max-width:300px}
+
+.sh-table .popover p {
 	padding:5px;
 	white-space:nowrap;
 	width:270px;
 	margin:0;
 }
-.popover p strong {
-	float:left;
-}
-.popover p em {
-	float:right;
-}
-.popover .bg-info {
-	background-color:#5bc0de;
-}
+.sh-table .popover p strong {float:left}
 
-.popover .start-time strong,
-.popover .start-time em {
-	text-decoration:underline;
-}
-.popover-title {
-	height:35px;
-}
-.popover-title strong {
-	float:left;
-}
-.popover-title em {
-	float:right;
-}
+.sh-table .popover p em {float:right}
 
-tfoot td {
-	position:relative;
-}
-tfoot th {
-	font-size:12px;
-}
+.sh-table .popover .bg-info {background-color:#5bc0de}
 
-.domloaded {
+.sh-table .popover .start-time strong,
+.sh-table .popover .start-time em {text-decoration:underline}
+
+.sh-table .popover-title {height:35px}
+
+.sh-table .popover-title strong {float:left}
+
+.sh-table .popover-title em {float:right}
+
+.sh-table tfoot td {position:relative}
+
+.sh-table tfoot th {font-size:12px}
+
+
+.sh-table .domloaded {
 	display:block;
 	border-left:1px solid #5cb85c;
 	height:24px;
@@ -222,7 +196,8 @@ tfoot th {
 	bottom:0;
 	background-color:#000;
 }
-.windowloaded {
+
+.sh-table .windowloaded {
 	display:block;
 	border-left:1px solid #d9534f;
 	height:24px;
@@ -231,7 +206,7 @@ tfoot th {
 	bottom:0;
 	background-color:#000;
 }
-.renderstarted {
+.sh-table .renderstarted {
 	display:block;
 	border-left:1px solid #5BC0DE;
 	height:24px;
@@ -241,7 +216,8 @@ tfoot th {
 	background-color:#000;
 }
 
-.sorting-asc:after, .sorting-desc:after {
+.sh-table .sorting-asc:after,
+.sh-table .sorting-desc:after {
 	display:inline-block;
 	font-family:'Glyphicons Halflings';
 	font-weight:400;
@@ -252,18 +228,13 @@ tfoot th {
 	padding-left:4px;
 	font-size:12px;
 }
-.sorting-desc:after {
-	content:"\e156";
-}
+.sh-table .sorting-desc:after {content:"\e156"}
 
-.container thead th {
-	cursor:pointer;
-}
-.container thead th:hover {
-	text-decoration:underline;
-}
+.sh-container thead th {cursor:pointer}
 
-.totalTime {
+.sh-container thead th:hover {text-decoration:underline}
+
+.sh-table .totalTime {
 	position:absolute;
 	font-size:11px;
 	line-height:20px;
