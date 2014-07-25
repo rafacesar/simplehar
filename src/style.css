@@ -153,34 +153,34 @@
 	direction:ltr;
 }
 
-.sh-table .bg-secondary {
+.sh-container .bg-secondary {
 	background-color:#B45CB8;
 	color:#FFF;
 }
-.sh-table .bg-last {background-color:#B7B7B7}
+.sh-container .bg-last {background-color:#B7B7B7}
 
-.sh-table .popover {max-width:300px}
+.sh-container .popover {max-width:300px}
 
-.sh-table .popover p {
+.sh-container .popover p {
 	padding:5px;
 	white-space:nowrap;
 	width:270px;
 	margin:0;
 }
-.sh-table .popover p strong {float:left}
+.sh-container .popover p strong {float:left}
 
-.sh-table .popover p em {float:right}
+.sh-container .popover p em {float:right}
 
-.sh-table .popover .bg-info {background-color:#5bc0de}
+.sh-container .popover .bg-info {background-color:#5bc0de}
 
-.sh-table .popover .start-time strong,
-.sh-table .popover .start-time em {text-decoration:underline}
+.sh-container .popover .start-time strong,
+.sh-container .popover .start-time em {text-decoration:underline}
 
-.sh-table .popover-title {height:35px}
+.sh-container .popover-title {height:35px}
 
-.sh-table .popover-title strong {float:left}
+.sh-container .popover-title strong {float:left}
 
-.sh-table .popover-title em {float:right}
+.sh-container .popover-title em {float:right}
 
 .sh-table tfoot td {position:relative}
 
