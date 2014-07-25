@@ -302,8 +302,12 @@ harParser.parseSize = function(size, compressed, status) {
 
 	if(status === 304)
 		mainSize = harParser.em(mainSize);
-	else if((status === 200 || !status) && (!compressed || compressed < 0))
-		mainSize = harParser.strong(mainSize);
+	else if((status === 200 || !status) && (!compressed || compressed < 0)) {
+		if(status === 200 && compressed <= 0)
+			mainSize = harParser.strong(mainSize, 'text-danger');
+		else
+			mainSize = harParser.strong(mainSize);
+	}
 	
 	
 	return {
