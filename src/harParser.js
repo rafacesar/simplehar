@@ -105,8 +105,9 @@ var harParser = module.exports = function(har, htmlEncode) {
 		info+= '<th colspan="3" class="text-right">';
 		info+= size.total + ' (' + size.compressed + ' [compressed])</th>';
 		info+= '<th class="text-center">';
-		info+= load.content?'('+load.content+') ':'';
-		info+= load.on + '</th>';
+		if(load.content)
+			info+= '<span title="DOMContentLoaded" class="text-success">('+load.content+')</span> ';
+		info+= '<span title="Page Loaded" class="text-danger">' + load.on + '</span></th>';
 		
 		return info;
 	},
