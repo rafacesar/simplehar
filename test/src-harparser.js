@@ -98,7 +98,7 @@ describe('Har Parser', function() {
 		expect(harParser.parseSize(50, 0, 200)).to.eql({
 			originalSize: '50 Bytes',
 			originalCompressed: '0 Bytes',
-			size: '<strong>50 Bytes</strong>',
+			size: '<strong class="text-danger">50 Bytes</strong>',
 			complete: 50,
 			compressed: 0
 		});
@@ -112,7 +112,7 @@ describe('Har Parser', function() {
 		expect(harParser.parseSize(0, 0, 200)).to.eql({
 			originalSize: '0 Bytes',
 			originalCompressed: '0 Bytes',
-			size: '<strong>0 Bytes</strong>',
+			size: '<strong class="text-danger">0 Bytes</strong>',
 			complete: 0,
 			compressed: 0
 		});
@@ -126,7 +126,7 @@ describe('Har Parser', function() {
 		expect(harParser.parseSize(-10, -20, 200)).to.eql({
 			originalSize: '-10 Bytes',
 			originalCompressed: '-20 Bytes',
-			size: '<strong>0 Bytes</strong>',
+			size: '<strong class="text-danger">0 Bytes</strong>',
 			complete: -10,
 			compressed: -20
 		});
@@ -874,7 +874,7 @@ describe('Har Parser', function() {
 					dnsWidth: '0',
 					connectWidth: '0',
 					sendWidth: 0,
-					sslWidth: 0,
+					sslWidth: '0',
 					waitWidth: '95.96768598711243%',
 					receiveWidth: '0.00009989179840567282%',
 					totalTime: '120ms',
@@ -885,8 +885,8 @@ describe('Har Parser', function() {
 			];
 		
 		result.title = 'http://example.com/';
-		result.info = '<th>1 [requests]</th><th colspan="3" class="text-right">1.24 KB (1.24 KB [compressed])</th><th class="text-center">(125ms) 124ms</th>';
-		
+		result.info = '<th>1 [requests]</th><th colspan="3" class="text-right">1.24 KB (1.24 KB [compressed])</th><th class="text-center"><span title="DOMContentLoaded" class="text-success">(125ms)</span> <span title="Page Loaded" class="text-danger">124ms</span></th>';
+
 		expect(harParser(JSON.parse(har))).to.eql(result);
 	});
 });
