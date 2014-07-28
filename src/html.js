@@ -140,6 +140,8 @@
 					parseContent($parent.eq(ilen).attr('id').substr(4), $parseable.eq(ilen).text()),
 				100);
 			
+			$('.sh-container .popover, .sh-container .tooltip').remove();
+			
 			addInteraction($);
 			
 		});
