@@ -1,0 +1,29 @@
+{
+	"node": true,
+	"browser": false,
+	"esnext": false,
+	"bitwise": true,
+	"camelcase": true,
+	"curly": false,
+	"freeze": true,
+	"eqeqeq": true,
+	"immed": true,
+	"indent": 4,
+	"globals": {
+		"unescape":true
+	},
+	"maxparams": 4,
+	"newcap": true,
+	"noempty": true,
+	"nonbsp": true,
+	"noarg": true,
+	"quotmark": "single",
+	"latedef": true,
+	"undef": true,
+	"unused": "strict",
+	"strict": true,
+	"trailing": true,
+	"smarttabs": true,
+	"maxcomplexity": 10,
+	"maxlen": 100
+}

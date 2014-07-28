@@ -6,9 +6,9 @@ describe('Har Parser', function() {
 	it('should parse the method', function() {
 		expect(harParser.parseMethod('get')).to.be('');
 		expect(harParser.parseMethod('GET')).to.be('');
-		expect(harParser.parseMethod('post')).to.be('<strong>post</strong>');
-		expect(harParser.parseMethod('POST')).to.be('<strong>POST</strong>');
-		expect(harParser.parseMethod('HEAD')).to.be('<strong>HEAD</strong>');
+		expect(harParser.parseMethod('post')).to.be('<strong>post </strong>');
+		expect(harParser.parseMethod('POST')).to.be('<strong>POST </strong>');
+		expect(harParser.parseMethod('HEAD')).to.be('<strong>HEAD </strong>');
 	});
 	it('should parse the http status', function() {
 		expect(harParser.parseStatus(0, '')).to.eql({
@@ -98,7 +98,7 @@ describe('Har Parser', function() {
 		expect(harParser.parseSize(50, 0, 200)).to.eql({
 			originalSize: '50 Bytes',
 			originalCompressed: '0 Bytes',
-			size: '<strong>50 Bytes</strong>',
+			size: '<strong class="text-danger">50 Bytes</strong>',
 			complete: 50,
 			compressed: 0
 		});
@@ -112,7 +112,7 @@ describe('Har Parser', function() {
 		expect(harParser.parseSize(0, 0, 200)).to.eql({
 			originalSize: '0 Bytes',
 			originalCompressed: '0 Bytes',
-			size: '<strong>0 Bytes</strong>',
+			size: '<strong class="text-danger">0 Bytes</strong>',
 			complete: 0,
 			compressed: 0
 		});
@@ -126,7 +126,7 @@ describe('Har Parser', function() {
 		expect(harParser.parseSize(-10, -20, 200)).to.eql({
 			originalSize: '-10 Bytes',
 			originalCompressed: '-20 Bytes',
-			size: '<strong>0 Bytes</strong>',
+			size: '<strong class="text-danger">0 Bytes</strong>',
 			complete: -10,
 			compressed: -20
 		});
@@ -324,5 +324,569 @@ describe('Har Parser', function() {
 		expect(harParser.em('')).to.be('<em></em>');
 		expect(harParser.em('test')).to.be('<em>test</em>');
 		expect(harParser.em('test', 'testing')).to.be('<em class="testing">test</em>');
+	});
+	it('should return pct value', function() {
+		expect(harParser.pct()).to.be(0);
+		expect(harParser.pct('')).to.be(0);
+		expect(harParser.pct(35, 100)).to.be('35%');
+		expect(harParser.pct(35, 50)).to.be('70%');
+		expect(harParser.pct(35, .1)).to.be('35000%');
+		expect(harParser.pct(2, 100)).to.be('2%');
+		expect(harParser.pct(.1, 100)).to.be('0.1%');
+		expect(harParser.pct(58, 100)).to.be('58%');
+	});
+	it('should format time', function() {
+		expect(harParser.timeFormatter(600,2)).to.be('600ms');
+		expect(harParser.timeFormatter(6000,2)).to.be('6s');
+		expect(harParser.timeFormatter(321456,2)).to.be('5.36min');
+		expect(harParser.timeFormatter(725769.35737,3)).to.be('12.096min');
+		expect(harParser.timeFormatter(1000000000,2)).to.be('277.78h');
+		expect(harParser.timeFormatter(1000,2)).to.be('1s');
+		expect(harParser.timeFormatter(3211313132,5)).to.be('892.03143h');
+		expect(harParser.timeFormatter(725769.35,5)).to.be('12.09616min');
+	});
+	
+	it('should decode a text', function() {
+		expect(harParser.decode('%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC')).to.be('][áóçõü');
+	});
+	it('should decode a multiple encoded text', function() {
+		expect(harParser.decoder('%2525255B')).to.be('[');
+		expect(harParser.decoder('%25252525255B')).to.be('[');
+		expect(harParser.decoder('%252525255B%5B')).to.be('[[');
+		
+	});
+	
+	it('should filter a list of objects attributes', function() {
+		expect(harParser.filterObjList([{some:'object'}, { attr:'Test', value:'anything'}, {attr:'anothertest', value:'other thing'}, {attr:'my', value:'test'}, {attr:'testing', value:'again'}, {attr:'something', value:'some value'}], 'attr', 'test')).to.eql([{some:'object'}, {attr:'my', value:'test'}, {attr:'something', value:'some value'}]);
+		expect(harParser.filterObjList([{anotherattrname:'test', value:'anything'}, {anotherattrname:'anothertest', value:'other thing'}, {anotherattrname:'my', value:'test'}, {anotherattrname:'testing', value:'again'}, {anotherattrname:'something', value:'some value'}], 'anotherattrname', 'test')).to.eql([{anotherattrname:'my', value:'test'}, {anotherattrname:'something', value:'some value'}]);
+	});
+	
+	it('should decode object list', function() {
+		expect(harParser.decodeObj([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'test', value:'][áóçõü'}, {name:'testing',value:'][áóçõü'}]);
+		expect(harParser.decodeObj([{name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.eql([{name:'testing',value:'][áóçõü'}]);
+	});
+	
+	it('should generate a DL list', function() {
+		expect(harParser.objToDl([{name:'test',value:'][áóçõü'}, {name:'testing',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}])).to.be('<dl class="dl-horizontal"><dt>test</dt><dd>][áóçõü</dd><dt>testing</dt><dd>%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC</dd></dl>');
+		expect(harParser.objToDl([{name:'test',value:'%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC'}, {name:'testing',value:'][áóçõü'}])).to.be('<dl class="dl-horizontal"><dt>test</dt><dd>%5D%5B%C3%A1%C3%B3%C3%A7%C3%B5%C3%BC</dd><dt>testing</dt><dd>][áóçõü</dd></dl>');
+	});
+	
+	it('should generate an object with the tab content', function() {
+		expect(harParser.tabContainer).to.throwError();
+		expect(harParser.tabContainer({tab:'headers', decode:false, filter:'cookie'}, {headers:[{name:'teste', value:'value'}, {name:'testeCookie', value:'value'}]}, {headers:[{name:'teste', value:'value'}, {name:'testeCookie', value:'value'}]})).to.eql({ tabs: '<li><a href="#headers">[Headers]</a></li>',containers: '<div class="headers"><h3 class="headers-title"><small>[Request Headers]</small></h3><dl class="dl-horizontal"><dt>teste</dt><dd>value</dd></dl><h3 class="headers-title"><small>[Response Headers]</small></h3><dl class="dl-horizontal"><dt>teste</dt><dd>value</dd></dl></div>'});
+		expect(harParser.tabContainer({tab:'test', decode:true}, {test:[{name:'teste', value:'value'}]}, {test:[{name:'teste', value:'value'}]})).to.eql({ tabs: '<li><a href="#test">[Test]</a></li><li><a href="#parsedtest">[Parsed Test]</a></li>',containers: '<div class="test"><h3 class="headers-title"><small>[Request Test]</small></h3><dl class="dl-horizontal"><dt>teste</dt><dd>value</dd></dl><h3 class="headers-title"><small>[Response Test]</small></h3><dl class="dl-horizontal"><dt>teste</dt><dd>value</dd></dl></div><div class="parsedtest"><h3 class="headers-title"><small>[Request Test]</small></h3><dl class="dl-horizontal"><dt>teste</dt><dd>value</dd></dl><h3 class="headers-title"><small>[Response Test]</small></h3><dl class="dl-horizontal"><dt>teste</dt><dd>value</dd></dl></div>'});
+		expect(harParser.tabContainer({tab:'tabname', decode:false}, {tabname:[{name:'testing', value:'v%C3%A1l%C3%BC%C3%A8'}]}, {tabname:[{name:'another test', value:'my value;with something;here'}]})).to.eql({ tabs: '<li><a href="#tabname">[Tabname]</a></li>',containers: '<div class="tabname"><h3 class="headers-title"><small>[Request Tabname]</small></h3><dl class="dl-horizontal"><dt>testing</dt><dd>v%C3%A1l%C3%BC%C3%A8</dd></dl><h3 class="headers-title"><small>[Response Tabname]</small></h3><dl class="dl-horizontal"><dt>another test</dt><dd>my value;<br>with something;<br>here</dd></dl></div>'});
+		expect(harParser.tabContainer({tab:'tabname', decode:true, filter:'cookie'}, {tabname:[{name:'testingCookie', value:'v%C3%A1l%C3%BC%C3%A8'}]}, {tabname:[{name:'another test', value:'my value;with %C3%A0n%C3%93therth%C3%AD%C3%B1g;here'}]})).to.eql({ tabs: '<li><a href="#tabname">[Tabname]</a></li><li><a href="#parsedtabname">[Parsed Tabname]</a></li>',containers: '<div class="tabname"><h3 class="headers-title"><small>[Response Tabname]</small></h3><dl class="dl-horizontal"><dt>another test</dt><dd>my value;<br>with %C3%A0n%C3%93therth%C3%AD%C3%B1g;<br>here</dd></dl></div><div class="parsedtabname"><h3 class="headers-title"><small>[Response Tabname]</small></h3><dl class="dl-horizontal"><dt>another test</dt><dd>my value;<br>with ànÓtherthíñg;<br>here</dd></dl></div>'});
+		expect(harParser.tabContainer({tab:'tabname', decode:true}, {tabname:[{name:'some name', value:'v%C3%A1l%C3%BC%C3%A8'}]}, {tabname:[{name:'another test', value:'my value;with %C3%A0n%C3%93therth%C3%AD%C3%B1g;here'}]})).to.eql({ tabs: '<li><a href="#tabname">[Tabname]</a></li><li><a href="#parsedtabname">[Parsed Tabname]</a></li>',containers: '<div class="tabname"><h3 class="headers-title"><small>[Request Tabname]</small></h3><dl class="dl-horizontal"><dt>some name</dt><dd>v%C3%A1l%C3%BC%C3%A8</dd></dl><h3 class="headers-title"><small>[Response Tabname]</small></h3><dl class="dl-horizontal"><dt>another test</dt><dd>my value;<br>with %C3%A0n%C3%93therth%C3%AD%C3%B1g;<br>here</dd></dl></div><div class="parsedtabname"><h3 class="headers-title"><small>[Request Tabname]</small></h3><dl class="dl-horizontal"><dt>some name</dt><dd>válüè</dd></dl><h3 class="headers-title"><small>[Response Tabname]</small></h3><dl class="dl-horizontal"><dt>another test</dt><dd>my value;<br>with ànÓtherthíñg;<br>here</dd></dl></div>'});
+	});
+	
+	it('should return the object list with progress parsed informations', function() {
+		expect(harParser.convertProgress).to.throwError();
+		expect(harParser.convertProgress([
+			{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0, ssl:0},
+			{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0, ssl:0}
+		], 50)).to.eql([
+			{ progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 0ms</em></p>', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0, sslWidth: 0 },
+			{ progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 0ms</em></p>', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0, sslWidth: 0 }
+		]);
+		expect(harParser.convertProgress([
+			{
+				startedDateTime:1, blocked:2, dns:3, connect:4, send:5, wait:6, receive:7, total:15, ssl:47
+			},
+			{
+				startedDateTime:8, blocked:9, dns:10, connect:11, send:12, wait:13, receive:14, total:0, ssl:52
+			},
+			{
+				startedDateTime:13, blocked:12, dns:11, connect:10, send:9, wait:8, receive:7, ssl:18
+			},
+			{
+				startedDateTime:6, blocked:5, dns:4, connect:3, send:2, wait:1, receive:0, ssl:21
+			}
+		], 178.9)).to.eql([
+			{
+				progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 6ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 7ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 47ms</em></p>',
+				startPosition: 0,
+				blockedWidth: "1.1179429849077698%",
+				dnsWidth: "1.6769144773616544%",
+				connectWidth: "2.2358859698155396%",
+				sendWidth: "2.794857462269424%",
+				sslWidth: "26.271660145332586%",
+				waitWidth: "3.353828954723309%",
+				totalTime: '15ms',
+				receiveWidth: "3.9128004471771938%"
+			},
+			{
+				progressStart: '<strong>[Start Time]: </strong> <em> 7ms</em>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 9ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 10ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 11ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 12ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 13ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 14ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 52ms</em></p>',
+				startPosition: "3.9128004471771938%",
+				blockedWidth: "5.0307434320849636%",
+				dnsWidth: "5.589714924538848%",
+				connectWidth: "6.148686416992733%",
+				sendWidth: "6.707657909446618%",
+				sslWidth: "29.066517607602012%",
+				waitWidth: "7.266629401900503%",
+				totalTime: '0ms',
+				receiveWidth: "7.8256008943543875%"
+			},
+			{
+				progressStart: '<strong>[Start Time]: </strong> <em> 12ms</em>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 12ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 11ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 10ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 9ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 8ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 7ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 18ms</em></p>',
+				startPosition: "6.707657909446618%",
+				blockedWidth: "6.707657909446618%",
+				dnsWidth: "6.148686416992733%",
+				connectWidth: "5.589714924538848%",
+				sendWidth: "5.0307434320849636%",
+				sslWidth: "10.061486864169927%",
+				waitWidth: "4.471771939631079%",
+				totalTime: '0ms',
+				receiveWidth: "3.9128004471771938%"
+			},
+			{
+				progressStart: '<strong>[Start Time]: </strong> <em> 5ms</em>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 1ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[SSL]: </strong> <em> 21ms</em></p>',
+				startPosition: "2.794857462269424%",
+				blockedWidth: "2.794857462269424%",
+				dnsWidth: "2.2358859698155396%",
+				connectWidth: "1.6769144773616544%",
+				sendWidth: "1.1179429849077698%",
+				sslWidth: "11.738401341531581%",
+				totalTime: '0ms',
+				waitWidth: "0.5589714924538849%",
+				receiveWidth: 0
+			}
+		]);
+	});
+
+	it('should convert har request to a new object', function() {
+		expect(true).to.be.ok();
+		expect(harParser.convertHar({
+        "startedDateTime": "2014-07-21T21:18:46.161Z",
+        "time": 167.9999828338623,
+        "request": {
+          "method": "GET",
+          "url": "http://example.com/",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip,deflate,sdch"
+            },
+            {
+              "name": "Host",
+              "value": "example.com"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
+            }
+          ],
+          "queryString": [],
+          "cookies": [],
+          "headersSize": 358,
+          "bodySize": 0
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Date",
+              "value": "Mon, 21 Jul 2014 21:18:46 GMT"
+            },
+            {
+              "name": "x-ec-custom-error",
+              "value": "1"
+            },
+            {
+              "name": "Last-Modified",
+              "value": "Fri, 09 Aug 2013 23:54:35 GMT"
+            },
+            {
+              "name": "Server",
+              "value": "ECS (fll/0761)"
+            },
+            {
+              "name": "Etag",
+              "value": "\"359670651\""
+            },
+            {
+              "name": "X-Cache",
+              "value": "HIT"
+            },
+            {
+              "name": "Content-Type",
+              "value": "text/html"
+            },
+            {
+              "name": "Cache-Control",
+              "value": "max-age=604800"
+            },
+            {
+              "name": "Accept-Ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "Content-Length",
+              "value": "1270"
+            },
+            {
+              "name": "Expires",
+              "value": "Mon, 28 Jul 2014 21:18:46 GMT"
+            }
+          ],
+          "cookies": [],
+          "content": {
+            "size": 1270,
+            "mimeType": "text/html",
+            "compression": 0,
+            "text": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n"
+          },
+          "redirectURL": "",
+          "headersSize": 321,
+          "bodySize": 1270
+        },
+        "cache": {},
+        "timings": {
+          "blocked": 0,
+          "dns": 0,
+          "connect": 50.00000004656613,
+          "send": 0,
+          "wait": 116.99999996926636,
+          "receive": 0.9999828180298209,
+          "ssl": -1
+        },
+        "connection": "26436",
+        "pageref": "page_1"
+      }, 10, function() {return arguments[0];})).to.eql({
+		  "fileName": "http://example.com/",
+		  "fullMimeType": "text/html",
+		  "fullSize": "1270 Bytes",
+		  "fullStatus": "200 OK",
+		  "method": "",
+		  "mime": "html",
+		  "params": "",
+		  "size": "1270 Bytes",
+		  "sizeToShow": "1.24 KB",
+		  "status": 200,
+		  "fullUrl": "http://example.com/",
+		  "fileContent": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n",
+		  "tabContainers": "<div class=\"headers\"><h3 class=\"headers-title\"><small>[Request Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class=\"headers-title\"><small>[Response Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:18:46 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\"359670651\"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:18:46 GMT</dd></dl></div><div class=\"content\"><pre class=\"pre-scrollable\"><!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n</pre></div>",
+		  "tabs": "<li><a href=\"#headers\">[Headers]</a></li><li><a href=\"#content\">[Content]</a></li>"
+	  });
+		expect(harParser.convertHar({
+        "startedDateTime": "2014-07-21T21:18:46.161Z",
+        "time": 167.9999828338623,
+        "request": {
+          "method": "POST",
+          "url": "https://example.com/",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip,deflate,sdch"
+            },
+            {
+              "name": "Host",
+              "value": "example.com"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
+            }
+          ],
+          "queryString": [],
+          "cookies": [],
+          "headersSize": 358,
+          "bodySize": 0
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Date",
+              "value": "Mon, 21 Jul 2014 21:18:46 GMT"
+            },
+            {
+              "name": "x-ec-custom-error",
+              "value": "1"
+            },
+            {
+              "name": "Last-Modified",
+              "value": "Fri, 09 Aug 2013 23:54:35 GMT"
+            },
+            {
+              "name": "Server",
+              "value": "ECS (fll/0761)"
+            },
+            {
+              "name": "Etag",
+              "value": "\"359670651\""
+            },
+            {
+              "name": "X-Cache",
+              "value": "HIT"
+            },
+            {
+              "name": "Content-Type",
+              "value": "text/html"
+            },
+            {
+              "name": "Cache-Control",
+              "value": "max-age=604800"
+            },
+            {
+              "name": "Accept-Ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "Content-Length",
+              "value": "1270"
+            },
+            {
+              "name": "Expires",
+              "value": "Mon, 28 Jul 2014 21:18:46 GMT"
+            }
+          ],
+          "cookies": [],
+          "content": {
+            "size": 1270,
+            "mimeType": "text/html",
+            "compression": 0,
+            "text": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n"
+          },
+          "redirectURL": "",
+          "headersSize": 321,
+          "bodySize": 1270
+        },
+        "cache": {},
+        "timings": {
+          "blocked": 0,
+          "dns": 0,
+          "connect": 50.00000004656613,
+          "send": 0,
+          "wait": 116.99999996926636,
+          "receive": 0.9999828180298209,
+          "ssl": -1
+        },
+        "connection": "26436",
+        "pageref": "page_1"
+      }, 1, function() {return arguments[0];})).to.eql({
+		  "fileName": "<strong class=\"text-success\">/</strong>",
+		  "fullMimeType": "text/html",
+		  "fullSize": "1270 Bytes",
+		  "fullStatus": "200 OK",
+		  "method": "<strong>POST </strong>",
+		  "mime": "html",
+		  "params": "",
+		  "size": "1270 Bytes",
+		  "sizeToShow": "1.24 KB",
+		  "status": 200,
+		  "fullUrl": "https://example.com/",
+		  "fileContent": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n",
+		  "tabContainers": "<div class=\"headers\"><h3 class=\"headers-title\"><small>[Request Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class=\"headers-title\"><small>[Response Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:18:46 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\"359670651\"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:18:46 GMT</dd></dl></div><div class=\"content\"><pre class=\"pre-scrollable\"><!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n</pre></div>",
+		  "tabs": "<li><a href=\"#headers\">[Headers]</a></li><li><a href=\"#content\">[Content]</a></li>"
+	  });
+	  expect(harParser.convertHar({
+        "startedDateTime": "2014-07-21T21:43:30.804Z",
+        "time": 235.0001335144043,
+        "request": {
+          "method": "GET",
+          "url": "http://example.com/?testing=something",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip,deflate,sdch"
+            },
+            {
+              "name": "Host",
+              "value": "example.com"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
+            }
+          ],
+          "queryString": [
+            {
+              "name": "testing",
+              "value": "something"
+            }
+          ],
+          "cookies": [],
+          "headersSize": 376,
+          "bodySize": 0
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Date",
+              "value": "Mon, 21 Jul 2014 21:43:30 GMT"
+            },
+            {
+              "name": "x-ec-custom-error",
+              "value": "1"
+            },
+            {
+              "name": "Last-Modified",
+              "value": "Fri, 09 Aug 2013 23:54:35 GMT"
+            },
+            {
+              "name": "Server",
+              "value": "ECS (fll/0761)"
+            },
+            {
+              "name": "Etag",
+              "value": "\"359670651\""
+            },
+            {
+              "name": "X-Cache",
+              "value": "HIT"
+            },
+            {
+              "name": "Content-Type",
+              "value": "text/html"
+            },
+            {
+              "name": "Cache-Control",
+              "value": "max-age=604800"
+            },
+            {
+              "name": "Accept-Ranges",
+              "value": "bytes"
+            },
+            {
+              "name": "Content-Length",
+              "value": "1270"
+            },
+            {
+              "name": "Expires",
+              "value": "Mon, 28 Jul 2014 21:43:30 GMT"
+            }
+          ],
+          "cookies": [],
+          "content": {
+            "size": 1270,
+            "mimeType": "text/html",
+            "compression": 0,
+            "text": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n"
+          },
+          "redirectURL": "",
+          "headersSize": 321,
+          "bodySize": 1270
+        },
+        "cache": {},
+        "timings": {
+          "blocked": 0,
+          "dns": 0,
+          "connect": 116.99999996926636,
+          "send": 0,
+          "wait": 118.0000000167638,
+          "receive": 0.00013352837413549423,
+          "ssl": -1
+        },
+        "connection": "42661",
+        "pageref": "page_2"
+      }, 1)).to.eql({
+		  "fileName": "/",
+		  "fullMimeType": "text/html",
+		  "fullSize": "1270 Bytes",
+		  "fullStatus": "200 OK",
+		  "method": "",
+		  "mime": "html",
+		  "params": "?testing=something",
+		  "size": "1270 Bytes",
+		  "sizeToShow": "1.24 KB",
+		  "status": 200,
+		  "fullUrl": "http://example.com/?testing=something",
+		  "fileContent": "",
+		  "tabContainers": "<div class=\"headers\"><h3 class=\"headers-title\"><small>[Request Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class=\"headers-title\"><small>[Response Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:43:30 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\"359670651\"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:43:30 GMT</dd></dl></div><div class=\"queryString\"><h3 class=\"headers-title\"><small>[Request QueryString]</small></h3><dl class=\"dl-horizontal\"><dt>testing</dt><dd>something</dd></dl></div><div class=\"parsedqueryString\"><h3 class=\"headers-title\"><small>[Request QueryString]</small></h3><dl class=\"dl-horizontal\"><dt>testing</dt><dd>something</dd></dl></div>",
+		  "tabs": "<li><a href=\"#headers\">[Headers]</a></li><li><a href=\"#queryString\">[QueryString]</a></li><li><a href=\"#parsedqueryString\">[Parsed QueryString]</a></li>"
+	  });
+	});
+	it('should parse the Har File', function() {
+		var fs = require('fs'),
+			path = require('path'),
+			har = fs.readFileSync(path.join(path.dirname(__filename),'test.har')).toString();
+			result = [
+				{
+					method: '',
+					fullUrl: 'http://example.com/',
+					fileName: '/',
+					params: '',
+					status: 200,
+					fullStatus: '200 OK',
+					mime: 'html',
+					fullMimeType: 'text/html',
+					size: '1270 Bytes',
+					fullSize: '1270 Bytes',
+					sizeToShow: '1.24 KB',
+					tabs: '<li><a href="#headers">[Headers]</a></li>',
+					tabContainers: '<div class="headers"><h3 class="headers-title"><small>[Request Headers]</small></h3><dl class="dl-horizontal"><dt>Pragma</dt><dd>no-cache</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.114 Safari/537.36</dd><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Cache-Control</dt><dd>no-cache</dd><dt>Connection</dt><dd>keep-alive</dd></dl><h3 class="headers-title"><small>[Response Headers]</small></h3><dl class="dl-horizontal"><dt>Date</dt><dd>Fri, 13 Jun 2014 22:37:28 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>"359670651"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Fri, 20 Jun 2014 22:37:28 GMT</dd></dl></div>',
+					fileContent: '',
+					progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
+					progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 1ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 119ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>',
+					startPosition: 0,
+					blockedWidth: '0.8064510859455214%',
+					dnsWidth: '0',
+					connectWidth: '0',
+					sendWidth: 0,
+					sslWidth: '0',
+					waitWidth: '95.96768598711243%',
+					receiveWidth: '0.00009989179840567282%',
+					totalTime: '120ms',
+					windowloaded: '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (124ms)" style="left:100%"></span>',
+					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (125ms)" style="left:100.80639269055209%"></span>',
+					renderstarted: '<span class="renderstarted" data-toggle="tooltip" title="[Start Render] (121ms)" style="left:97.58068858185382%"></span>'
+				}
+			];
+		
+		result.title = 'http://example.com/';
+		result.info = '<th>1 [requests]</th><th colspan="3" class="text-right">1.24 KB (1.24 KB [compressed])</th><th class="text-center"><span title="DOMContentLoaded" class="text-success">(125ms)</span> <span title="Page Loaded" class="text-danger">124ms</span></th>';
+
+		expect(harParser(JSON.parse(har))).to.eql(result);
 	});
 });
