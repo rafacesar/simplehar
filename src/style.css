@@ -1,4 +1,4 @@
-/* simplehar: 0.17.0 */
+/* simplehar: 0.17.1 */
 .sh-container caption:empty {display:none}
 
 .sh-container caption {
@@ -228,6 +228,14 @@
 	font-size:12px;
 }
 .sh-table .sorting-desc:after {content:"\e156"}
+
+.sh-table th.stat {position:relative}
+
+.sh-table th.stat:after {
+	position:absolute;
+	left:-10px;
+	padding:5px 0;
+}
 
 .sh-container thead th {cursor:pointer}
 
