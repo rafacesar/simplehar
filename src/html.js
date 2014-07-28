@@ -2,7 +2,8 @@
 	'use strict';
 	w.module = {};
 	$.create = function(e) {return $(d.createElement(e));};
-	var appendScript = function(path) {
+	var
+	appendScript = function(path) {
 		return $.create('script').attr({
 			src: path,
 			id: path.split('/')[1].split('.')[0]
@@ -89,7 +90,8 @@
 				i = 0,
 				ilen = newHar.length,
 				$table = $('table.sh-table').eq(0),
-				prop, nHar = newHar[0], _html;
+				prop, nHar = newHar[0], _html,
+				$parseable, $parent, parseContent;
 			
 			for(;i<ilen;i++) {
 				nHar = newHar[i];
@@ -105,31 +107,31 @@
 			$('.sh-loader').hide();
 			
 			
-			var $parseable = $table.find('tr.top').find('td.type:contains(css)').add(
-					$table.find('tr.top').find('td.type:contains(javascript)')
-				),
-				$parent = $parseable.parent(),
-				
-				parseContent = function(id, type) {
-					return function() {
-						var $inside = $('#inside-' + id),
-							tabs = translateTemplate('<li><a href="#parsedcontent">' +
-													 '[Parsed Content]</a></li>'),
-							result = '<div class="parsedcontent hidden" style="' +
-										$inside.find('div').eq(0).attr('style') + '">';
-						
-						
-						result += '<pre class="pre-scrollable">';
-						if(type.indexOf('css') !== -1)
-							result += unminify.css($inside.find('.content pre').html() || '');
-						else if(type.indexOf('javascript') !== -1)
-							result += unminify.js($inside.find('.content pre').html() || '');
-						result += '</pre>';
-						result += '</div>';
-						$inside.find('.nav')[0].innerHTML += tabs;
-						$inside.find('td').append($(result));
-					};
+			$parseable = $table.find('tr.top').find('td.type:contains(css)').add(
+				$table.find('tr.top').find('td.type:contains(javascript)')
+			);
+			$parent = $parseable.parent();
+			
+			parseContent = function(id, type) {
+				return function() {
+					var $inside = $('#inside-' + id),
+						tabs = translateTemplate('<li><a href="#parsedcontent">' +
+												 '[Parsed Content]</a></li>'),
+						result = '<div class="parsedcontent hidden" style="' +
+									$inside.find('div').eq(0).attr('style') + '">';
+					
+					
+					result += '<pre class="pre-scrollable">';
+					if(type.indexOf('css') !== -1)
+						result += unminify.css($inside.find('.content pre').html() || '');
+					else if(type.indexOf('javascript') !== -1)
+						result += unminify.js($inside.find('.content pre').html() || '');
+					result += '</pre>';
+					result += '</div>';
+					$inside.find('.nav')[0].innerHTML += tabs;
+					$inside.find('td').append($(result));
 				};
+			};
 			
 			ilen = $parent.length;
 			
