@@ -2,7 +2,7 @@
 	'use strict';
 	var addInteraction = function($) {
 		
-		if(typeof $ === 'undefined' || !$('.inside').length)
+		if(typeof $ === 'undefined' || !$('.sh-table .inside').length)
 			return waiting();
 		
 		var $table = $('.sh-table'),
