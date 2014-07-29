@@ -705,10 +705,10 @@ harParser.convertProgress = function(progress, lastTime) {
 			{classname:'warning',title:'Blocking',step:'blocked'},
 			{classname:'last',title:'DNS',step:'dns'},
 			{classname:'info',title:'Connect',step:'connect'},
+			{classname:'secondary',title:'SSL',step:'ssl'},
 			{classname:'primary',title:'Send',step:'send'},
 			{classname:'danger',title:'Wait',step:'wait'},
-			{classname:'success',title:'Receive',step:'receive'},
-			{classname:'last',title:'SSL',step:'ssl'}
+			{classname:'success',title:'Receive',step:'receive'}
 		],
 		step, j, jlen = steps.length, p,
 		progressRow = function(bg, title, value) {

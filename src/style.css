@@ -1,4 +1,4 @@
-/* simplehar: 0.17.1 */
+/* simplehar: 0.17.2 */
 .sh-container caption:empty {display:none}
 
 .sh-container caption {
@@ -144,6 +144,7 @@
 
 .sh-table .progress-bar-last {background-color:#B7B7B7}
 
+
 .sh-table .progress-bar-space {
 	background:transparent;
 	overflow:hidden;
@@ -152,10 +153,8 @@
 	direction:ltr;
 }
 
-.sh-container .bg-secondary {
-	background-color:#B45CB8;
-	color:#FFF;
-}
+.sh-container .bg-secondary {background-color:#D797DA}
+
 .sh-container .bg-last {background-color:#B7B7B7}
 
 .sh-container .popover {max-width:300px}
