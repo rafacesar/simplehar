@@ -36,7 +36,7 @@
 .sh-table .url strong em {color:#888}
 
 
-.sh-table .url div b.order {
+.sh-table .url div > .order {
 	position:absolute;
 	display:block;
 	left:-28px;
