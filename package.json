@@ -22,7 +22,7 @@
   "bugs": {
     "url": "https://github.com/rafacesar/simplehar/issues"
   },
-  "homepage": "https://github.com/rafacesar/simplehar",
+  "homepage": "http://rafacesar.github.io/simplehar/",
   "devDependencies": {
     "expect.js": "^0.3.1",
     "grunt": "^0.4.5",
