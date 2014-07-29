@@ -1,10 +1,10 @@
 {
   "name": "simplehar",
-  "version": "0.12.0",
+  "version": "0.17.2",
   "description": "Har viewer made simple",
   "main": "./lib/simplehar.js",
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt --force"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,12 @@
   },
   "homepage": "https://github.com/rafacesar/simplehar",
   "devDependencies": {
-    "grunt": "~0.4.4"
+    "expect.js": "^0.3.1",
+    "grunt": "^0.4.5",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-mocha-test": "^0.11.0",
+    "mocha": "^1.20.1",
+    "grunt-contrib-csslint": "^0.2.0"
   },
   "dependencies": {
     "html-entities": "~1.0.10"

@@ -1,10 +1,10 @@
 <tr class="top bg-{bgstatus}" id="top-{rId}">
 	<td class="url">
 		<div>
-			
-			<i class="glyphicon {sign}" data-toggle-sign="glyphicon {toggleSign}"></i>
+			<b class="order">{order}.</b>
+			<i class="glyphicon glyphicon-chevron-down" data-toggle-sign="glyphicon glyphicon-chevron-up"></i>
 			<a href="{fullUrl}">{fullUrl}</a>
-			<strong><span class="order">{order}.</span>{method} {fileName}<em>{params}</em></strong>
+			<strong>{method}{fileName}<em>{params}</em></strong>
 		</div>
 	</td>
 	<td class="status" data-toggle="tooltip" title="{fullStatus}">{status}</td>
@@ -18,6 +18,7 @@
 				<div class="progress-bar progress-bar-warning" style="width:{blockedWidth}"></div>
 				<div class="progress-bar progress-bar-last" style="width:{dnsWidth}"></div>
 				<div class="progress-bar progress-bar-info" style="width:{connectWidth}"></div>
+				<div class="progress-bar progress-bar-secondary" style="width:{sslWidth}"></div>
 				<div class="progress-bar progress-bar-primary" style="width:{sendWidth}"></div>
 				<div class="progress-bar progress-bar-danger" style="width:{waitWidth}"></div>
 				<div class="progress-bar progress-bar-success" style="width:{receiveWidth}"></div>
