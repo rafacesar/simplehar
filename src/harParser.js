@@ -712,17 +712,25 @@ harParser.convertProgress = function(progress, lastTime) {
 		],
 		step, j, jlen = steps.length, p,
 		progressRow = function(bg, title, value) {
-			var result = '<p class=\'clearfix bg-' + bg + '\'>';
-			
-			result += tinyRow(title, value);
-			
-			result += '</p>';
-			
-			return result;
+			if(value > 0) {
+				var result = '<p class=\'clearfix bg-' + bg + '\'>';
+				
+				result += tinyRow(title, value);
+				
+				result += '</p>';
+				
+				return result;
+			}
+			return '';
 		},
 		tinyRow = function(title, value) {
-			var result = '<strong>[' + title + ']: </strong> ';
-			result += '<em> ' + harParser.timeFormatter(value, 3) + '</em>';
+			var result = '<strong>[' + title + ']: </strong> ',
+				time = harParser.timeFormatter(value, 3);
+			
+			if(parseFloat(time) === 0 && value > 0)
+				time = '< ' + harParser.timeFormatter(1, 3);
+			
+			result += '<em> ' + time + '</em>';
 			return result;
 		};
 	
@@ -750,7 +758,7 @@ harParser.convertProgress = function(progress, lastTime) {
 		}
 		
 		
-		if(progressContent !== '' && startedTime >= 0)
+		if(startedTime >= 0)
 			r.progressStart = tinyRow('Start Time', startedTime);
 		else
 			r.progressStart = '';

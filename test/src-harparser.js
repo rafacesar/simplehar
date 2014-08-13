@@ -386,8 +386,8 @@ describe('Har Parser', function() {
 			{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0, ssl:0},
 			{startedDateTime:0, blocked:0, dns:0, connect:0, send:0, wait:0, receive:0, ssl:0}
 		], 50)).to.eql([
-			{ progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0, sslWidth: 0 },
-			{ progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0, sslWidth: 0 }
+			{ progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0, sslWidth: 0 },
+			{ progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>', totalTime: '0ms', progressContent: '', startPosition: 0, blockedWidth: 0, dnsWidth: 0, connectWidth: 0, sendWidth: 0, waitWidth: 0, receiveWidth: 0, sslWidth: 0 }
 		]);
 		expect(harParser.convertProgress([
 			{
@@ -444,7 +444,7 @@ describe('Har Parser', function() {
 			},
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 5ms</em>',
-				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 21ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 1ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>',
+				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 21ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 1ms</em></p>',
 				startPosition: "2.794857462269424%",
 				blockedWidth: "2.794857462269424%",
 				dnsWidth: "2.2358859698155396%",
@@ -868,7 +868,7 @@ describe('Har Parser', function() {
 					tabContainers: '<div class="headers"><h3 class="headers-title"><small>[Request Headers]</small></h3><dl class="dl-horizontal"><dt>Pragma</dt><dd>no-cache</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.114 Safari/537.36</dd><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Cache-Control</dt><dd>no-cache</dd><dt>Connection</dt><dd>keep-alive</dd></dl><h3 class="headers-title"><small>[Response Headers]</small></h3><dl class="dl-horizontal"><dt>Date</dt><dd>Fri, 13 Jun 2014 22:37:28 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>"359670651"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Fri, 20 Jun 2014 22:37:28 GMT</dd></dl></div>',
 					fileContent: '',
 					progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
-					progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 1ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 119ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0ms</em></p>',
+					progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 1ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 119ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> < 1ms</em></p>',
 					startPosition: 0,
 					blockedWidth: '0.8064510859455214%',
 					dnsWidth: '0',
