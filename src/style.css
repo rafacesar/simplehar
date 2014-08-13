@@ -138,6 +138,10 @@
 .sh-table .progress {
 	margin-bottom:0;
 	height:23px;
+	border-radius:0;
+	-webkit-box-shadow: -1px 0 3px rgba(0, 0, 0, 0.2);
+		-moz-box-shadow:-1px 0 3px rgba(0, 0, 0, 0.2);
+			box-shadow: -1px 0 3px rgba(0, 0, 0, 0.2);
 }
 
 .sh-table .progress-bar-secondary {background-color:#B45CB8}
@@ -151,6 +155,9 @@
 	text-indent:-5000px;
 	text-align:left;
 	direction:ltr;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+	box-shadow: none;
 }
 
 .sh-container .bg-secondary {background-color:#D797DA}
