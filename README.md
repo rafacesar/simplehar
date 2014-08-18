@@ -4,7 +4,8 @@
 ## Getting Started
 This viewer can be used within a server and accessing `index.html` in your browser or you can use it as a [node](http://nodejs.org) app.
 
-You can also access [rafacesar.github.io/simplehar](http://rafacesar.github.io/simplehar/) and use it online.
+You can also access [rafacesar.github.io/simplehar](http://rafacesar.github.io/simplehar/) and use it online!  
+To understand how the information is displayed, check [the explanation](https://github.com/rafacesar/simplehar/blob/master/howto/docs.md).
 
 The viewer needs __Bootstrap(+3.0.0)__ and __jQuery(+2.1.0)__ to work.
 
