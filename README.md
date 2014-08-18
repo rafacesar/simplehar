@@ -1,6 +1,7 @@
 # Simple Har
 > Har viewer made simple
 
+[![Build Status](https://travis-ci.org/rafacesar/simplehar.svg?branch=master)](https://travis-ci.org/rafacesar/simplehar)
 ## Getting Started
 This viewer can be used within a server and accessing `index.html` in your browser or you can use it as a [node](http://nodejs.org) app.
 
