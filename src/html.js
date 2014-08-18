@@ -236,24 +236,26 @@
 	
 	$.getJSON('src/translate.json', function(data) {
 		w.translations = data || false;
+		
+		$.get('src/template.html', function() {
+			$('.container').load('src/template.html table', function() {
+				var $table = $('table.sh-table');
+				$table.find('caption').html('');
+				$table.html(translateTemplate($table.html()));
+			});
+			
+			
+			
+			$('body')
+				.on('dragover', dragover)
+				.on('dragend', function() {return false;})
+				.on('dragleave', dragleave)
+				.on('drop', drop);
+				
+		})
+		.fail(localAccessWarning);
 	});
 	
-	$.get('src/template.html', function() {
-		$('.container').load('src/template.html table', function() {
-			var $table = $('table.sh-table');
-			$table.find('caption').html('');
-			$table.html(translateTemplate($table.html()));
-		});
-		
-		
-		
-		$('body')
-			.on('dragover', dragover)
-			.on('dragend', function() {return false;})
-			.on('dragleave', dragleave)
-			.on('drop', drop);
-			
-	})
-	.fail(localAccessWarning);
+	
 	
 })(window, document, jQuery);
