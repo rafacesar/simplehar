@@ -11,6 +11,8 @@
 		"Wait":"Aguardando",
 		"Receive":"Recebendo",
 		"Headers":"Cabeçalhos",
-		"requests":"requisições"
+		"requests":"requisições",
+		"Drop your harfile here!":"Jogue seu arquivo HAR aqui!",
+		"Drop Here! :)":"Pode soltar! :)"
 	}
 }
