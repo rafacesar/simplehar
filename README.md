@@ -16,7 +16,7 @@ npm install simplehar
 ```
 Or globally:
 ```shell
-node install -g simplehar
+npm install -g simplehar
 ```
 
 ### Using as a dependency
