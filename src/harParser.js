@@ -111,86 +111,96 @@ var harParser = module.exports = function(har, htmlEncode) {
 		
 		return info;
 	},
-	
-	
-	page = har.pages[0],
-	entries = filterEntryByPage(har.entries, page.id),
-	pageTimings = page.pageTimings,
-	onContentLoad = pageTimings.onContentLoad || false,
-	onLoad = pageTimings.onLoad,
-	totalSize = 0,
-	totalCompressedSize = 0,
-	lastTimeArray = [onLoad],
-	i = 0,
-	ilen = entries.length,
-	progress = [],
-	prop, lastTime, hResponse, hProgress, hEntry;
-	
-	
-	entries.sort(sortEntries);
-	
-	for(;i<ilen;i++) {
-		hEntry = entries[i];
-		hResponse = hEntry.response;
+	parsePages = function(har) {
+		var hars = har.pages.filter(function(page) {return !!page.id;});
 		
+		if(!hars.length)
+			hars = [har.pages[0]];
 		
-		totalSize += hResponse.content.size;
-		totalCompressedSize += hResponse.bodySize;
-		
-		hProgress = harParser.parseProgress(hEntry);
-		progress.push(hProgress);
-		
-		
-		hEntry = entries[i] = harParser.convertHar(hEntry, i, htmlEncode);
-		
-		lastTimeArray.push(
-			(hProgress.total + hProgress.startedDateTime) - progress[0].startedDateTime
-		);
-	}
+		hars = hars.map(function(page) {
+			var entries = filterEntryByPage(har.entries, page.id),
+				pageTimings = page.pageTimings,
+				onContentLoad = pageTimings.onContentLoad || false,
+				onLoad = pageTimings.onLoad,
+				totalSize = 0,
+				totalCompressedSize = 0,
+				lastTimeArray = [onLoad],
+				i = 0,
+				ilen = entries.length,
+				progress = [],
+				prop, lastTime, hResponse, hProgress, hEntry;
+			
+			entries.sort(sortEntries);
+			
+			for(;i<ilen;i++) {
+				hEntry = entries[i];
+				hResponse = hEntry.response;
+				
+				
+				totalSize += hResponse.content.size;
+				totalCompressedSize += hResponse.bodySize;
+				
+				hProgress = harParser.parseProgress(hEntry);
+				progress.push(hProgress);
+				
+				
+				hEntry = entries[i] = harParser.convertHar(hEntry, i, htmlEncode);
+				
+				lastTimeArray.push(
+					(hProgress.total + hProgress.startedDateTime) - progress[0].startedDateTime
+				);
+			}
 
+			
+			lastTime = Math.max.apply(null, lastTimeArray);
+			
+			progress = harParser.convertProgress(progress, lastTime);
+			
+			for(i=0;i<ilen;i++) {
+				hProgress = progress[i];
+				for(prop in hProgress) {
+					entries[i][prop] = hProgress[prop];
+				}
+			}
+			
+			entries = verticalMarkers(entries, {
+				onLoad:onLoad,
+				lastTime:lastTime,
+				load:onContentLoad,
+				loadText:onContentLoad?harParser.pct(onContentLoad, lastTime):'',
+				start:pageTimings._startRender || false
+			});
+			
+			
+			
+			
+			
+			
+			entries.title = page.title;
+			
+			if(onContentLoad !== false)
+				onContentLoad = harParser.timeFormatter(onContentLoad);
+			
+			entries.info = prepareInfo(
+				entries.length,
+				{
+					total:harParser.dataSizeFormatter(totalSize),
+					compressed:harParser.dataSizeFormatter(totalCompressedSize)
+				},
+				{
+					content:onContentLoad,
+					on:harParser.timeFormatter(onLoad)
+				}
+			);
+			
+			return entries;
+		});
+		
+		return hars;
+		
+	};
 	
-	lastTime = Math.max.apply(null, lastTimeArray);
-	
-	progress = harParser.convertProgress(progress, lastTime);
-	
-	for(i=0;i<ilen;i++) {
-		hProgress = progress[i];
-		for(prop in hProgress) {
-			entries[i][prop] = hProgress[prop];
-		}
-	}
-	
-	entries = verticalMarkers(entries, {
-		onLoad:onLoad,
-		lastTime:lastTime,
-		load:onContentLoad,
-		loadText:onContentLoad?harParser.pct(onContentLoad, lastTime):'',
-		start:pageTimings._startRender || false
-	});
-	
-	
-	
-	
-	
-	
-	entries.title = page.title;
-	
-	if(onContentLoad !== false)
-		onContentLoad = harParser.timeFormatter(onContentLoad);
-	
-	entries.info = prepareInfo(
-		entries.length,
-		{
-			total:harParser.dataSizeFormatter(totalSize),
-			compressed:harParser.dataSizeFormatter(totalCompressedSize)
-		},
-		{
-			content:onContentLoad,
-			on:harParser.timeFormatter(onLoad)
-		}
-	);
-	
-	return entries;
+	return parsePages(har);
 	
 	
 };

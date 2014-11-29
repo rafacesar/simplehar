@@ -851,7 +851,7 @@ describe('Har Parser', function() {
 		var fs = require('fs'),
 			path = require('path'),
 			har = fs.readFileSync(path.join(path.dirname(__filename),'test.har')).toString();
-			result = [
+			result = [[
 				{
 					method: '',
 					fullUrl: 'http://example.com/',
@@ -882,10 +882,10 @@ describe('Har Parser', function() {
 					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (125ms)" style="left:100.80639269055209%"></span>',
 					renderstarted: '<span class="renderstarted" data-toggle="tooltip" title="[Start Render] (121ms)" style="left:97.58068858185382%"></span>'
 				}
-			];
+			]];
 		
-		result.title = 'http://example.com/';
-		result.info = '<th>1 [requests]</th><th colspan="3" class="text-right">1.24 KB (1.24 KB [compressed])</th><th class="text-center"><span title="DOMContentLoaded" class="text-success">(125ms)</span> <span title="Page Loaded" class="text-danger">124ms</span></th>';
+		result[0].title = 'http://example.com/';
+		result[0].info = '<th>1 [requests]</th><th colspan="3" class="text-right">1.24 KB (1.24 KB [compressed])</th><th class="text-center"><span title="DOMContentLoaded" class="text-success">(125ms)</span> <span title="Page Loaded" class="text-danger">124ms</span></th>';
 
 		expect(harParser(JSON.parse(har))).to.eql(result);
 	});
