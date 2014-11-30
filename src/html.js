@@ -62,14 +62,7 @@
 		).appendTo(d.body);
 		$('body').html($('body').html().replace('{content}', ''));
 	},
-	runHar = function(har) {
-		w.har = har;
-		var newHar = harParser(w.har, function(content) {
-			var elm = d.createElement('span');
-			elm.appendChild(d.createTextNode(content));
-			return elm.innerHTML;
-		});
-		
+	runHar = function(newHar, $tableTemplate) {
 		for(var i=0, ilen=newHar.length, status;i<ilen;i++) {
 			newHar[i].order = i + 1;
 			newHar[i].rId = Math.floor((Math.random()*(new Date()).getTime())+1);
@@ -89,7 +82,7 @@
 			var html =  '',
 				i = 0,
 				ilen = newHar.length,
-				$table = $('table.sh-table').eq(0),
+				$table = $tableTemplate,
 				prop, nHar = newHar[0], _html,
 				$parseable, $parent, parseContent;
 			
@@ -104,6 +97,7 @@
 			$table.find('tbody').html(translateTemplate(html));
 			$table.find('tfoot tr').html(translateTemplate(newHar.info));
 			$table.find('caption').html(newHar.title);
+			$table.appendTo($('.sh-container'));
 			$('.sh-loader').hide();
 			
 			
@@ -142,7 +136,7 @@
 			
 			$('.sh-container .popover, .sh-container .tooltip').remove();
 			
-			addInteraction($);
+			addInteraction($, $table);
 			
 		});
 		
@@ -175,7 +169,7 @@
 			reader = new FileReader();
 			
 			reader.onload = function (evt) {
-				var har;
+				var har, $table = $('.sh-table'), $newTable;
 				try {
 					har = JSON.parse(evt.target.result);
 				}
@@ -184,11 +178,24 @@
 					$('.sh-loader').hide();
 					return;
 				}
-				$('.sh-table').find('tbody, tfoot tr, caption').html('');
-				$('.sh-table').find('.tooltip, .popover').remove();
+				$table.find('tbody, tfoot tr, caption').html('');
+				$table.find('.tooltip, .popover').remove();
+				
+				$newTable = $table.clone();
+				
+				$table.remove();
 				
 				
-				runHar(har);
+				
+				har = harParser(har, function(content) {
+					var elm = d.createElement('span');
+					elm.appendChild(d.createTextNode(content));
+					return elm.innerHTML;
+				});
+				
+				w.har = har;
+				for(var i=0,ilen=har.length;i<ilen;i++)
+					runHar(har[i], $newTable.clone());
 				
 			};
 			reader.readAsText(file);

@@ -1,12 +1,11 @@
 (function(w, d) {
 	'use strict';
-	var addInteraction = function($) {
+	var addInteraction = function($, $table) {
 		
-		if(typeof $ === 'undefined' || !$('.sh-table .inside').length)
+		if(typeof $ === 'undefined' || !$table.find('.inside').length)
 			return waiting();
 		
-		var $table = $('.sh-table'),
-			$tableParent = $table.parent(),
+		var $tableParent = $table.parent(),
 			$inside = $table.find('.inside'),
 			$nav = $inside.find('.nav'),
 			$top = $table.find('.top'),
@@ -42,7 +41,7 @@
 		
 		applyTooltip($top, $timeline, $tableParent);
 		
-		applyPopover($timeline, $tableParent);
+		applyPopover($timeline, $tableParent, $('.sh-table').length > 1);
 		
 		
 		
@@ -96,11 +95,11 @@
 			.add($timeline.find('span.windowloaded'))
 			.tooltip(tooltipOpt);
 	},
-	applyPopover = function($timeline, $container) {
+	applyPopover = function($timeline, $container, topBottom) {
 		var i = 0,
 			ilen = $timeline.length;
 		
-		if(ilen > 15) {
+		if(ilen > 15 || topBottom) {
 			for(ilen=Math.floor($timeline.length/2);i<ilen;i++)
 				$timeline.eq(i).data('placement', 'bottom');
 			

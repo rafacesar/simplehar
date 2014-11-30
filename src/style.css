@@ -5,9 +5,16 @@
 	font-size:20px;
 	font-family:"Trebuchet MS", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	text-align:center;
-	color:#999;
+	color:#666;
 	background-color:#EEE;
 }
+
+.sh-table {box-shadow: 0 -45px 15px -10px #CCC}
+
+.sh-table:first-child {box-shadow:none}
+
+.sh-table caption {border-top:2px solid #666}
+.sh-table:only-of-type caption {border:0}
 
 .sh-table .top {font-size:12px}
 
