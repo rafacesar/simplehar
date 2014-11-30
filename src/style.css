@@ -194,6 +194,8 @@
 
 .sh-container .popover-title em {float:right}
 
+.sh-container .popover-content:empty {display:none}
+
 .sh-table tfoot td {position:relative}
 
 .sh-table tfoot th {font-size:12px}
