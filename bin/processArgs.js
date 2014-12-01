@@ -151,7 +151,7 @@ var processArgs = function(argv) {
 		args.frame = result;
 	
 	
-	
+	args.commandLine = true;
 	
 	
 	return args;

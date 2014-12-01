@@ -177,6 +177,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 			
 			
 			entries.title = page.title;
+			entries.pRef = page.id;
 			
 			if(onContentLoad !== false)
 				onContentLoad = harParser.timeFormatter(onContentLoad);

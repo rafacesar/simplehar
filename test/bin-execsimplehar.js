@@ -21,6 +21,7 @@ describe('Binary Parameter', function() {
 		expect(processArgs(['', 'test.har'])).to.eql({
 			har:'test.har',
 			html:'test.html',
+			commandLine:true,
 			lng:process.env.LANG || false
 		});
 	});
@@ -28,6 +29,7 @@ describe('Binary Parameter', function() {
 		expect(processArgs(['', 'test.har', 'testing.html'])).to.eql({
 			har:'test.har',
 			html:'testing.html',
+			commandLine:true,
 			lng:process.env.LANG || false
 		});
 	});
@@ -35,6 +37,7 @@ describe('Binary Parameter', function() {
 		expect(processArgs(['', 'test.har', 'testing.htm'])).to.eql({
 			har:'test.har',
 			html:'testing.htm',
+			commandLine:true,
 			lng:process.env.LANG || false
 		});
 	});
@@ -42,13 +45,15 @@ describe('Binary Parameter', function() {
 		expect(processArgs(['', 'test.har', 'lng=en-US'])).to.eql({
 			har:'test.har',
 			html:'test.html',
-			lng:'en-US'
+			lng:'en-US',
+			commandLine:true
 		});
 	});
 	it('should return with a frame attribute', function() {
 		expect(processArgs(['', 'test.har', 'frame'])).to.eql({
 			har:'test.har',
 			html:'test.html',
+			commandLine:true,
 			lng:process.env.LANG || false,
 			frame:true
 		});

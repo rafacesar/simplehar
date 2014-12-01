@@ -886,7 +886,8 @@ describe('Har Parser', function() {
 		
 		result[0].title = 'http://example.com/';
 		result[0].info = '<th>1 [requests]</th><th colspan="3" class="text-right">1.24 KB (1.24 KB [compressed])</th><th class="text-center"><span title="DOMContentLoaded" class="text-success">(125ms)</span> <span title="Page Loaded" class="text-danger">124ms</span></th>';
-
+		result[0].pRef = 'page_2';
+		
 		expect(harParser(JSON.parse(har))).to.eql(result);
 	});
 });

@@ -56,7 +56,11 @@
 		if(typeof jQuery === 'undefined' || !jQuery('.inside').length)
 			return setTimeout(waiting, 500);
 
-		jQuery(addInteraction);
+		jQuery(function() {
+			jQuery('.sh-table').each(function() {
+				addInteraction(jQuery, jQuery(this));
+			});
+		});
 	},
 	getTableWidth = function($table, $div) {
 		$div.hide();
