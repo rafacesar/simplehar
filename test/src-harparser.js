@@ -879,7 +879,7 @@ describe('Har Parser', function() {
 					receiveWidth: '0.00009989179840567282%',
 					totalTime: '120ms',
 					windowloaded: '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (124ms)" style="left:100%"></span>',
-					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (125ms)" style="left:100.80639269055209%"></span>',
+					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (125ms)" style="left:100%"></span>',
 					renderstarted: '<span class="renderstarted" data-toggle="tooltip" title="[Start Render] (121ms)" style="left:97.58068858185382%"></span>'
 				}
 			]];
@@ -922,7 +922,7 @@ describe('Har Parser', function() {
 					receiveWidth: '0.10184695733597696%',
 					totalTime: '238.72ms',
 					windowloaded: '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (257.19ms)" style="left:100%"></span>',
-					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (257.20ms)" style="left:100.00389345649016%"></span>',
+					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (257.20ms)" style="left:100%"></span>',
 					renderstarted: ''
 				}
 			],

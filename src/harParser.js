@@ -12,7 +12,7 @@ var harParser = module.exports = function(har, htmlEncode) {
 		var result = '<span class="' + cname + '" data-toggle="tooltip" ';
 		
 		result += 'title="[' + title + '] (' + harParser.timeFormatter(value) +')" ';
-		result += 'style="left:' + left + '"></span>';
+		result += 'style="left:' + (parseFloat(left)>100?'100%':left) + '"></span>';
 		
 		return result;
 	},
