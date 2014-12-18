@@ -181,7 +181,7 @@
 				$table.find('tbody, tfoot tr, caption').html('');
 				$table.find('.tooltip, .popover').remove();
 				
-				$newTable = $table.clone();
+				$newTable = $table.first().clone();
 				
 				$table.remove();
 				
