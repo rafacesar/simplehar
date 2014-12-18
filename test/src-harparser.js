@@ -890,4 +890,83 @@ describe('Har Parser', function() {
 		
 		expect(harParser(JSON.parse(har))).to.eql(result);
 	});
+	it('should parse the Multi Har File', function() {
+		var fs = require('fs'),
+			path = require('path'),
+			har = fs.readFileSync(path.join(path.dirname(__filename),'test-m.har')).toString();
+			result = [[
+				{
+					method: '',
+					fullUrl: 'http://example.com/',
+					fileName: '/',
+					params: '',
+					status: 200,
+					fullStatus: '200 OK',
+					mime: 'html',
+					fullMimeType: 'text/html',
+					size: '1270 Bytes',
+					fullSize: '1270 Bytes',
+					sizeToShow: '1.24 KB',
+					tabs: '<li><a href="#headers">[Headers]</a></li>',
+					tabContainers: '<div class="headers"><h3 class="headers-title"><small>[Request Headers]</small></h3><dl class="dl-horizontal"><dt>Pragma</dt><dd>no-cache</dd><dt>Accept-Encoding</dt><dd>gzip, deflate, sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4,de;<br>q=0.2</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36</dd><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Cache-Control</dt><dd>no-cache</dd><dt>Connection</dt><dd>keep-alive</dd></dl><h3 class="headers-title"><small>[Response Headers]</small></h3><dl class="dl-horizontal"><dt>Date</dt><dd>Thu, 18 Dec 2014 16:36:35 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>"359670651"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Thu, 25 Dec 2014 16:36:35 GMT</dd></dl></div>',
+					fileContent: '',
+					progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
+					progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 7.879ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 2.904ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 113.033ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0.231ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 114.411ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0.262ms</em></p>',
+					startPosition: 0,
+					blockedWidth: '3.0634940155198276%',
+					dnsWidth: '1.1291263722406286%',
+					connectWidth: '43.94922229691293%',
+					sendWidth: '0.08981687566275937%',
+					sslWidth: '0',
+					waitWidth: '44.48501298622736%',
+					receiveWidth: '0.10184695733597696%',
+					totalTime: '238.72ms',
+					windowloaded: '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (257.19ms)" style="left:100%"></span>',
+					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (257.20ms)" style="left:100.00389345649016%"></span>',
+					renderstarted: ''
+				}
+			],
+			[
+				{
+					method: '',
+					fullUrl: 'https://example.com/',
+					fileName: '<strong class=\"text-success\">/</strong>',
+					params: '',
+					status: 200,
+					fullStatus: '200 OK',
+					mime: 'html',
+					fullMimeType: 'text/html',
+					size: '1270 Bytes',
+					fullSize: '1270 Bytes',
+					sizeToShow: '1.24 KB',
+					tabs: '<li><a href="#headers">[Headers]</a></li>',
+					tabContainers: '<div class="headers"><h3 class="headers-title"><small>[Request Headers]</small></h3><dl class="dl-horizontal"><dt>Pragma</dt><dd>no-cache</dd><dt>Accept-Encoding</dt><dd>gzip, deflate, sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4,de;<br>q=0.2</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36</dd><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Cache-Control</dt><dd>no-cache</dd><dt>Connection</dt><dd>keep-alive</dd></dl><h3 class="headers-title"><small>[Response Headers]</small></h3><dl class="dl-horizontal"><dt>Date</dt><dd>Thu, 18 Dec 2014 16:36:45 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/07A8)</dd><dt>Etag</dt><dd>"359670651"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Thu, 25 Dec 2014 16:36:45 GMT</dd></dl></div>',
+					fileContent: '',
+					progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
+					progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 0.506ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 0.696ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 369.123ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 248.792ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 0.114ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 121.150ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 0.371ms</em></p>',
+					startPosition: 0,
+					blockedWidth: '0.06830896754215358%',
+					dnsWidth: '0.09395857029419628%',
+					connectWidth: '49.83085073381275%',
+					sendWidth: '0.015389758508105268%',
+					sslWidth: '33.58641161173152%',
+					waitWidth: '16.35500244174412%',
+					receiveWidth: '0.050090815292323745%',
+					totalTime: '740.75ms',
+					windowloaded: '<span class="windowloaded" data-toggle="tooltip" title="[Page Loaded] (508.59ms)" style="left:68.6586084371251%"></span>',
+					domloaded: '<span class="domloaded" data-toggle="tooltip" title="[DOMContentLoaded] (508.60ms)" style="left:68.65996025000659%"></span>',
+					renderstarted: ''
+				}
+			]];
+		
+		result[0].title = 'http://example.com/';
+		result[0].info = '<th>1 [requests]</th><th colspan="3" class="text-right">1.24 KB (1.24 KB [compressed])</th><th class="text-center"><span title="DOMContentLoaded" class="text-success">(257.20ms)</span> <span title="Page Loaded" class="text-danger">257.19ms</span></th>';
+		result[0].pRef = 'page_2';
+
+		result[1].title = 'https://example.com/';
+		result[1].info = '<th>1 [requests]</th><th colspan="3" class="text-right">1.24 KB (1.24 KB [compressed])</th><th class="text-center"><span title="DOMContentLoaded" class="text-success">(508.60ms)</span> <span title="Page Loaded" class="text-danger">508.59ms</span></th>';
+		result[1].pRef = 'page_3';
+		
+		expect(harParser(JSON.parse(har))).to.eql(result);
+	});
 });
