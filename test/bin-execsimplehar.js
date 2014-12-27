@@ -1,3 +1,6 @@
+/*jshint maxlen:false, globalstrict:true */
+/*global it, describe */
+'use strict';
 var expect = require('expect.js'),
 	processArgs = require('../bin/processArgs.js');
 

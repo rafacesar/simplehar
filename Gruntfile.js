@@ -1,3 +1,5 @@
+/*jshint globalstrict:true */
+'use strict';
 module.exports = function(grunt) {
 	var jshintrc = grunt.file.readJSON('./.jshintrc'),
 		browserJshintrc = grunt.file.readJSON('./.jshintrc');
@@ -24,14 +26,14 @@ module.exports = function(grunt) {
 				options: {
 					'box-model':false
 				},
-				src:['src/*.css']
+				src:['**/*.css', '!node_modules/**']
 			}
 		},
 		jshint: {
 			bin: {
 				options: jshintrc,
 				files: {
-					src:['bin/*.js', 'lib/simplehar.js', 'src/harParser.js']
+					src:['bin/*.js', 'lib/simplehar.js', 'src/harParser.js', 'test/**.js']
 				}
 			},
 			

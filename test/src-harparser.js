@@ -1,3 +1,6 @@
+/*jshint maxlen:false, globalstrict:true */
+/*global it, describe */
+'use strict';
 var expect = require('expect.js'),
 	harParser = require('../src/harParser.js');
 
@@ -224,8 +227,8 @@ describe('Har Parser', function() {
 		});
 	});
 	it('should parse the content', function() {
-		var htmlEntities = require('html-entities').XmlEntities;
-		htmlEntities = new htmlEntities();
+		var HtmlEntities = require('html-entities').XmlEntities,
+			htmlEntities = new HtmlEntities();
 		htmlEntities = htmlEntities.encode;
 		
 		expect(harParser.parseContent).withArgs().to.throwError();
@@ -283,17 +286,17 @@ describe('Har Parser', function() {
 		
 		har = JSON.parse(har.toString());
 		expect(harParser.parseProgress({
-			"timings": {
-			"blocked": 0.6489999996119877,
-			"dns": 0.05400000009103678,
-			"connect": 11.163000001033652,
-			"send": 0.12199999946460593,
-			"wait": 15.643999999156222,
-			"receive": 1.5771369635331212,
-			"ssl": -1
+			'timings': {
+				'blocked': 0.6489999996119877,
+				'dns': 0.05400000009103678,
+				'connect': 11.163000001033652,
+				'send': 0.12199999946460593,
+				'wait': 15.643999999156222,
+				'receive': 1.5771369635331212,
+				'ssl': -1
 			},
-			"startedDateTime": "2014-04-23T04:57:20.534Z",
-			"time": 29.209136962890625
+			'startedDateTime': '2014-04-23T04:57:20.534Z',
+			'time': 29.209136962890625
 		})).to.eql({
 			startedDateTime:1398229040534,
 			blocked:0.6489999996119877,
@@ -330,9 +333,9 @@ describe('Har Parser', function() {
 		expect(harParser.pct('')).to.be(0);
 		expect(harParser.pct(35, 100)).to.be('35%');
 		expect(harParser.pct(35, 50)).to.be('70%');
-		expect(harParser.pct(35, .1)).to.be('35000%');
+		expect(harParser.pct(35, 0.1)).to.be('35000%');
 		expect(harParser.pct(2, 100)).to.be('2%');
-		expect(harParser.pct(.1, 100)).to.be('0.1%');
+		expect(harParser.pct(0.1, 100)).to.be('0.1%');
 		expect(harParser.pct(58, 100)).to.be('58%');
 	});
 	it('should format time', function() {
@@ -391,68 +394,98 @@ describe('Har Parser', function() {
 		]);
 		expect(harParser.convertProgress([
 			{
-				startedDateTime:1, blocked:2, dns:3, connect:4, send:5, wait:6, receive:7, total:15, ssl:47
+				startedDateTime:1,
+				blocked:2,
+				dns:3,
+				connect:4,
+				send:5,
+				wait:6,
+				receive:7,
+				total:15,
+				ssl:47
 			},
 			{
-				startedDateTime:8, blocked:9, dns:10, connect:11, send:12, wait:13, receive:14, total:0, ssl:52
+				startedDateTime:8,
+				blocked:9,
+				dns:10,
+				connect:11,
+				send:12,
+				wait:13,
+				receive:14,
+				total:0,
+				ssl:52
 			},
 			{
-				startedDateTime:13, blocked:12, dns:11, connect:10, send:9, wait:8, receive:7, ssl:18
+				startedDateTime:13,
+				blocked:12,
+				dns:11,
+				connect:10,
+				send:9,
+				wait:8,
+				receive:7,
+				ssl:18
 			},
 			{
-				startedDateTime:6, blocked:5, dns:4, connect:3, send:2, wait:1, receive:0, ssl:21
+				startedDateTime:6,
+				blocked:5,
+				dns:4,
+				connect:3,
+				send:2,
+				wait:1,
+				receive:0,
+				ssl:21
 			}
 		], 178.9)).to.eql([
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 0ms</em>',
 				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 47ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 6ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 7ms</em></p>',
 				startPosition: 0,
-				blockedWidth: "1.1179429849077698%",
-				dnsWidth: "1.6769144773616544%",
-				connectWidth: "2.2358859698155396%",
-				sendWidth: "2.794857462269424%",
-				sslWidth: "26.271660145332586%",
-				waitWidth: "3.353828954723309%",
+				blockedWidth: '1.1179429849077698%',
+				dnsWidth: '1.6769144773616544%',
+				connectWidth: '2.2358859698155396%',
+				sendWidth: '2.794857462269424%',
+				sslWidth: '26.271660145332586%',
+				waitWidth: '3.353828954723309%',
 				totalTime: '15ms',
-				receiveWidth: "3.9128004471771938%"
+				receiveWidth: '3.9128004471771938%'
 			},
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 7ms</em>',
 				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 9ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 10ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 11ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 52ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 12ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 13ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 14ms</em></p>',
-				startPosition: "3.9128004471771938%",
-				blockedWidth: "5.0307434320849636%",
-				dnsWidth: "5.589714924538848%",
-				connectWidth: "6.148686416992733%",
-				sendWidth: "6.707657909446618%",
-				sslWidth: "29.066517607602012%",
-				waitWidth: "7.266629401900503%",
+				startPosition: '3.9128004471771938%',
+				blockedWidth: '5.0307434320849636%',
+				dnsWidth: '5.589714924538848%',
+				connectWidth: '6.148686416992733%',
+				sendWidth: '6.707657909446618%',
+				sslWidth: '29.066517607602012%',
+				waitWidth: '7.266629401900503%',
 				totalTime: '0ms',
-				receiveWidth: "7.8256008943543875%"
+				receiveWidth: '7.8256008943543875%'
 			},
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 12ms</em>',
 				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 12ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 11ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 10ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 18ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 9ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 8ms</em></p><p class=\'clearfix bg-success\'><strong>[Receive]: </strong> <em> 7ms</em></p>',
-				startPosition: "6.707657909446618%",
-				blockedWidth: "6.707657909446618%",
-				dnsWidth: "6.148686416992733%",
-				connectWidth: "5.589714924538848%",
-				sendWidth: "5.0307434320849636%",
-				sslWidth: "10.061486864169927%",
-				waitWidth: "4.471771939631079%",
+				startPosition: '6.707657909446618%',
+				blockedWidth: '6.707657909446618%',
+				dnsWidth: '6.148686416992733%',
+				connectWidth: '5.589714924538848%',
+				sendWidth: '5.0307434320849636%',
+				sslWidth: '10.061486864169927%',
+				waitWidth: '4.471771939631079%',
 				totalTime: '0ms',
-				receiveWidth: "3.9128004471771938%"
+				receiveWidth: '3.9128004471771938%'
 			},
 			{
 				progressStart: '<strong>[Start Time]: </strong> <em> 5ms</em>',
 				progressContent: '<p class=\'clearfix bg-warning\'><strong>[Blocking]: </strong> <em> 5ms</em></p><p class=\'clearfix bg-last\'><strong>[DNS]: </strong> <em> 4ms</em></p><p class=\'clearfix bg-info\'><strong>[Connect]: </strong> <em> 3ms</em></p><p class=\'clearfix bg-secondary\'><strong>[SSL]: </strong> <em> 21ms</em></p><p class=\'clearfix bg-primary\'><strong>[Send]: </strong> <em> 2ms</em></p><p class=\'clearfix bg-danger\'><strong>[Wait]: </strong> <em> 1ms</em></p>',
-				startPosition: "2.794857462269424%",
-				blockedWidth: "2.794857462269424%",
-				dnsWidth: "2.2358859698155396%",
-				connectWidth: "1.6769144773616544%",
-				sendWidth: "1.1179429849077698%",
-				sslWidth: "11.738401341531581%",
+				startPosition: '2.794857462269424%',
+				blockedWidth: '2.794857462269424%',
+				dnsWidth: '2.2358859698155396%',
+				connectWidth: '1.6769144773616544%',
+				sendWidth: '1.1179429849077698%',
+				sslWidth: '11.738401341531581%',
 				totalTime: '0ms',
-				waitWidth: "0.5589714924538849%",
+				waitWidth: '0.5589714924538849%',
 				receiveWidth: 0
 			}
 		]);
@@ -461,396 +494,396 @@ describe('Har Parser', function() {
 	it('should convert har request to a new object', function() {
 		expect(true).to.be.ok();
 		expect(harParser.convertHar({
-        "startedDateTime": "2014-07-21T21:18:46.161Z",
-        "time": 167.9999828338623,
-        "request": {
-          "method": "GET",
-          "url": "http://example.com/",
-          "httpVersion": "HTTP/1.1",
-          "headers": [
-            {
-              "name": "Accept",
-              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-            },
-            {
-              "name": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "name": "Accept-Encoding",
-              "value": "gzip,deflate,sdch"
-            },
-            {
-              "name": "Host",
-              "value": "example.com"
-            },
-            {
-              "name": "Accept-Language",
-              "value": "pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4"
-            },
-            {
-              "name": "User-Agent",
-              "value": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
-            }
-          ],
-          "queryString": [],
-          "cookies": [],
-          "headersSize": 358,
-          "bodySize": 0
-        },
-        "response": {
-          "status": 200,
-          "statusText": "OK",
-          "httpVersion": "HTTP/1.1",
-          "headers": [
-            {
-              "name": "Date",
-              "value": "Mon, 21 Jul 2014 21:18:46 GMT"
-            },
-            {
-              "name": "x-ec-custom-error",
-              "value": "1"
-            },
-            {
-              "name": "Last-Modified",
-              "value": "Fri, 09 Aug 2013 23:54:35 GMT"
-            },
-            {
-              "name": "Server",
-              "value": "ECS (fll/0761)"
-            },
-            {
-              "name": "Etag",
-              "value": "\"359670651\""
-            },
-            {
-              "name": "X-Cache",
-              "value": "HIT"
-            },
-            {
-              "name": "Content-Type",
-              "value": "text/html"
-            },
-            {
-              "name": "Cache-Control",
-              "value": "max-age=604800"
-            },
-            {
-              "name": "Accept-Ranges",
-              "value": "bytes"
-            },
-            {
-              "name": "Content-Length",
-              "value": "1270"
-            },
-            {
-              "name": "Expires",
-              "value": "Mon, 28 Jul 2014 21:18:46 GMT"
-            }
-          ],
-          "cookies": [],
-          "content": {
-            "size": 1270,
-            "mimeType": "text/html",
-            "compression": 0,
-            "text": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n"
-          },
-          "redirectURL": "",
-          "headersSize": 321,
-          "bodySize": 1270
-        },
-        "cache": {},
-        "timings": {
-          "blocked": 0,
-          "dns": 0,
-          "connect": 50.00000004656613,
-          "send": 0,
-          "wait": 116.99999996926636,
-          "receive": 0.9999828180298209,
-          "ssl": -1
-        },
-        "connection": "26436",
-        "pageref": "page_1"
-      }, 10, function() {return arguments[0];})).to.eql({
-		  "fileName": "http://example.com/",
-		  "fullMimeType": "text/html",
-		  "fullSize": "1270 Bytes",
-		  "fullStatus": "200 OK",
-		  "method": "",
-		  "mime": "html",
-		  "params": "",
-		  "size": "1270 Bytes",
-		  "sizeToShow": "1.24 KB",
-		  "status": 200,
-		  "fullUrl": "http://example.com/",
-		  "fileContent": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n",
-		  "tabContainers": "<div class=\"headers\"><h3 class=\"headers-title\"><small>[Request Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class=\"headers-title\"><small>[Response Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:18:46 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\"359670651\"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:18:46 GMT</dd></dl></div><div class=\"content\"><pre class=\"pre-scrollable\"><!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n</pre></div>",
-		  "tabs": "<li><a href=\"#headers\">[Headers]</a></li><li><a href=\"#content\">[Content]</a></li>"
-	  });
+			'startedDateTime': '2014-07-21T21:18:46.161Z',
+			'time': 167.9999828338623,
+			'request': {
+				'method': 'GET',
+				'url': 'http://example.com/',
+				'httpVersion': 'HTTP/1.1',
+				'headers': [
+					{
+						'name': 'Accept',
+						'value': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+					},
+					{
+						'name': 'Connection',
+						'value': 'keep-alive'
+					},
+					{
+						'name': 'Accept-Encoding',
+						'value': 'gzip,deflate,sdch'
+					},
+					{
+						'name': 'Host',
+						'value': 'example.com'
+					},
+					{
+						'name': 'Accept-Language',
+						'value': 'pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4'
+					},
+					{
+						'name': 'User-Agent',
+						'value': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36'
+					}
+				],
+				'queryString': [],
+				'cookies': [],
+				'headersSize': 358,
+				'bodySize': 0
+			},
+			'response': {
+				'status': 200,
+				'statusText': 'OK',
+				'httpVersion': 'HTTP/1.1',
+				'headers': [
+					{
+						'name': 'Date',
+						'value': 'Mon, 21 Jul 2014 21:18:46 GMT'
+					},
+					{
+						'name': 'x-ec-custom-error',
+						'value': '1'
+					},
+					{
+						'name': 'Last-Modified',
+						'value': 'Fri, 09 Aug 2013 23:54:35 GMT'
+					},
+					{
+						'name': 'Server',
+						'value': 'ECS (fll/0761)'
+					},
+					{
+						'name': 'Etag',
+						'value': '\'359670651\''
+					},
+					{
+						'name': 'X-Cache',
+						'value': 'HIT'
+					},
+					{
+						'name': 'Content-Type',
+						'value': 'text/html'
+					},
+					{
+						'name': 'Cache-Control',
+						'value': 'max-age=604800'
+					},
+					{
+						'name': 'Accept-Ranges',
+						'value': 'bytes'
+					},
+					{
+						'name': 'Content-Length',
+						'value': '1270'
+					},
+					{
+						'name': 'Expires',
+						'value': 'Mon, 28 Jul 2014 21:18:46 GMT'
+					}
+				],
+				'cookies': [],
+				'content': {
+					'size': 1270,
+					'mimeType': 'text/html',
+					'compression': 0,
+					'text': '<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset="utf-8" />\n    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1" />\n    <style type="text/css">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href="http://www.iana.org/domains/example">More information...</a></p>\n</div>\n</body>\n</html>\n'
+				},
+				'redirectURL': '',
+				'headersSize': 321,
+				'bodySize': 1270
+			},
+			'cache': {},
+			'timings': {
+				'blocked': 0,
+				'dns': 0,
+				'connect': 50.00000004656613,
+				'send': 0,
+				'wait': 116.99999996926636,
+				'receive': 0.9999828180298209,
+				'ssl': -1
+			},
+			'connection': '26436',
+			'pageref': 'page_1'
+		}, 10, function() {return arguments[0];})).to.eql({
+			'fileName': 'http://example.com/',
+			'fullMimeType': 'text/html',
+			'fullSize': '1270 Bytes',
+			'fullStatus': '200 OK',
+			'method': '',
+			'mime': 'html',
+			'params': '',
+			'size': '1270 Bytes',
+			'sizeToShow': '1.24 KB',
+			'status': 200,
+			'fullUrl': 'http://example.com/',
+			'fileContent': '<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset="utf-8" />\n    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1" />\n    <style type="text/css">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href="http://www.iana.org/domains/example">More information...</a></p>\n</div>\n</body>\n</html>\n',
+			'tabContainers': '<div class="headers"><h3 class="headers-title"><small>[Request Headers]</small></h3><dl class="dl-horizontal"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class="headers-title"><small>[Response Headers]</small></h3><dl class="dl-horizontal"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:18:46 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\'359670651\'</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:18:46 GMT</dd></dl></div><div class="content"><pre class="pre-scrollable"><!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset="utf-8" />\n    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1" />\n    <style type="text/css">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href="http://www.iana.org/domains/example">More information...</a></p>\n</div>\n</body>\n</html>\n</pre></div>',
+			'tabs': '<li><a href="#headers">[Headers]</a></li><li><a href="#content">[Content]</a></li>'
+		});
 		expect(harParser.convertHar({
-        "startedDateTime": "2014-07-21T21:18:46.161Z",
-        "time": 167.9999828338623,
-        "request": {
-          "method": "POST",
-          "url": "https://example.com/",
-          "httpVersion": "HTTP/1.1",
-          "headers": [
-            {
-              "name": "Accept",
-              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-            },
-            {
-              "name": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "name": "Accept-Encoding",
-              "value": "gzip,deflate,sdch"
-            },
-            {
-              "name": "Host",
-              "value": "example.com"
-            },
-            {
-              "name": "Accept-Language",
-              "value": "pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4"
-            },
-            {
-              "name": "User-Agent",
-              "value": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
-            }
-          ],
-          "queryString": [],
-          "cookies": [],
-          "headersSize": 358,
-          "bodySize": 0
-        },
-        "response": {
-          "status": 200,
-          "statusText": "OK",
-          "httpVersion": "HTTP/1.1",
-          "headers": [
-            {
-              "name": "Date",
-              "value": "Mon, 21 Jul 2014 21:18:46 GMT"
-            },
-            {
-              "name": "x-ec-custom-error",
-              "value": "1"
-            },
-            {
-              "name": "Last-Modified",
-              "value": "Fri, 09 Aug 2013 23:54:35 GMT"
-            },
-            {
-              "name": "Server",
-              "value": "ECS (fll/0761)"
-            },
-            {
-              "name": "Etag",
-              "value": "\"359670651\""
-            },
-            {
-              "name": "X-Cache",
-              "value": "HIT"
-            },
-            {
-              "name": "Content-Type",
-              "value": "text/html"
-            },
-            {
-              "name": "Cache-Control",
-              "value": "max-age=604800"
-            },
-            {
-              "name": "Accept-Ranges",
-              "value": "bytes"
-            },
-            {
-              "name": "Content-Length",
-              "value": "1270"
-            },
-            {
-              "name": "Expires",
-              "value": "Mon, 28 Jul 2014 21:18:46 GMT"
-            }
-          ],
-          "cookies": [],
-          "content": {
-            "size": 1270,
-            "mimeType": "text/html",
-            "compression": 0,
-            "text": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n"
-          },
-          "redirectURL": "",
-          "headersSize": 321,
-          "bodySize": 1270
-        },
-        "cache": {},
-        "timings": {
-          "blocked": 0,
-          "dns": 0,
-          "connect": 50.00000004656613,
-          "send": 0,
-          "wait": 116.99999996926636,
-          "receive": 0.9999828180298209,
-          "ssl": -1
-        },
-        "connection": "26436",
-        "pageref": "page_1"
-      }, 1, function() {return arguments[0];})).to.eql({
-		  "fileName": "<strong class=\"text-success\">/</strong>",
-		  "fullMimeType": "text/html",
-		  "fullSize": "1270 Bytes",
-		  "fullStatus": "200 OK",
-		  "method": "<strong>POST </strong>",
-		  "mime": "html",
-		  "params": "",
-		  "size": "1270 Bytes",
-		  "sizeToShow": "1.24 KB",
-		  "status": 200,
-		  "fullUrl": "https://example.com/",
-		  "fileContent": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n",
-		  "tabContainers": "<div class=\"headers\"><h3 class=\"headers-title\"><small>[Request Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class=\"headers-title\"><small>[Response Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:18:46 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\"359670651\"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:18:46 GMT</dd></dl></div><div class=\"content\"><pre class=\"pre-scrollable\"><!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n</pre></div>",
-		  "tabs": "<li><a href=\"#headers\">[Headers]</a></li><li><a href=\"#content\">[Content]</a></li>"
-	  });
-	  expect(harParser.convertHar({
-        "startedDateTime": "2014-07-21T21:43:30.804Z",
-        "time": 235.0001335144043,
-        "request": {
-          "method": "GET",
-          "url": "http://example.com/?testing=something",
-          "httpVersion": "HTTP/1.1",
-          "headers": [
-            {
-              "name": "Accept",
-              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
-            },
-            {
-              "name": "Connection",
-              "value": "keep-alive"
-            },
-            {
-              "name": "Accept-Encoding",
-              "value": "gzip,deflate,sdch"
-            },
-            {
-              "name": "Host",
-              "value": "example.com"
-            },
-            {
-              "name": "Accept-Language",
-              "value": "pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4"
-            },
-            {
-              "name": "User-Agent",
-              "value": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36"
-            }
-          ],
-          "queryString": [
-            {
-              "name": "testing",
-              "value": "something"
-            }
-          ],
-          "cookies": [],
-          "headersSize": 376,
-          "bodySize": 0
-        },
-        "response": {
-          "status": 200,
-          "statusText": "OK",
-          "httpVersion": "HTTP/1.1",
-          "headers": [
-            {
-              "name": "Date",
-              "value": "Mon, 21 Jul 2014 21:43:30 GMT"
-            },
-            {
-              "name": "x-ec-custom-error",
-              "value": "1"
-            },
-            {
-              "name": "Last-Modified",
-              "value": "Fri, 09 Aug 2013 23:54:35 GMT"
-            },
-            {
-              "name": "Server",
-              "value": "ECS (fll/0761)"
-            },
-            {
-              "name": "Etag",
-              "value": "\"359670651\""
-            },
-            {
-              "name": "X-Cache",
-              "value": "HIT"
-            },
-            {
-              "name": "Content-Type",
-              "value": "text/html"
-            },
-            {
-              "name": "Cache-Control",
-              "value": "max-age=604800"
-            },
-            {
-              "name": "Accept-Ranges",
-              "value": "bytes"
-            },
-            {
-              "name": "Content-Length",
-              "value": "1270"
-            },
-            {
-              "name": "Expires",
-              "value": "Mon, 28 Jul 2014 21:43:30 GMT"
-            }
-          ],
-          "cookies": [],
-          "content": {
-            "size": 1270,
-            "mimeType": "text/html",
-            "compression": 0,
-            "text": "<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset=\"utf-8\" />\n    <meta http-equiv=\"Content-type\" content=\"text/html; charset=utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <style type=\"text/css\">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: \"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href=\"http://www.iana.org/domains/example\">More information...</a></p>\n</div>\n</body>\n</html>\n"
-          },
-          "redirectURL": "",
-          "headersSize": 321,
-          "bodySize": 1270
-        },
-        "cache": {},
-        "timings": {
-          "blocked": 0,
-          "dns": 0,
-          "connect": 116.99999996926636,
-          "send": 0,
-          "wait": 118.0000000167638,
-          "receive": 0.00013352837413549423,
-          "ssl": -1
-        },
-        "connection": "42661",
-        "pageref": "page_2"
-      }, 1)).to.eql({
-		  "fileName": "/",
-		  "fullMimeType": "text/html",
-		  "fullSize": "1270 Bytes",
-		  "fullStatus": "200 OK",
-		  "method": "",
-		  "mime": "html",
-		  "params": "?testing=something",
-		  "size": "1270 Bytes",
-		  "sizeToShow": "1.24 KB",
-		  "status": 200,
-		  "fullUrl": "http://example.com/?testing=something",
-		  "fileContent": "",
-		  "tabContainers": "<div class=\"headers\"><h3 class=\"headers-title\"><small>[Request Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class=\"headers-title\"><small>[Response Headers]</small></h3><dl class=\"dl-horizontal\"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:43:30 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\"359670651\"</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:43:30 GMT</dd></dl></div><div class=\"queryString\"><h3 class=\"headers-title\"><small>[Request QueryString]</small></h3><dl class=\"dl-horizontal\"><dt>testing</dt><dd>something</dd></dl></div><div class=\"parsedqueryString\"><h3 class=\"headers-title\"><small>[Request QueryString]</small></h3><dl class=\"dl-horizontal\"><dt>testing</dt><dd>something</dd></dl></div>",
-		  "tabs": "<li><a href=\"#headers\">[Headers]</a></li><li><a href=\"#queryString\">[QueryString]</a></li><li><a href=\"#parsedqueryString\">[Parsed QueryString]</a></li>"
-	  });
+			'startedDateTime': '2014-07-21T21:18:46.161Z',
+			'time': 167.9999828338623,
+			'request': {
+				'method': 'POST',
+				'url': 'https://example.com/',
+				'httpVersion': 'HTTP/1.1',
+				'headers': [
+					{
+						'name': 'Accept',
+						'value': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+					},
+					{
+						'name': 'Connection',
+						'value': 'keep-alive'
+					},
+					{
+						'name': 'Accept-Encoding',
+						'value': 'gzip,deflate,sdch'
+					},
+					{
+						'name': 'Host',
+						'value': 'example.com'
+					},
+					{
+						'name': 'Accept-Language',
+						'value': 'pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4'
+					},
+					{
+						'name': 'User-Agent',
+						'value': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36'
+					}
+				],
+				'queryString': [],
+				'cookies': [],
+				'headersSize': 358,
+				'bodySize': 0
+			},
+			'response': {
+				'status': 200,
+				'statusText': 'OK',
+				'httpVersion': 'HTTP/1.1',
+				'headers': [
+					{
+						'name': 'Date',
+						'value': 'Mon, 21 Jul 2014 21:18:46 GMT'
+					},
+					{
+						'name': 'x-ec-custom-error',
+						'value': '1'
+					},
+					{
+						'name': 'Last-Modified',
+						'value': 'Fri, 09 Aug 2013 23:54:35 GMT'
+					},
+					{
+						'name': 'Server',
+						'value': 'ECS (fll/0761)'
+					},
+					{
+						'name': 'Etag',
+						'value': '\'359670651\''
+					},
+					{
+						'name': 'X-Cache',
+						'value': 'HIT'
+					},
+					{
+						'name': 'Content-Type',
+						'value': 'text/html'
+					},
+					{
+						'name': 'Cache-Control',
+						'value': 'max-age=604800'
+					},
+					{
+						'name': 'Accept-Ranges',
+						'value': 'bytes'
+					},
+					{
+						'name': 'Content-Length',
+						'value': '1270'
+					},
+					{
+						'name': 'Expires',
+						'value': 'Mon, 28 Jul 2014 21:18:46 GMT'
+					}
+				],
+				'cookies': [],
+				'content': {
+					'size': 1270,
+					'mimeType': 'text/html',
+					'compression': 0,
+					'text': '<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset="utf-8" />\n    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1" />\n    <style type="text/css">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href="http://www.iana.org/domains/example">More information...</a></p>\n</div>\n</body>\n</html>\n'
+				},
+				'redirectURL': '',
+				'headersSize': 321,
+				'bodySize': 1270
+			},
+			'cache': {},
+			'timings': {
+				'blocked': 0,
+				'dns': 0,
+				'connect': 50.00000004656613,
+				'send': 0,
+				'wait': 116.99999996926636,
+				'receive': 0.9999828180298209,
+				'ssl': -1
+			},
+			'connection': '26436',
+			'pageref': 'page_1'
+		}, 1, function() {return arguments[0];})).to.eql({
+			'fileName': '<strong class="text-success">/</strong>',
+			'fullMimeType': 'text/html',
+			'fullSize': '1270 Bytes',
+			'fullStatus': '200 OK',
+			'method': '<strong>POST </strong>',
+			'mime': 'html',
+			'params': '',
+			'size': '1270 Bytes',
+			'sizeToShow': '1.24 KB',
+			'status': 200,
+			'fullUrl': 'https://example.com/',
+			'fileContent': '<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset="utf-8" />\n    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1" />\n    <style type="text/css">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href="http://www.iana.org/domains/example">More information...</a></p>\n</div>\n</body>\n</html>\n',
+			'tabContainers': '<div class="headers"><h3 class="headers-title"><small>[Request Headers]</small></h3><dl class="dl-horizontal"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class="headers-title"><small>[Response Headers]</small></h3><dl class="dl-horizontal"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:18:46 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\'359670651\'</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:18:46 GMT</dd></dl></div><div class="content"><pre class="pre-scrollable"><!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset="utf-8" />\n    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1" />\n    <style type="text/css">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href="http://www.iana.org/domains/example">More information...</a></p>\n</div>\n</body>\n</html>\n</pre></div>',
+			'tabs': '<li><a href="#headers">[Headers]</a></li><li><a href="#content">[Content]</a></li>'
+		});
+		expect(harParser.convertHar({
+			'startedDateTime': '2014-07-21T21:43:30.804Z',
+			'time': 235.0001335144043,
+			'request': {
+				'method': 'GET',
+				'url': 'http://example.com/?testing=something',
+				'httpVersion': 'HTTP/1.1',
+				'headers': [
+					{
+						'name': 'Accept',
+						'value': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+					},
+					{
+						'name': 'Connection',
+						'value': 'keep-alive'
+					},
+					{
+						'name': 'Accept-Encoding',
+						'value': 'gzip,deflate,sdch'
+					},
+					{
+						'name': 'Host',
+						'value': 'example.com'
+					},
+					{
+						'name': 'Accept-Language',
+						'value': 'pt-BR,pt;q=0.8,en-US;q=0.6,en;q=0.4'
+					},
+					{
+						'name': 'User-Agent',
+						'value': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36'
+					}
+				],
+				'queryString': [
+					{
+						'name': 'testing',
+						'value': 'something'
+					}
+				],
+				'cookies': [],
+				'headersSize': 376,
+				'bodySize': 0
+			},
+			'response': {
+				'status': 200,
+				'statusText': 'OK',
+				'httpVersion': 'HTTP/1.1',
+				'headers': [
+					{
+						'name': 'Date',
+						'value': 'Mon, 21 Jul 2014 21:43:30 GMT'
+					},
+					{
+						'name': 'x-ec-custom-error',
+						'value': '1'
+					},
+					{
+						'name': 'Last-Modified',
+						'value': 'Fri, 09 Aug 2013 23:54:35 GMT'
+					},
+					{
+						'name': 'Server',
+						'value': 'ECS (fll/0761)'
+					},
+					{
+						'name': 'Etag',
+						'value': '\'359670651\''
+					},
+					{
+						'name': 'X-Cache',
+						'value': 'HIT'
+					},
+					{
+						'name': 'Content-Type',
+						'value': 'text/html'
+					},
+					{
+						'name': 'Cache-Control',
+						'value': 'max-age=604800'
+					},
+					{
+						'name': 'Accept-Ranges',
+						'value': 'bytes'
+					},
+					{
+						'name': 'Content-Length',
+						'value': '1270'
+					},
+					{
+						'name': 'Expires',
+						'value': 'Mon, 28 Jul 2014 21:43:30 GMT'
+					}
+				],
+				'cookies': [],
+				'content': {
+					'size': 1270,
+					'mimeType': 'text/html',
+					'compression': 0,
+					'text': '<!doctype html>\n<html>\n<head>\n    <title>Example Domain</title>\n\n    <meta charset="utf-8" />\n    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1" />\n    <style type="text/css">\n    body {\n        background-color: #f0f0f2;\n        margin: 0;\n        padding: 0;\n        font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;\n        \n    }\n    div {\n        width: 600px;\n        margin: 5em auto;\n        padding: 50px;\n        background-color: #fff;\n        border-radius: 1em;\n    }\n    a:link, a:visited {\n        color: #38488f;\n        text-decoration: none;\n    }\n    @media (max-width: 700px) {\n        body {\n            background-color: #fff;\n        }\n        div {\n            width: auto;\n            margin: 0 auto;\n            border-radius: 0;\n            padding: 1em;\n        }\n    }\n    </style>    \n</head>\n\n<body>\n<div>\n    <h1>Example Domain</h1>\n    <p>This domain is established to be used for illustrative examples in documents. You may use this\n    domain in examples without prior coordination or asking for permission.</p>\n    <p><a href="http://www.iana.org/domains/example">More information...</a></p>\n</div>\n</body>\n</html>\n'
+				},
+				'redirectURL': '',
+				'headersSize': 321,
+				'bodySize': 1270
+			},
+			'cache': {},
+			'timings': {
+				'blocked': 0,
+				'dns': 0,
+				'connect': 116.99999996926636,
+				'send': 0,
+				'wait': 118.0000000167638,
+				'receive': 0.00013352837413549423,
+				'ssl': -1
+			},
+			'connection': '42661',
+			'pageref': 'page_2'
+		}, 1)).to.eql({
+			'fileName': '/',
+			'fullMimeType': 'text/html',
+			'fullSize': '1270 Bytes',
+			'fullStatus': '200 OK',
+			'method': '',
+			'mime': 'html',
+			'params': '?testing=something',
+			'size': '1270 Bytes',
+			'sizeToShow': '1.24 KB',
+			'status': 200,
+			'fullUrl': 'http://example.com/?testing=something',
+			'fileContent': '',
+			'tabContainers': '<div class="headers"><h3 class="headers-title"><small>[Request Headers]</small></h3><dl class="dl-horizontal"><dt>Accept</dt><dd>text/html,application/xhtml+xml,application/xml;<br>q=0.9,image/webp,*/*;<br>q=0.8</dd><dt>Connection</dt><dd>keep-alive</dd><dt>Accept-Encoding</dt><dd>gzip,deflate,sdch</dd><dt>Host</dt><dd>example.com</dd><dt>Accept-Language</dt><dd>pt-BR,pt;<br>q=0.8,en-US;<br>q=0.6,en;<br>q=0.4</dd><dt>User-Agent</dt><dd>Mozilla/5.0 (Windows NT 6.1;<br> WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.125 Safari/537.36</dd></dl><h3 class="headers-title"><small>[Response Headers]</small></h3><dl class="dl-horizontal"><dt>Date</dt><dd>Mon, 21 Jul 2014 21:43:30 GMT</dd><dt>x-ec-custom-error</dt><dd>1</dd><dt>Last-Modified</dt><dd>Fri, 09 Aug 2013 23:54:35 GMT</dd><dt>Server</dt><dd>ECS (fll/0761)</dd><dt>Etag</dt><dd>\'359670651\'</dd><dt>X-Cache</dt><dd>HIT</dd><dt>Content-Type</dt><dd>text/html</dd><dt>Cache-Control</dt><dd>max-age=604800</dd><dt>Accept-Ranges</dt><dd>bytes</dd><dt>Content-Length</dt><dd>1270</dd><dt>Expires</dt><dd>Mon, 28 Jul 2014 21:43:30 GMT</dd></dl></div><div class="queryString"><h3 class="headers-title"><small>[Request QueryString]</small></h3><dl class="dl-horizontal"><dt>testing</dt><dd>something</dd></dl></div><div class="parsedqueryString"><h3 class="headers-title"><small>[Request QueryString]</small></h3><dl class="dl-horizontal"><dt>testing</dt><dd>something</dd></dl></div>',
+			'tabs': '<li><a href="#headers">[Headers]</a></li><li><a href="#queryString">[QueryString]</a></li><li><a href="#parsedqueryString">[Parsed QueryString]</a></li>'
+		});
 	});
 	it('should parse the Har File', function() {
 		var fs = require('fs'),
 			path = require('path'),
-			har = fs.readFileSync(path.join(path.dirname(__filename),'test.har')).toString();
+			har = fs.readFileSync(path.join(path.dirname(__filename),'test.har')).toString(),
 			result = [[
 				{
 					method: '',
@@ -893,7 +926,7 @@ describe('Har Parser', function() {
 	it('should parse the Multi Har File', function() {
 		var fs = require('fs'),
 			path = require('path'),
-			har = fs.readFileSync(path.join(path.dirname(__filename),'test-m.har')).toString();
+			har = fs.readFileSync(path.join(path.dirname(__filename),'test-m.har')).toString(),
 			result = [[
 				{
 					method: '',
