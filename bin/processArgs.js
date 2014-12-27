@@ -24,7 +24,7 @@ var processArgs = function(argv) {
 				if(args[i] === '--help') {
 					help = [
 						'',
-						'Usage: simplehar [harFile] [htmlFile] [frame] [lng]'
+						'Usage: simplehar `harFile` [htmlFile] [frame] [lng]'
 					];
 					return help.join('\n  ');
 				}

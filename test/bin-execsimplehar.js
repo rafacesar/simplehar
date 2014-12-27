@@ -7,7 +7,8 @@ describe('Binary Parameter', function() {
 		expect(processArgs(['', '-v'])).to.be(require('../package.json').version);
 	});
 	it('should show the help message', function() {
-		expect(processArgs(['', '--help'])).to.be("\n  Usage: simplehar [harFile] [htmlFile] [frame] [lng]");
+		expect(processArgs(['', '--help']))
+			.to.be('\n  Usage: simplehar `harFile` [htmlFile] [frame] [lng]');
 	});
 	it('should throw an error if without or with empty parameters', function() {
 		expect(processArgs).withArgs().to.throwException(function(error) {
