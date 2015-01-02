@@ -19,7 +19,7 @@ Or globally:
 npm install -g simplehar
 ```
 
-### Using as a dependency
+### Using as a dependency/programmatically
 ```javascript
 var simplehar = require('simplehar'),
 	path = require('path'),
@@ -43,6 +43,18 @@ var result = simplehar({
 });
 
 
+//[
+//	<style>...</style>...html...<script>...</script>,
+//	<style>...</style>...html...<script>...</script>
+//]
+var result = simplehar({
+	har:multipleSitesHarFile,
+	lng:false,
+	frame:true,
+	return:true
+});
+
+
 //{
 //	css:'...',
 //	js:'...',
@@ -51,6 +63,22 @@ var result = simplehar({
 var result = simplehar({
 	har:harFile,
 	html:htmlFile,
+	lng:false,
+	frame:true,
+	return:true,
+	frameContent:{
+		css:false,
+		js:false
+	}
+});
+
+//{
+//	css:'...',
+//	js:'...',
+//	html:['...', '...']
+//}
+var result = simplehar({
+	har:multipleSitesHarFile,
 	lng:false,
 	frame:true,
 	return:true,
@@ -88,15 +116,20 @@ Har source to be used as base (it needs the `.har` extension)
 
 ### htmlFile (*Optional*)
 Html file to be generate with the har informations (it needs the `.html` extension)
+__Via Command Line:__
+>This parameter __will be ignored__ when using multiple sites in one harFile
+
+__Via Programmatically (_when using multiple sites_)__
+> The string `{id}` __will be replaced__ by the id of the page on harFile.
+> If the `{id}` is __missing__, this parameter __will be ignored__
 
 ### frame (*Optional*)
 This option genarate a html file just with the div content, embedding the CSS and JS necessary to viewer work.
-
-This options is good for embedding the html in another page. But the page must already have bootstrap and jQuery loaded.
+> This options is good for embedding the html in another page. But the page must already have bootstrap and jQuery loaded.
 
 ### lng (*Optional*)
 Language used to translate (from src/translate.json) (e.g pt-BR)
 
 
-### frameContent (*Optional* - *`Used only as dependency`*)
+### frameContent (*Optional* - *`Used only as dependency/programmatically`*)
 Object specifying if the html should have JS or CSS inline
