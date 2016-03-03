@@ -8,17 +8,21 @@ var processArgs = function(argv) {
 		result,
 		getVersion = function(args, ilen) {
 			var i = 0;
+
 			while(i < ilen) {
 				
 				if(args[i] === '-v')
-					return require(path.join('..','package.json')).version;
+					return require(path.join('..', 'package.json')).version;
 				
 				i++;
 			}
+
 			return false;
 		},
+
 		getHelpMessage = function(args, ilen) {
 			var i = 0;
+
 			while(i < ilen) {
 				
 				if(args[i] === '--help') {
@@ -26,16 +30,20 @@ var processArgs = function(argv) {
 						'',
 						'Usage: simplehar `harFile` [htmlFile] [frame] [lng]'
 					];
+					
 					return help.join('\n  ');
 				}
 				
 				i++;
 			}
+
 			return false;
 		},
+
 		getHar = function(args, ilen) {
 			var i = 0,
 				har;
+
 			while( !har && i < ilen) {
 				if(args[i].lastIndexOf('.har') + 4 === args[i].length)
 					har = args[i];
@@ -49,10 +57,12 @@ var processArgs = function(argv) {
 			
 			return har;
 		},
+
 		getHtml = function(args, har, ilen) {
 			var i = 0,
 				htmlExt = '.html',
 				html;
+
 			while( !html && i < ilen) {
 				if(args[i].lastIndexOf('.html') + 5 === args[i].length) {
 					html = args[i];
@@ -72,9 +82,11 @@ var processArgs = function(argv) {
 			
 			return html;
 		},
+
 		getLanguage = function(args, ilen) {
 			var i = 0,
 				lng;
+
 			while( !lng && i < ilen) {
 				
 				if(args[i].indexOf('lng=') === 0)
@@ -86,9 +98,11 @@ var processArgs = function(argv) {
 
 			return lng || process.env.LANG || false;
 		},
+
 		hasFrame = function(args, ilen) {
 			var i = 0,
 				frame = false;
+
 			while( !frame && i < ilen) {
 				
 				if(args[i].toLowerCase() === 'frame')
@@ -112,6 +126,7 @@ var processArgs = function(argv) {
 	
 	//Showing the version
 	result = getVersion(argv, ilen);
+
 	if(result)
 		return result;
 	
@@ -120,6 +135,7 @@ var processArgs = function(argv) {
 	
 	//Showing help message
 	result = getHelpMessage(argv, ilen);
+
 	if(result)
 		return result;
 	
@@ -147,6 +163,7 @@ var processArgs = function(argv) {
 	
 	//Verifying frame option
 	result = hasFrame(argv, ilen);
+
 	if(result)
 		args.frame = result;
 	
@@ -157,4 +174,5 @@ var processArgs = function(argv) {
 	return args;
 	
 };
+
 module.exports = processArgs;

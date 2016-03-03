@@ -43,13 +43,20 @@ module.exports = function(grunt) {
 					src: ['src/html.js', 'src/script.js']
 				}
 			}
+		},
+		jscs: {
+			src: ['bin/*.js', 'lib/simplehar.js', 'src/harParser.js', 'src/html.js', 'src/script.js'],
+			options: {
+				config: './.jscsrc'
+			}
 		}
 	});
 	
 	grunt.loadNpmTasks('grunt-mocha-test');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 	grunt.loadNpmTasks('grunt-contrib-csslint');
+	grunt.loadNpmTasks('grunt-jscs');
 	
-	grunt.registerTask('default', ['mochaTest', 'jshint', 'csslint']);
+	grunt.registerTask('default', ['jshint', 'jscs', 'csslint', 'mochaTest']);
 	
 };
