@@ -523,6 +523,7 @@ harParser.parseProgress = function(entry) {
 		wait = timings.wait,
 		receive = timings.receive,
 		ssl = timings.ssl,
+		ttfb = timings.send + timings.wait,
 		_blocked = blocked >= 0?blocked:0,
 		_dns = dns >= 0?dns:0,
 		_connect = connect >= 0?connect:0,
@@ -541,6 +542,7 @@ harParser.parseProgress = function(entry) {
 		connect: connect,
 		send: send,
 		wait: wait,
+		ttfb: ttfb,
 		receive: receive,
 		ssl: ssl,
 		total:	_blocked +
@@ -857,6 +859,8 @@ harParser.convertProgress = function(progress, lastTime) {
 			{classname:'primary',title:'Send',step:'send'},
 			{classname:'danger',title:'Wait',step:'wait'},
 			{classname:'success',title:'Receive',step:'receive'}
+
+			// {classname: 'primary',title: 'Time to First Byte',step: 'ttfb'},
 		],
 		step, j, jlen = steps.length, p,
 		progressRow = function(bg, title, value) {
