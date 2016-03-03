@@ -229,6 +229,14 @@ harParser.decode = function(str) {
 	}
 	return _str;
 };
+
+harParser.parseDomain = function(url) {
+	'use strict';
+	var matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+
+	return matches && matches[1];
+};
+
 //Return request method with strong tag, or empty if GET
 harParser.parseMethod = function(method) {
 	'use strict';
@@ -245,6 +253,7 @@ harParser.urlDataRe = /^data:(\w+\/\w+);(?:base64,)?(charset=[^,]+,)?(.+)$/i;
 harParser.parseUrl = function(url, complete) {
 	'use strict';
 	var urlMatch = url.match(harParser.urlRe),
+		full = false,
 		urlFile;
 	
 	if(!urlMatch) {
@@ -259,8 +268,10 @@ harParser.parseUrl = function(url, complete) {
 		if(!urlMatch[4]) {
 			urlFile = urlMatch[3];
 			
-			if(complete)
+			if(complete) {
 				urlFile = urlMatch[1] + urlMatch[2] + urlFile;
+				full = true;
+			}
 			else if(!urlFile)
 				urlFile = '/';
 		}
@@ -276,7 +287,8 @@ harParser.parseUrl = function(url, complete) {
 	return {
 		params: harParser.decode(urlMatch && urlMatch[5] || ''),
 		file: urlFile,
-		complete:url
+		complete: url,
+		full: full
 	};
 };
 //Parse status + statusText and return an object with necessary attributes
@@ -834,7 +846,8 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 	return {
 		method: method,
 		fullUrl: url.complete,
-		fileName: url.file,
+		domain: !url.full?harParser.parseDomain(url.complete):'',
+		fileName: (!url.full?'&nbsp;&nbsp;|&nbsp;&nbsp;':'') + url.file,
 		params: harParser.htmlEncode(url.params),
 		status: status.status,
 		fullStatus: status.complete,

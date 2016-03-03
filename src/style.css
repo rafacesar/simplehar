@@ -25,6 +25,8 @@
 	padding:0;
 }
 
+.sh-table .sh-domain {text-decoration: underline}
+
 .sh-table .url > div,
 .sh-table .timeline > div {position:relative}
 
