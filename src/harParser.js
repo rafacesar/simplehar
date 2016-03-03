@@ -2,6 +2,8 @@ var harParser = module.exports = function(har, htmlEncode) {
 	'use strict';
 	
 	har = har.log;
+
+	harParser.htmlEncode = htmlEncode;
 	
 	// if(!htmlEncode)
 	// 	console.error('htmlEncode not found. The content tab will not be displayed');
@@ -615,8 +617,8 @@ harParser.objToDl = function(objList) {
 	
 	for(;i<ilen;i++) {
 		obj = objList[i];
-		dl += '<dt>' + obj.name + '</dt>';
-		dl += '<dd>' + obj.value.replace(/;/g, ';<br>') + '</dd>';
+		dl += '<dt>' + harParser.htmlEncode(obj.name) + '</dt>';
+		dl += '<dd>' + harParser.htmlEncode(obj.value).replace(/;/g, ';<br>') + '</dd>';
 	}
 	
 	return (dl + '</dl>');
@@ -833,7 +835,7 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 		method: method,
 		fullUrl: url.complete,
 		fileName: url.file,
-		params: url.params,
+		params: harParser.htmlEncode(url.params),
 		status: status.status,
 		fullStatus: status.complete,
 		mime: (mime.type === 'plain' || !mime.type) && mime.base?mime.base:mime.type,
