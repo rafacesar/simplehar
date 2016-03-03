@@ -148,9 +148,6 @@
 	},
 	requestClickListener = function() {
 		var $this = jQuery(this),
-			$i = $this.find('i'),
-			classname = $i.get(0).className,
-			toggleClass = $i.data('toggle-sign'),
 			$next = jQuery('#inside-' + $this.attr('id').substr(4));
 		
 		
@@ -168,8 +165,7 @@
 			$this.addClass('opened');
 			$next.removeClass('hidden');
 		}
-		$i.get(0).className = toggleClass;
-		$i.data('toggle-sign', classname);
+
 		return false;
 	},
 	totalStartTime = function($row) {

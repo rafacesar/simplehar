@@ -230,6 +230,42 @@ harParser.decode = function(str) {
 	return _str;
 };
 
+harParser.contentIcon = function(mimeType, status) {
+	'use strict';
+
+	var re = new RegExp('(html|plain|text\/css|javascript|flash|' +
+		'image|font|application\/json|application\/ocsp-response)');
+
+	if(status >= 300) {
+		return ({
+			3: 'glyphicon-share-alt',
+			4: 'glyphicon-alert',
+			5: 'glyphicon-remove-circle'
+		})[parseInt(status / 100, 10)];
+	}
+
+	
+	if(mimeType) {
+
+		mimeType = mimeType.match(re);
+
+		return ({
+			html: 'glyphicon-file',
+			plain: 'glyphicon-file',
+			'text/css': 'glyphicon-tint',
+			javascript: 'glyphicon-wrench',
+			flash: 'glyphicon-flash',
+			image: 'glyphicon-picture',
+			font: 'glyphicon-text-size',
+			'application/json': 'glyphicon-cog',
+			'application/ocsp-response': 'glyphicon-ok-circle'
+		})[mimeType && mimeType[1]] || 'glyphicon-question-sign';
+	}
+
+	return 'glyphicon-question-sign';
+
+};
+
 harParser.parseDomain = function(url) {
 	'use strict';
 	var matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
@@ -852,6 +888,7 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 		status: status.status,
 		fullStatus: status.complete,
 		mime: (mime.type === 'plain' || !mime.type) && mime.base?mime.base:mime.type,
+		contentIcon: harParser.contentIcon(mime.complete, status.status),
 		fullMimeType: mime.complete,
 		size: size.originalCompressed,
 		fullSize: size.originalSize,
