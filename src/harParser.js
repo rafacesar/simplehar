@@ -104,13 +104,23 @@ var harParser = module.exports = function(har, htmlEncode) {
 	},
 	prepareInfo = function(requests, size, load) {
 		var info = '<th>' + requests + ' [requests]</th>';
-		info+= '<th colspan="3" class="text-right">';
-		info+= size.total + ' (' + size.compressed + ' [compressed])</th>';
-		info+= '<th class="text-center">';
+
+		info += '<th colspan="3" class="text-right">';
+		info += size.total + ' <span title="compressed">(' + size.compressed + ')</span>' + '</th>';
+		info += '<th class="text-center">';
+
 		if(load.content)
-			info+= '<span title="DOMContentLoaded" class="text-success">('+load.content+')</span> ';
-		info+= '<span title="Page Loaded" class="text-danger">' + load.on + '</span></th>';
-		
+			info += '<span title="DOMContentLoaded" class="text-success">DOMContentLoaded: ' +
+					load.content +
+					'</span> ';
+
+		// if(load.start)
+		// 	info += '<span title="StartRender" class="text-primary">StartRender: ' +
+		// load.start + '</span> ';
+		info += '<span title="Page Loaded" class="text-danger">Page Loaded: ' +
+				load.on +
+				'</span></th>';
+
 		return info;
 	},
 	parsePages = function(har) {
@@ -191,8 +201,10 @@ var harParser = module.exports = function(har, htmlEncode) {
 					compressed:harParser.dataSizeFormatter(totalCompressedSize)
 				},
 				{
-					content:onContentLoad,
-					on:harParser.timeFormatter(onLoad)
+
+					// start: harParser.timeFormatter(page._firstPaint),
+					content: onContentLoad,
+					on: harParser.timeFormatter(onLoad)
 				}
 			);
 			
