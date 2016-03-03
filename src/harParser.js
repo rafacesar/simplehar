@@ -278,6 +278,33 @@ harParser.contentIcon = function(mimeType, status) {
 
 };
 
+harParser.sinceLastMod = function(headers) {
+	'use strict';
+	var dates = {},
+		i = 0,
+		ilen = headers.length,
+		count = 2,
+		header, name;
+
+	while(i < ilen && count) {
+		header = headers[i++];
+		name = header.name.toLowerCase();
+
+		if(name === 'last-modified' || name === 'date') {
+			dates[name] = new Date(header.value);
+			count--;
+		}
+	}
+	
+
+	if(!dates['last-modified'])
+		return -1;
+
+
+	return ((dates.date || new Date()).getTime() - dates['last-modified']);
+
+};
+
 harParser.parseDomain = function(url) {
 	'use strict';
 	var matches = url.match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
@@ -591,22 +618,28 @@ harParser.pct = function(value, pct, symbol) {
 	symbol = symbol || '%';
 	return ((value * 100) / pct) + symbol;
 };
+
 //Format time based on miliseconds
 harParser.timeFormatter = function(time, precision) {
 	'use strict';
-	var ext = ['ms', 's', 'min', 'h'],
-		div = [1000, 60, 60, 60],
-		i = 0;
+	var ext = ['ms', 's', 'min', 'h', ' days', ' weeks', ' months', ' years'],
+		div = [1000, 60, 60, 24, 7, 4, 12],
+		i = 0,
+		ilen = ext.length - 1;
 	
-	time = time >= 0 ? time : 0;
+	time = time >= 0?time:0;
+
+	while(time >= div[i] && i < ilen)
+		time /= div[i++];
 	
-	while(time >= div[i] && i < (ext.length - 1)) {
-		time /= div[i];
-		i++;
-	}
-	
-	return harParser.precisionFormatter(time, precision || 2) + ext[i];
+	time = harParser.precisionFormatter(time, precision || 2);
+
+	if(i > 5 && precision === '0')
+		time = '~' + time;
+
+	return time + ext[i];
 };
+
 //Decode multiple encoded text
 harParser.decoder = function(text) {
 	'use strict';
@@ -684,6 +717,48 @@ harParser.objToDl = function(objList) {
 	return (dl + '</dl>');
 	
 };
+
+harParser.cacheTime = function(headers) {
+	'use strict';
+	var i = 0,
+		ilen = headers.length,
+		count = 2,
+		cacheTime = {},
+		name, header;
+
+	while(i < ilen && count) {
+		header = headers[i++];
+		name = header.name.toLowerCase();
+
+		if((name === 'cache-control' || name === 'expires') && header.value) {
+			cacheTime[name] = header.value;
+			count--;
+		}
+	}
+
+	header = cacheTime['cache-control'];
+
+	if(header) {
+		if(header.indexOf('no-cache') > -1 || header.indexOf('no-store') > -1)
+			return 0;
+
+		header = header.match(/max-age=(\d+)/);
+
+		if(header && header.length >= 2)
+			return parseInt(header[1], 10) * 1000;
+
+	}
+
+	header = cacheTime.expires;
+
+	if(header)
+		return (new Date(header)).getTime() - (new Date()).getTime();
+
+	return 0;
+};
+
+
+
 //Generate an object with the tabs/titles and the content based in
 //the request and response objects
 harParser.tabContainer = function(header, request, response) {
@@ -904,6 +979,8 @@ harParser.convertHar = function(entry, i, htmlEncode) {
 		fullMimeType: mime.complete,
 		size: size.originalCompressed,
 		fullSize: size.originalSize,
+		lastMod: harParser.timeFormatter(harParser.sinceLastMod(__response.headers), 1),
+		cacheTime: harParser.timeFormatter(harParser.cacheTime(__response.headers), 1),
 		sizeToShow: size.size,
 		tabs: tabs,
 		tabContainers: containers,
