@@ -852,15 +852,15 @@ harParser.convertProgress = function(progress, lastTime) {
 		result = [],
 		progressContent, startedTime, r,
 		steps = [
-			{classname:'warning',title:'Blocking',step:'blocked'},
-			{classname:'last',title:'DNS',step:'dns'},
-			{classname:'info',title:'Connect',step:'connect'},
-			{classname:'secondary',title:'SSL',step:'ssl'},
-			{classname:'primary',title:'Send',step:'send'},
-			{classname:'danger',title:'Wait',step:'wait'},
-			{classname:'success',title:'Receive',step:'receive'}
+			{classname: 'warning',title: 'Blocking',step: 'blocked'},
+			{classname: 'last',title: 'DNS Lookup',step: 'dns'},
+			{classname: 'info',title: 'Initial Connection',step: 'connect'},
+			{classname: 'secondary',title: 'SSL',step: 'ssl'},
+			{classname: 'primary',title: 'Send',step: 'send'},
+			{classname: 'danger',title: 'Wait',step: 'wait'},
 
 			// {classname: 'primary',title: 'Time to First Byte',step: 'ttfb'},
+			{classname: 'success',title: 'Content Download',step: 'receive'}
 		],
 		step, j, jlen = steps.length, p,
 		progressRow = function(bg, title, value) {

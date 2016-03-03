@@ -6,10 +6,11 @@
 		"Content":"Conteúdo",
 		"Start Time":"Momento inicial",
 		"Blocking":"Bloqueado",
-		"Connect":"Conectando",
+		"DNS Lookup": "DNS",
+		"Initial Connection":"Conexão inicial",
 		"Send":"Enviando",
 		"Wait":"Aguardando",
-		"Receive":"Recebendo",
+		"Content Download":"Baixado",
 		"Headers":"Cabeçalhos",
 		"requests":"requisições"
 	}
